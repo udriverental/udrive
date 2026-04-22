@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UDrive Car Rental — Albania & Kosovo</title>
+  <meta name="description" content="Premium car rental at Tirana Airport (TIA) and Pristina Airport (PRN). No hidden fees, no credit card required. Deposit returned instantly in cash." />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg:      #07070f;
+      --surface: #0d0d1a;
+      --card:    #111120;
+      --raised:  #181826;
+      --line:    rgba(255,255,255,0.07);
+      --glow:    rgba(249,115,22,0.18);
+      --or:      #F97316;
+      --or-d:    #d9620d;
+      --or-l:    #fb923c;
+      --gold:    #d4a843;
+      --gold-l:  #f0c96a;
+      --txt:     #eeeef5;
+      --muted:   #7878a0;
+      --dim:     #3a3a58;
+      --wa:      #25D366;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--txt);
+      font-family: 'DM Sans', sans-serif;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    h1, h2, h3, h4 { font-family: 'Cormorant Garamond', serif; }
+
+    /* ── Grain overlay ── */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.5;
+    }
+
+    /* ════════════════════════════
+       NAV
+    ════════════════════════════ */
+    .nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 500;
+      padding: 14px 20px;
+      display: flex; align-items: center; justify-content: space-between;
+      background: rgba(7,7,15,0.82);
+      backdrop-filter: blur(24px) saturate(1.4);
+      -webkit-backdrop-filter: blur(24px) saturate(1.4);
+      border-bottom: 1px solid var(--line);
+    }
+    .nav-logo { height: 42px; object-fit: contain; display: block; }
+    .nav-right { display: flex; align-items: center; gap: 10px; }
+    .nav-wa {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 9px 16px;
+      background: var(--wa); color: #fff;
+      border-radius: 100px; font-size: 13px; font-weight: 600;
+      text-decoration: none;
+      box-shadow: 0 4px 18px rgba(37,211,102,0.28);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .nav-wa:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(37,211,102,0.38); }
+    .nav-wa:active { transform: none; }
+    .nav-wa-label { display: none; }
+    @media(min-width:540px){ .nav-wa-label { display: inline; } }
+
+    /* ════════════════════════════
+       HERO
+    ════════════════════════════ */
+    .hero {
+      position: relative; min-height: 100svh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 110px 20px 60px;
+      overflow: hidden;
+    }
+    .hero-orb1 {
+      position: absolute; border-radius: 50%; pointer-events: none;
+      width: 900px; height: 600px; top: -200px; left: 50%; transform: translateX(-50%);
+      background: radial-gradient(ellipse at center, rgba(249,115,22,0.10) 0%, transparent 68%);
+      filter: blur(2px);
+    }
+    .hero-orb2 {
+      position: absolute; border-radius: 50%; pointer-events: none;
+      width: 500px; height: 500px; bottom: 0; right: -150px;
+      background: radial-gradient(ellipse at center, rgba(212,168,67,0.05) 0%, transparent 70%);
+    }
+    .hero-grid {
+      position: absolute; inset: 0; pointer-events: none;
+      background-image:
+        linear-gradient(rgba(249,115,22,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(249,115,22,0.025) 1px, transparent 1px);
+      background-size: 64px 64px;
+      mask-image: radial-gradient(ellipse 80% 60% at 50% 30%, black 30%, transparent 80%);
+    }
+
+    .hero-inner {
+      position: relative; z-index: 2;
+      text-align: center; width: 100%; max-width: 1000px;
+    }
+    .hero-flag-pill {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 5px 15px 5px 10px;
+      border: 1px solid rgba(249,115,22,0.22);
+      border-radius: 100px; font-size: 12px; font-weight: 600;
+      color: var(--or-l); background: rgba(249,115,22,0.06);
+      letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 26px;
+    }
+    .hero-flag-pill span { font-size: 16px; }
+
+    .hero-title {
+      font-size: clamp(3rem, 9vw, 5.8rem);
+      font-weight: 600; line-height: 1.04; letter-spacing: -0.025em;
+      margin-bottom: 18px;
+    }
+    .hero-title em { font-style: italic; color: var(--or); }
+
+    .hero-sub {
+      font-family: 'DM Sans', sans-serif;
+      font-size: clamp(0.92rem, 2.2vw, 1.1rem);
+      color: var(--muted); line-height: 1.75; font-weight: 300;
+      max-width: 580px; margin: 0 auto 44px;
+    }
+    .hero-sub strong { color: var(--txt); font-weight: 500; }
+
+    /* Booking card */
+    .booking-card {
+      background: rgba(17,17,32,0.92);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 20px; padding: 22px 20px;
+      box-shadow:
+        0 0 0 1px rgba(249,115,22,0.04),
+        0 24px 64px rgba(0,0,0,0.65),
+        0 4px 24px rgba(249,115,22,0.07);
+      backdrop-filter: blur(16px);
+    }
+    .booking-fields {
+      display: grid; gap: 10px;
+      grid-template-columns: 1fr;
+    }
+    @media(min-width:560px){
+      .booking-fields { grid-template-columns: 1fr 1fr; }
+    }
+    @media(min-width:1000px){
+      .booking-fields { grid-template-columns: 1.6fr 1fr 1fr 1fr 1fr auto; align-items: end; }
+    }
+
+    .f-label {
+      display: block; font-size: 10.5px; font-weight: 600;
+      color: var(--muted); text-transform: uppercase; letter-spacing: 0.09em;
+      margin-bottom: 6px;
+    }
+    .f-input {
+      width: 100%; padding: 11px 13px;
+      background: var(--raised); border: 1px solid var(--line);
+      border-radius: 10px; color: var(--txt);
+      font-family: 'DM Sans', sans-serif; font-size: 14px;
+      outline: none; appearance: none; -webkit-appearance: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .f-input:focus {
+      border-color: var(--or);
+      box-shadow: 0 0 0 3px rgba(249,115,22,0.13);
+    }
+    .f-input option { background: var(--raised); }
+
+    .find-btn {
+      width: 100%; padding: 13px 24px;
+      background: var(--or); color: #fff; border: none; border-radius: 10px;
+      font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600;
+      cursor: pointer; white-space: nowrap;
+      box-shadow: 0 4px 22px rgba(249,115,22,0.38);
+      transition: background 0.18s, transform 0.14s, box-shadow 0.18s;
+    }
+    .find-btn:hover { background: var(--or-d); transform: translateY(-1px); box-shadow: 0 8px 30px rgba(249,115,22,0.46); }
+    .find-btn:active { transform: none; }
+
+    /* ════════════════════════════
+       TRUST BAR
+    ════════════════════════════ */
+    .trust-bar {
+      background: var(--surface);
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      padding: 26px 20px;
+    }
+    .trust-inner {
+      max-width: 1140px; margin: 0 auto;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 18px;
+    }
+    @media(min-width:768px){ .trust-inner { grid-template-columns: repeat(4,1fr); } }
+
+    .trust-item { display: flex; align-items: center; gap: 12px; }
+    .trust-ico {
+      width: 42px; height: 42px; flex-shrink: 0;
+      background: rgba(249,115,22,0.09);
+      border: 1px solid rgba(249,115,22,0.16);
+      border-radius: 11px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 19px;
+    }
+    .trust-main { font-size: 13px; font-weight: 600; color: var(--txt); line-height: 1.3; }
+    .trust-sub { font-size: 11px; color: var(--muted); margin-top: 2px; line-height: 1.4; }
+
+    /* ════════════════════════════
+       DEPOSIT HIGHLIGHT
+    ════════════════════════════ */
+    .deposit-wrap {
+      max-width: 1140px; margin: 64px auto 0; padding: 0 20px;
+    }
+    .deposit-box {
+      border-radius: 20px; padding: 30px 28px;
+      background: linear-gradient(135deg, rgba(249,115,22,0.07) 0%, rgba(212,168,67,0.04) 100%);
+      border: 1px solid rgba(249,115,22,0.2);
+      display: flex; flex-direction: column; gap: 20px;
+    }
+    @media(min-width:700px){
+      .deposit-box { flex-direction: row; align-items: center; gap: 28px; }
+    }
+    .deposit-emoji { font-size: 3rem; flex-shrink: 0; line-height: 1; }
+    .deposit-title {
+      font-size: clamp(1.3rem,3vw,1.75rem); font-weight: 600;
+      color: var(--gold-l); margin-bottom: 8px;
+    }
+    .deposit-body { font-size: 13.5px; color: var(--muted); line-height: 1.75; }
+    .deposit-body strong { color: var(--txt); font-weight: 500; }
+
+    .deposit-chips {
+      display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px;
+    }
+    .chip {
+      padding: 5px 12px; border-radius: 100px;
+      font-size: 11.5px; font-weight: 600;
+      background: rgba(34,197,94,0.08);
+      border: 1px solid rgba(34,197,94,0.18);
+      color: #4ade80;
+    }
+    .chip-or {
+      background: rgba(249,115,22,0.08);
+      border-color: rgba(249,115,22,0.2);
+      color: var(--or-l);
+    }
+
+    /* ════════════════════════════
+       FLEET SECTION
+    ════════════════════════════ */
+    .fleet-wrap {
+      max-width: 1140px; margin: 72px auto 80px; padding: 0 20px;
+    }
+    .sec-eye {
+      display: block; font-size: 11px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.13em;
+      color: var(--or); margin-bottom: 10px;
+    }
+    .sec-title {
+      font-size: clamp(1.9rem,5vw,3rem); font-weight: 600;
+      letter-spacing: -0.02em; line-height: 1.15;
+    }
+    .sec-head { text-align: center; margin-bottom: 38px; }
+
+    /* Filter tabs */
+    .tabs-scroll { overflow-x: auto; scrollbar-width: none; margin-bottom: 30px; }
+    .tabs-scroll::-webkit-scrollbar { display: none; }
+    .tabs { display: flex; gap: 7px; justify-content: center; min-width: max-content; padding-bottom: 2px; }
+    .tab {
+      padding: 9px 20px; border-radius: 100px;
+      border: 1px solid var(--line);
+      background: transparent; color: var(--muted);
+      font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500;
+      cursor: pointer; white-space: nowrap;
+      transition: all 0.18s;
+    }
+    .tab:hover { border-color: rgba(249,115,22,0.3); color: var(--txt); }
+    .tab.on {
+      background: var(--or); border-color: var(--or); color: #fff;
+      box-shadow: 0 4px 18px rgba(249,115,22,0.32);
+    }
+
+    /* Grid */
+    .cars-grid {
+      display: grid; gap: 18px;
+      grid-template-columns: 1fr;
+    }
+    @media(min-width:560px){ .cars-grid { grid-template-columns: repeat(2,1fr); } }
+    @media(min-width:960px){ .cars-grid { grid-template-columns: repeat(3,1fr); } }
+
+    /* Card */
+    .car-card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 16px; overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.28s cubic-bezier(0.34,1.56,0.64,1),
+                  box-shadow 0.28s ease, border-color 0.28s;
+    }
+    .car-card:hover {
+      transform: translateY(-5px);
+      border-color: rgba(249,115,22,0.22);
+      box-shadow: 0 16px 48px rgba(0,0,0,0.55), 0 0 0 1px rgba(249,115,22,0.07);
+    }
+    .car-img-wrap {
+      position: relative; aspect-ratio: 4/3; overflow: hidden;
+      background: var(--raised);
+    }
+    .car-img {
+      width: 100%; height: 100%; object-fit: cover;
+      transition: transform 0.55s cubic-bezier(0.25,0.46,0.45,0.94);
+      display: block;
+    }
+    .car-card:hover .car-img { transform: scale(1.06); }
+    .car-img-shade {
+      position: absolute; inset: 0;
+      background: linear-gradient(to bottom, transparent 45%, rgba(7,7,15,0.72) 100%);
+    }
+    .cat-badge {
+      position: absolute; top: 11px; left: 11px;
+      padding: 3px 9px; border-radius: 100px;
+      font-size: 10.5px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase;
+    }
+    .cat-economy { background: rgba(34,197,94,0.14); border:1px solid rgba(34,197,94,0.24); color:#4ade80; }
+    .cat-suv     { background: rgba(59,130,246,0.14); border:1px solid rgba(59,130,246,0.24); color:#60a5fa; }
+    .cat-luxury  { background: rgba(212,168,67,0.14); border:1px solid rgba(212,168,67,0.24); color:#d4a843; }
+    .cat-van     { background: rgba(168,85,247,0.14); border:1px solid rgba(168,85,247,0.24); color:#c084fc; }
+
+    .car-body { padding: 15px; }
+    .car-name { font-size: 1.15rem; font-weight: 600; line-height: 1.2; }
+    .car-year { font-family: 'DM Sans',sans-serif; font-size: 11.5px; color: var(--muted); margin-top: 2px; margin-bottom: 11px; }
+    .car-specs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 13px; }
+    .spec-chip {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: var(--raised); border-radius: 6px;
+      padding: 3px 8px; font-size: 11.5px; color: var(--muted);
+    }
+    .car-bottom {
+      display: flex; align-items: flex-end; justify-content: space-between; gap: 8px;
+      padding-top: 13px; border-top: 1px solid var(--line);
+    }
+    .car-price-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.1rem; font-weight: 700; line-height: 1; color: var(--or);
+    }
+    .car-price-unit { font-family: 'DM Sans',sans-serif; font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .car-deposit-line { font-size: 11px; color: var(--muted); margin-top: 3px; }
+    .car-deposit-line b { color: var(--txt); font-weight: 500; }
+    .book-btn {
+      padding: 10px 16px; background: var(--or); color: #fff; border: none;
+      border-radius: 9px; font-family: 'DM Sans',sans-serif; font-size: 13px; font-weight: 600;
+      cursor: pointer; white-space: nowrap; flex-shrink: 0;
+      transition: background 0.18s, transform 0.14s;
+    }
+    .book-btn:hover { background: var(--or-d); transform: translateY(-1px); }
+    .book-btn:active { transform: none; }
+    .card-note { text-align: center; font-size: 10.5px; color: var(--dim); margin-top: 7px; }
+
+    /* Empty state */
+    .empty-state { text-align:center; padding:60px 20px; color:var(--muted); font-size:15px; }
+
+    /* ════════════════════════════
+       LOCATIONS
+    ════════════════════════════ */
+    .loc-section {
+      background: var(--surface);
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      padding: 68px 20px;
+    }
+    .loc-inner { max-width: 1140px; margin: 0 auto; }
+    .loc-grid {
+      display: grid; gap: 18px; grid-template-columns: 1fr; margin-top: 0;
+    }
+    @media(min-width:700px){ .loc-grid { grid-template-columns: 1fr 1fr; } }
+    .loc-card {
+      background: var(--card); border: 1px solid var(--line);
+      border-radius: 18px; padding: 28px;
+      transition: border-color 0.25s;
+    }
+    .loc-card:hover { border-color: rgba(249,115,22,0.2); }
+    .loc-flag { font-size: 2.2rem; display: block; margin-bottom: 14px; }
+    .loc-name { font-size: 1.35rem; font-weight: 600; margin-bottom: 4px; }
+    .loc-iata { font-size: 12px; color: var(--or); font-weight: 600; letter-spacing: 0.1em; margin-bottom: 12px; }
+    .loc-desc { font-size: 13px; color: var(--muted); line-height: 1.7; }
+    .loc-badge {
+      display: inline-flex; align-items: center; gap: 6px; margin-top: 14px;
+      padding: 6px 13px; border-radius: 100px;
+      font-size: 12px; color: var(--or-l); font-weight: 500;
+      background: rgba(249,115,22,0.07); border: 1px solid rgba(249,115,22,0.15);
+    }
+
+    /* ════════════════════════════
+       FOOTER
+    ════════════════════════════ */
+    .footer { padding: 44px 20px 60px; text-align: center; }
+    .footer-logo { height: 38px; margin: 0 auto 18px; opacity: 0.65; display: block; }
+    .footer-txt { font-size: 12.5px; color: var(--dim); line-height: 1.8; }
+    .footer-langs { display: flex; justify-content: center; gap: 14px; margin-top: 14px; font-size: 12px; color: var(--muted); }
+    .footer-copy { margin-top: 20px; font-size: 11px; color: var(--dim); opacity: 0.55; }
+
+    /* ════════════════════════════
+       WA FAB
+    ════════════════════════════ */
+    .wa-fab {
+      position: fixed; bottom: 22px; right: 22px; z-index: 600;
+      width: 58px; height: 58px; border-radius: 50%;
+      background: var(--wa); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      text-decoration: none;
+      box-shadow: 0 4px 22px rgba(37,211,102,0.38), 0 0 0 0 rgba(37,211,102,0.14);
+      animation: wa-ring 2.8s ease-in-out infinite;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .wa-fab:hover {
+      transform: scale(1.1); animation: none;
+      box-shadow: 0 8px 36px rgba(37,211,102,0.5);
+    }
+    @keyframes wa-ring {
+      0%,100% { box-shadow: 0 4px 22px rgba(37,211,102,0.38), 0 0 0 0 rgba(37,211,102,0.14); }
+      55%      { box-shadow: 0 4px 22px rgba(37,211,102,0.38), 0 0 0 14px rgba(37,211,102,0); }
+    }
+
+    /* ════════════════════════════
+       MODAL
+    ════════════════════════════ */
+    .modal-bg {
+      position: fixed; inset: 0; z-index: 700;
+      background: rgba(0,0,0,0.72);
+      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+      display: flex; align-items: flex-end; justify-content: center;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.28s;
+    }
+    @media(min-width:600px){ .modal-bg { align-items: center; } }
+    .modal-bg.open { opacity: 1; pointer-events: all; }
+
+    .modal {
+      position: relative;
+      background: var(--card);
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 22px 22px 0 0;
+      padding: 26px 22px 44px;
+      width: 100%; max-width: 500px; max-height: 92svh; overflow-y: auto;
+      transform: translateY(100%);
+      transition: transform 0.38s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    @media(min-width:600px){
+      .modal {
+        border-radius: 22px;
+        transform: translateY(16px) scale(0.96);
+        max-height: 88svh;
+      }
+    }
+    .modal-bg.open .modal { transform: translateY(0) scale(1); }
+
+    .modal-drag {
+      width: 38px; height: 4px; background: var(--line);
+      border-radius: 2px; margin: 0 auto 20px;
+    }
+    @media(min-width:600px){ .modal-drag { display:none; } }
+
+    .modal-close-btn {
+      position: absolute; top: 18px; right: 18px;
+      width: 30px; height: 30px; border-radius: 50%;
+      background: var(--raised); border: none; color: var(--muted);
+      font-size: 15px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.18s, color 0.18s;
+    }
+    .modal-close-btn:hover { background: var(--line); color: var(--txt); }
+
+    .modal-title { font-size: 1.55rem; font-weight: 600; margin-bottom: 4px; }
+    .modal-sub { font-family:'DM Sans',sans-serif; font-size:12.5px; color:var(--or); font-weight:500; margin-bottom:20px; }
+
+    .modal-grid {
+      display: grid; gap: 10px; grid-template-columns: 1fr;
+      margin-bottom: 16px;
+    }
+    @media(min-width:380px){ .modal-grid { grid-template-columns: 1fr 1fr; } }
+    .mg-full { grid-column: 1 / -1; }
+
+    /* Summary box */
+    .summary {
+      background: var(--raised); border: 1px solid var(--line);
+      border-radius: 13px; padding: 15px; margin-bottom: 14px;
+    }
+    .sum-row {
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 12.5px; padding: 3px 0;
+    }
+    .sum-lbl { color: var(--muted); }
+    .sum-val { font-weight: 500; }
+    .sum-div { height:1px; background: var(--line); margin: 8px 0; }
+    .sum-total .sum-lbl { font-size:14px; font-weight:600; color:var(--txt); }
+    .sum-total .sum-val { font-size:20px; font-weight:700; color:var(--or); }
+    .sum-dep {
+      font-size: 11.5px; color: var(--muted);
+      margin-top: 8px; padding: 7px 11px;
+      background: rgba(34,197,94,0.05);
+      border: 1px solid rgba(34,197,94,0.13);
+      border-radius: 8px; line-height: 1.55;
+    }
+    .sum-dep b { color: var(--txt); }
+
+    .wa-book-btn {
+      width: 100%; padding: 15px;
+      background: var(--wa); color: #fff; border: none; border-radius: 13px;
+      font-family: 'DM Sans',sans-serif; font-size: 15px; font-weight: 600;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      box-shadow: 0 4px 22px rgba(37,211,102,0.28);
+      transition: background 0.18s, transform 0.14s;
+    }
+    .wa-book-btn:hover { background: #1ea851; transform: translateY(-1px); }
+    .wa-book-btn:active { transform: none; }
+    .modal-note { text-align:center; font-size:11px; color:var(--dim); margin-top:9px; }
+
+    /* ════════════════════════════
+       SCROLL REVEAL
+    ════════════════════════════ */
+    .fade-up {
+      opacity: 0; transform: translateY(22px);
+      transition: opacity 0.55s ease, transform 0.55s ease;
+    }
+    .fade-up.vis { opacity: 1; transform: none; }
+  </style>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<nav class="nav">
+  <img src="brand_assets/Modern%20UDrive%20car%20rental%20logo.png" alt="UDrive Car Rental" class="nav-logo" />
+  <div class="nav-right">
+    <a href="https://wa.me/355693755827?text=Hello%20UDrive!%20I'd%20like%20to%20inquire%20about%20renting%20a%20car." target="_blank" rel="noopener" class="nav-wa">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      <span class="nav-wa-label">WhatsApp Us</span>
+    </a>
+  </div>
+</nav>
+
+<!-- ── HERO ── -->
+<section class="hero">
+  <div class="hero-orb1"></div>
+  <div class="hero-orb2"></div>
+  <div class="hero-grid"></div>
+
+  <div class="hero-inner">
+    <div class="hero-flag-pill">
+      <span>🇦🇱</span> Albania &amp; Kosovo <span>🇽🇰</span>
+    </div>
+
+    <h1 class="hero-title">Your Road,<br/><em>Your Rules.</em></h1>
+
+    <p class="hero-sub">
+      Premium car rental from <strong>Tirana Airport (TIA)</strong> and <strong>Pristina Airport (PRN)</strong>.
+      No hidden fees, no credit card, <strong>deposit returned in cash the moment you hand back the keys.</strong>
+    </p>
+
+    <div class="booking-card">
+      <div class="booking-fields">
+        <div>
+          <label class="f-label">📍 Pickup Location</label>
+          <select class="f-input" id="h-loc">
+            <option value="">Airport…</option>
+            <option value="Tirana International Airport (TIA)">🇦🇱 Tirana Airport — TIA</option>
+            <option value="Pristina Airport (PRN)">🇽🇰 Pristina Airport — PRN</option>
+          </select>
+        </div>
+        <div>
+          <label class="f-label">📅 Pickup Date</label>
+          <input type="date" class="f-input" id="h-pd" />
+        </div>
+        <div>
+          <label class="f-label">⏰ Pickup Time</label>
+          <input type="time" class="f-input" id="h-pt" value="10:00" />
+        </div>
+        <div>
+          <label class="f-label">📅 Return Date</label>
+          <input type="date" class="f-input" id="h-rd" />
+        </div>
+        <div>
+          <label class="f-label">⏰ Return Time</label>
+          <input type="time" class="f-input" id="h-rt" value="10:00" />
+        </div>
+        <div>
+          <button class="find-btn" onclick="scrollToFleet()">Find My Car →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── TRUST BAR ── -->
+<div class="trust-bar">
+  <div class="trust-inner">
+    <div class="trust-item">
+      <div class="trust-ico">✅</div>
+      <div>
+        <div class="trust-main">No Hidden Fees</div>
+        <div class="trust-sub">What you see is what you pay</div>
+      </div>
+    </div>
+    <div class="trust-item">
+      <div class="trust-ico">📞</div>
+      <div>
+        <div class="trust-main">24/7 Support</div>
+        <div class="trust-sub">Always on WhatsApp</div>
+      </div>
+    </div>
+    <div class="trust-item">
+      <div class="trust-ico">💎</div>
+      <div>
+        <div class="trust-main">Albanian Hospitality</div>
+        <div class="trust-sub">Genuine care, every rental</div>
+      </div>
+    </div>
+    <div class="trust-item">
+      <div class="trust-ico">💵</div>
+      <div>
+        <div class="trust-main">Instant Cash Deposit Return</div>
+        <div class="trust-sub">On the spot — no waiting</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── DEPOSIT POLICY ── -->
+<div class="deposit-wrap fade-up">
+  <div class="deposit-box">
+    <div class="deposit-emoji">🔑</div>
+    <div>
+      <h3 class="deposit-title">Deposit returned the moment you hand back the keys</h3>
+      <p class="deposit-body">
+        We believe in <strong>complete transparency</strong>. Your security deposit is returned
+        <strong>in cash, immediately</strong> when you return the car — not in 2 weeks, not after a
+        bank review, not "pending assessment". Right there at the airport,
+        <strong>cash in hand.</strong>
+      </p>
+      <div class="deposit-chips">
+        <span class="chip">✓ No credit card required</span>
+        <span class="chip">✓ Cash deposit only</span>
+        <span class="chip chip-or">✓ Instant return on key handover</span>
+        <span class="chip chip-or">✓ Problem-free cars guaranteed</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── FLEET ── -->
+<section class="fleet-wrap" id="fleet">
+  <div class="sec-head fade-up">
+    <span class="sec-eye">Our Fleet</span>
+    <h2 class="sec-title">Choose Your Perfect Ride</h2>
+  </div>
+
+  <div class="tabs-scroll">
+    <div class="tabs" id="tabs">
+      <button class="tab on" data-cat="all">All Cars</button>
+      <button class="tab" data-cat="economy">Economy</button>
+      <button class="tab" data-cat="suv">SUV</button>
+      <button class="tab" data-cat="luxury">Luxury</button>
+      <button class="tab" data-cat="van">Van &amp; MPV</button>
+    </div>
+  </div>
+
+  <div class="cars-grid" id="cars-grid"></div>
+</section>
+
+<!-- ── LOCATIONS ── -->
+<section class="loc-section" id="locations">
+  <div class="loc-inner">
+    <div class="sec-head fade-up">
+      <span class="sec-eye">Pickup Points</span>
+      <h2 class="sec-title">Two Countries, One Service</h2>
+    </div>
+    <div class="loc-grid">
+      <div class="loc-card fade-up">
+        <span class="loc-flag">🇦🇱</span>
+        <div class="loc-name">Tirana International Airport</div>
+        <div class="loc-iata">TIA · Nënë Tereza</div>
+        <p class="loc-desc">Serving all arrivals at Albania's main international gateway. Meet &amp; greet at arrivals terminal — we'll be there whenever your flight lands.</p>
+        <div class="loc-badge">🕐 Open 24 / 7 — Always Available</div>
+      </div>
+      <div class="loc-card fade-up" style="transition-delay:0.12s">
+        <span class="loc-flag">🇽🇰</span>
+        <div class="loc-name">Pristina International Airport</div>
+        <div class="loc-iata">PRN · Adem Jashari</div>
+        <p class="loc-desc">Serving Kosovo's capital and the wider region. Full fleet available at Pristina Airport — Gulf, Albanian, and international guests welcome.</p>
+        <div class="loc-badge">🕐 Open 24 / 7 — Always Available</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer class="footer">
+  <img src="brand_assets/Modern%20UDrive%20car%20rental%20logo.png" alt="UDrive" class="footer-logo" />
+  <p class="footer-txt">
+    UDrive Car Rental · Albania &amp; Kosovo<br/>
+    Tirana International Airport (TIA) &amp; Pristina Airport (PRN)
+  </p>
+  <div class="footer-langs">
+    <span>🇬🇧 English</span><span>·</span>
+    <span>🇦🇱 Shqip</span><span>·</span>
+    <span>🇸🇦 العربية</span>
+  </div>
+  <p class="footer-copy">© 2025 UDrive Car Rental. All rights reserved.</p>
+</footer>
+
+<!-- ── WA FAB ── -->
+<a class="wa-fab" href="https://wa.me/355693755827?text=Hello%20UDrive!%20I'd%20like%20to%20inquire%20about%20renting%20a%20car." target="_blank" rel="noopener" title="Chat on WhatsApp">
+  <svg width="27" height="27" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+</a>
+
+<!-- ── BOOKING MODAL ── -->
+<div class="modal-bg" id="modal-bg" onclick="closeBg(event)">
+  <div class="modal" id="modal">
+    <div class="modal-drag"></div>
+    <button class="modal-close-btn" onclick="closeModal()">✕</button>
+    <h2 class="modal-title">Book Your Car</h2>
+    <div class="modal-sub" id="modal-sub"></div>
+
+    <div class="modal-grid">
+      <div class="mg-full">
+        <label class="f-label">📍 Pickup Location</label>
+        <select class="f-input" id="m-loc">
+          <option value="">Select airport…</option>
+          <option value="Tirana International Airport (TIA)">🇦🇱 Tirana Airport — TIA</option>
+          <option value="Pristina Airport (PRN)">🇽🇰 Pristina Airport — PRN</option>
+        </select>
+      </div>
+      <div>
+        <label class="f-label">📅 Pickup Date</label>
+        <input type="date" class="f-input" id="m-pd" />
+      </div>
+      <div>
+        <label class="f-label">⏰ Pickup Time</label>
+        <input type="time" class="f-input" id="m-pt" value="10:00" />
+      </div>
+      <div>
+        <label class="f-label">📅 Return Date</label>
+        <input type="date" class="f-input" id="m-rd" />
+      </div>
+      <div>
+        <label class="f-label">⏰ Return Time</label>
+        <input type="time" class="f-input" id="m-rt" value="10:00" />
+      </div>
+    </div>
+
+    <div class="summary" id="summary" style="display:none">
+      <div class="sum-row"><span class="sum-lbl">Duration</span><span class="sum-val" id="s-days">—</span></div>
+      <div class="sum-row"><span class="sum-lbl">Rate</span><span class="sum-val" id="s-rate">—</span></div>
+      <div class="sum-div"></div>
+      <div class="sum-row sum-total"><span class="sum-lbl">Total</span><span class="sum-val" id="s-total">—</span></div>
+      <div class="sum-dep" id="s-dep"></div>
+    </div>
+
+    <button class="wa-book-btn" onclick="sendWA()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      Confirm Booking via WhatsApp
+    </button>
+    <p class="modal-note">💳 No credit card · Cash deposit · Returned instantly on key handover</p>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════
+// CAR DATA
+// ═══════════════════════════════════
+const CARS = [
+  // ─── ECONOMY ───
+  { id:1,  name:'Renault Clio',     year:2019, cat:'economy', tx:'Automatic', fuel:'Diesel',      seats:5, ppd:65,  dep:200, img:'cars/Renault%20clio/IMG_3652.jpeg',                                    features:['A/C','Bluetooth','USB','Rear Camera'] },
+  { id:2,  name:'VW Golf 7',        year:2019, cat:'economy', tx:'Automatic', fuel:'Diesel',      seats:5, ppd:60,  dep:250, img:'cars/Golf%207%20white%202019/IMG_0624.jpeg',                            features:['A/C','Navigation','Bluetooth','Parking Sensors'] },
+  { id:3,  name:'VW Golf 7',        year:2017, cat:'economy', tx:'Manual',    fuel:'Diesel',      seats:5, ppd:55,  dep:200, img:'cars/Golf%207%20black/IMG_3707.jpeg',                                   features:['A/C','Bluetooth','USB Charging'] },
+  { id:4,  name:'VW Golf 8',        year:2022, cat:'economy', tx:'Automatic', fuel:'Diesel',      seats:5, ppd:70,  dep:300, img:'cars/Golf%20new%208/IMG_0855.jpeg',                                     features:['Digital Cockpit','Navigation','Apple CarPlay','Parking Sensors'] },
+  { id:5,  name:'VW Golf Plus',     year:2012, cat:'economy', tx:'Automatic', fuel:'Diesel',      seats:5, ppd:50,  dep:250, img:'cars/Golf%20plus/IMG_0614.jpeg',                                        features:['A/C','Navigation','Heated Seats'] },
+  { id:6,  name:'VW Jetta',         year:2015, cat:'economy', tx:'Automatic', fuel:'Petrol',      seats:5, ppd:45,  dep:200, img:'cars/Jetta%20gri/2f4809e0-707f-4e74-b00f-6fd08d077a53.jpg',            features:['A/C','Bluetooth','USB Charging'] },
+  { id:7,  name:'Renault Megane',   year:2018, cat:'economy', tx:'Manual',    fuel:'Diesel',      seats:5, ppd:60,  dep:250, img:'cars/Renault%20Mwgane/IMG_3660.jpeg',                                  features:['A/C','Bluetooth','USB Charging'] },
+  { id:8,  name:'Ford Mondeo',      year:2020, cat:'economy', tx:'Automatic', fuel:'Diesel',      seats:5, ppd:60,  dep:250, img:'cars/Ford%20mondeo%20kosov/IMG_2760.jpeg',                              features:['A/C','Navigation','LED Lights','Parking Sensors'] },
+  { id:9,  name:'VW Passat',        year:2013, cat:'economy', tx:'Automatic', fuel:'Petrol',      seats:5, ppd:60,  dep:250, img:'cars/Passat%20blue/3D042D47-A67C-4BF0-A95A-F0E5C476EC09.jpeg',         features:['Panoramic Roof','Leather Seats','Navigation','Heated Seats'] },
+  { id:10, name:'VW Passat',        year:2013, cat:'economy', tx:'Automatic', fuel:'Petrol',      seats:5, ppd:55,  dep:250, img:'cars/Passat%20grey/5C60D808-82AD-4B30-AF6C-9D5B2194D87D.jpeg',         features:['A/C','Navigation','Bluetooth','Parking Sensors'] },
+  { id:11, name:'Volvo XC70',       year:2012, cat:'economy', tx:'Automatic', fuel:'Petrol/LPG',  seats:5, ppd:65,  dep:300, img:'cars/Xc70%20volvo/02577358-1f8c-41f2-8402-4ed8fbf4a709.jpeg',          features:['A/C','Navigation','Leather Seats','Roof Rails'] },
+  // ─── SUV ───
+  { id:12, name:'Peugeot 3008',     year:2019, cat:'suv',     tx:'Automatic', fuel:'Diesel',      seats:5, ppd:90,  dep:400, img:'cars/Pegeot%203008/IMG_0612.jpg',                                      features:['A/C','Navigation','Panoramic Roof','Parking Sensors'] },
+  { id:13, name:'Skoda Karoq',      year:2021, cat:'suv',     tx:'Automatic', fuel:'Diesel',      seats:5, ppd:90,  dep:450, img:'cars/Skoca%20karoq/IMG_0824.jpeg',                                     features:['Digital Dash','Navigation','LED Lights','Parking Sensors'] },
+  { id:14, name:'VW Tiguan',        year:2014, cat:'suv',     tx:'Automatic', fuel:'Diesel',      seats:5, ppd:80,  dep:400, img:'cars/VW%20Tiguan%20Beige/37adcdec-bce6-48b6-b8cf-7c418d629992.jpg',   features:['A/C','Navigation','4WD','Roof Rails'] },
+  { id:15, name:'Toyota RAV4',      year:2015, cat:'suv',     tx:'Automatic', fuel:'Petrol/LPG',  seats:5, ppd:80,  dep:400, img:'cars/Rav%204/IMG_2539.jpeg',                                           features:['A/C','Navigation','4WD','Roof Rails'] },
+  { id:16, name:'Ford Explorer',    year:2014, cat:'suv',     tx:'Automatic', fuel:'Petrol/LPG',  seats:7, ppd:85,  dep:500, img:'cars/Ford%20explorer/26134d7c-a77f-44fa-80b2-d9d3e1966a14.jpeg',       features:['Navigation','7 Seats','Leather Seats','4WD'] },
+  { id:17, name:'Lexus GX460',      year:2020, cat:'suv',     tx:'Automatic', fuel:'Petrol',      seats:7, ppd:200, dep:800, img:'cars/Lexus%20GX460/b29888bc-93b4-4317-ab2c-6ea4772a1833.JPG',          features:['Quilted Leather','Navigation','Premium Audio','4WD'] },
+  // ─── LUXURY ───
+  { id:19, name:'Mercedes C200',    year:2018, cat:'luxury',  tx:'Automatic', fuel:'Diesel',      seats:5, ppd:110, dep:550, img:'cars/C200%20zi%20/IMG_0635.jpeg',                                      features:['AMG Package','Navigation','Leather Seats','360° Camera'] },
+  { id:20, name:'Mercedes C-Class', year:2020, cat:'luxury',  tx:'Automatic', fuel:'Diesel',      seats:5, ppd:120, dep:600, img:'cars/Cclass%20i%20ri/41e7e9ec-d487-4597-90fe-488ff4849704.jpeg',       features:['Latest Gen','Navigation','Leather Seats','Ambient Lighting'] },
+  { id:21, name:'Mercedes C Estate',year:2005, cat:'luxury',  tx:'Automatic', fuel:'Diesel',      seats:5, ppd:45,  dep:350, img:'cars/C%20class%20portobagazh/7239636A-49F7-4E61-B913-26CFD937BE4F.jpeg',features:['Estate Wagon','Navigation','Large Boot','A/C'] },
+  { id:22, name:'Mercedes E-Class', year:2016, cat:'luxury',  tx:'Automatic', fuel:'Diesel',      seats:5, ppd:90,  dep:650, img:'cars/E%20class%20white/IMG_0745.jpeg',                                 features:['Executive Sedan','Navigation','Leather Seats','Heated Seats'] },
+  { id:23, name:'Mercedes E-Class', year:2016, cat:'luxury',  tx:'Automatic', fuel:'Diesel',      seats:5, ppd:70,  dep:700, img:'cars/Eclass%20new%20look/IMG_4660.jpeg',                               features:['AMG Look','Navigation','Leather Seats','Panoramic Roof'] },
+  { id:24, name:'Mercedes C Cabrio',year:2017, cat:'luxury',  tx:'Automatic', fuel:'Diesel',      seats:4, ppd:250, dep:800, img:'cars/Benz%20Cabrio%20/3243654b-ae58-4716-ae27-19c28652a5aa.jpg',       features:['Convertible','AMG Package','Leather Seats','Navigation'] },
+  // ─── VAN ───
+  { id:25, name:'Kia Carnival',     year:2018, cat:'van',     tx:'Automatic', fuel:'Diesel',      seats:7, ppd:95,  dep:500, img:'cars/Kia%20carnical/d85ea500-60da-400f-9eda-9c8319e33798.JPG',         features:['7 Seats','Navigation','Leather Seats','Panoramic Roof'] },
+  { id:26, name:'Mercedes Viano',   year:2008, cat:'van',     tx:'Automatic', fuel:'Diesel',      seats:7, ppd:110, dep:450, img:'cars/Viano%20/IMG_5243.jpeg',                                          features:['7 Seats','Large Boot','A/C','Bluetooth'] },
+  { id:27, name:'Mercedes Vito',    year:2020, cat:'van',     tx:'Automatic', fuel:'Diesel',      seats:7, ppd:160, dep:500, img:'cars/Vito%20ri/IMG_4864.jpg',                                          features:['7 Seats','Navigation','LED Lights','A/C'] },
+  { id:28, name:'VW Transporter',   year:2012, cat:'van',     tx:'Automatic', fuel:'Diesel',      seats:9, ppd:110, dep:550, img:'cars/Vw%20Transporter%209%20seater/IMG_0825%202.jpeg',                 features:['9 Seats','A/C','Group Travel','Bluetooth'] },
+  { id:29, name:'Peugeot Expert',   year:2020, cat:'van',     tx:'Automatic', fuel:'Diesel',      seats:9, ppd:150, dep:400, img:'cars/Pegueot%20Expert/19de46b1-f097-41af-866e-11f0589f0723.jpeg',      features:['9 Seats','A/C','Navigation','Ample Boot'] },
+  { id:30, name:'VW Touran',        year:2008, cat:'van',     tx:'Automatic', fuel:'Diesel',      seats:7, ppd:60,  dep:350, img:'cars/Touran%20grey/99e5d7f5-14bc-4100-9df2-79632446147c.jpeg',         features:['7 Seats','Spacious','Navigation','A/C'] },
+];
+
+const CAT_LABEL = { economy:'Economy', suv:'SUV', luxury:'Luxury', van:'Van & MPV' };
+const FUEL_ICON  = { Petrol:'⛽', Diesel:'🛢', Hybrid:'🌿', 'Petrol+LPG':'⛽', 'Petrol/LPG':'⛽' };
+
+let activeCar = null;
+
+// ─── RENDER ───
+function renderCars(cat) {
+  const grid = document.getElementById('cars-grid');
+  const list = cat === 'all' ? CARS : CARS.filter(c => c.cat === cat);
+
+  if (!list.length) {
+    grid.innerHTML = '<div class="empty-state">No cars available in this category.</div>';
+    return;
+  }
+
+  grid.innerHTML = list.map((c, i) => `
+    <div class="car-card fade-up" style="transition-delay:${(i % 6) * 0.055}s" onclick="openModal(${c.id})">
+      <div class="car-img-wrap">
+        <img class="car-img" src="${c.img}" alt="${c.name} ${c.year}" loading="lazy"
+          onerror="this.src='https://placehold.co/400x300/111120/3a3a58?text=${encodeURIComponent(c.name)}'" />
+        <div class="car-img-shade"></div>
+        <span class="cat-badge cat-${c.cat}">${CAT_LABEL[c.cat]}</span>
+      </div>
+      <div class="car-body">
+        <div class="car-name">${c.name}</div>
+        <div class="car-year">${c.year}</div>
+        <div class="car-specs">
+          <span class="spec-chip">👤 ${c.seats} seats</span>
+          <span class="spec-chip">⚙️ ${c.tx}</span>
+          <span class="spec-chip">${FUEL_ICON[c.fuel] || '⛽'} ${c.fuel}</span>
+        </div>
+        <div class="car-bottom">
+          <div>
+            <div class="car-price-num">€${c.ppd}</div>
+            <div class="car-price-unit">per day</div>
+            <div class="car-deposit-line">Deposit: <b>€${c.dep}</b></div>
+          </div>
+          <button class="book-btn" onclick="event.stopPropagation();openModal(${c.id})">Book Now</button>
+        </div>
+        <div class="card-note">✓ No credit card · Cash deposit only</div>
+      </div>
+    </div>
+  `).join('');
+
+  setTimeout(() => {
+    grid.querySelectorAll('.fade-up').forEach(el => el.classList.add('vis'));
+  }, 40);
+}
+
+// ─── TABS ───
+document.getElementById('tabs').addEventListener('click', e => {
+  const btn = e.target.closest('.tab');
+  if (!btn) return;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
+  btn.classList.add('on');
+  renderCars(btn.dataset.cat);
+});
+
+// ─── SCROLL TO FLEET ───
+function scrollToFleet() {
+  document.getElementById('fleet').scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+// ─── MODAL ───
+function openModal(id) {
+  activeCar = CARS.find(c => c.id === id);
+  if (!activeCar) return;
+
+  document.getElementById('modal-sub').textContent =
+    `${activeCar.name} ${activeCar.year} · €${activeCar.ppd}/day`;
+
+  // Pre-fill from hero form
+  const copy = (hId, mId) => {
+    const v = document.getElementById(hId).value;
+    if (v) document.getElementById(mId).value = v;
+  };
+  copy('h-loc','m-loc'); copy('h-pd','m-pd');
+  copy('h-pt','m-pt');   copy('h-rd','m-rd'); copy('h-rt','m-rt');
+
+  document.getElementById('modal-bg').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  calcSummary();
+}
+
+function closeModal() {
+  document.getElementById('modal-bg').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function closeBg(e) { if (e.target === document.getElementById('modal-bg')) closeModal(); }
+
+// ─── SUMMARY CALC ───
+function calcSummary() {
+  const pd = document.getElementById('m-pd').value;
+  const pt = document.getElementById('m-pt').value;
+  const rd = document.getElementById('m-rd').value;
+  const rt = document.getElementById('m-rt').value;
+  const box = document.getElementById('summary');
+
+  if (!pd || !rd || !activeCar) { box.style.display='none'; return; }
+
+  const pickup = new Date(`${pd}T${pt||'00:00'}`);
+  const ret    = new Date(`${rd}T${rt||'00:00'}`);
+  const ms = ret - pickup;
+  if (ms <= 0) { box.style.display='none'; return; }
+
+  const days  = Math.ceil(ms / 86400000);
+  const total = days * activeCar.ppd;
+
+  document.getElementById('s-days').textContent  = `${days} day${days!==1?'s':''}`;
+  document.getElementById('s-rate').textContent  = `€${activeCar.ppd}/day`;
+  document.getElementById('s-total').textContent = `€${total}`;
+  document.getElementById('s-dep').innerHTML =
+    `💵 Security deposit: <b>€${activeCar.dep}</b> — returned in cash immediately when you hand back the keys. No delays.`;
+  box.style.display = 'block';
+}
+
+['m-pd','m-pt','m-rd','m-rt'].forEach(id =>
+  document.getElementById(id).addEventListener('change', calcSummary)
+);
+
+// ─── WHATSAPP SEND ───
+function sendWA() {
+  const loc = document.getElementById('m-loc').value;
+  const pd  = document.getElementById('m-pd').value;
+  const pt  = document.getElementById('m-pt').value  || '00:00';
+  const rd  = document.getElementById('m-rd').value;
+  const rt  = document.getElementById('m-rt').value  || '00:00';
+
+  if (!loc || !pd || !rd || !activeCar) {
+    alert('Please fill in all details before confirming.'); return;
+  }
+  const pickup = new Date(`${pd}T${pt}`);
+  const ret    = new Date(`${rd}T${rt}`);
+  if (ret <= pickup) { alert('Return date must be after pickup date.'); return; }
+
+  const days  = Math.ceil((ret - pickup) / 86400000);
+  const total = days * activeCar.ppd;
+
+  const fmtDate = d => d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+  const fmtTime = d => d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+
+  const lines = [
+    'Hello UDrive! 🚗',
+    '',
+    '*Booking Request*',
+    '',
+    `🚙 Car: *${activeCar.name} ${activeCar.year}*`,
+    `📍 Pickup: *${loc}*`,
+    `📅 From: *${fmtDate(pickup)} at ${fmtTime(pickup)}*`,
+    `📅 To:   *${fmtDate(ret)} at ${fmtTime(ret)}*`,
+    `⏱️ Duration: *${days} day${days!==1?'s':''}*`,
+    `💰 Rate: €${activeCar.ppd}/day`,
+    `💳 Total Rental: *€${total}*`,
+    `🏦 Deposit: *€${activeCar.dep}* _(returned in cash on key handover)_`,
+    '',
+    'Please confirm availability. Thank you!',
+  ];
+  window.open(`https://wa.me/355693755827?text=${encodeURIComponent(lines.join('\n'))}`, '_blank');
+}
+
+// ─── SCROLL REVEAL ───
+const revealObs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('vis'); revealObs.unobserve(e.target); } });
+}, { threshold: 0.08 });
+document.querySelectorAll('.fade-up').forEach(el => revealObs.observe(el));
+
+// ─── DEFAULT DATES ───
+(function setDates() {
+  const fmt = d => d.toISOString().split('T')[0];
+  const today    = new Date();
+  const tomorrow = new Date(today); tomorrow.setDate(today.getDate()+1);
+  const weekOut  = new Date(today); weekOut.setDate(today.getDate()+7);
+  document.getElementById('h-pd').value = fmt(tomorrow);
+  document.getElementById('h-pd').min   = fmt(today);
+  document.getElementById('h-rd').value = fmt(weekOut);
+  document.getElementById('h-rd').min   = fmt(tomorrow);
+  document.getElementById('m-pd').min   = fmt(today);
+  document.getElementById('m-rd').min   = fmt(today);
+})();
+
+// ─── ESC KEY ───
+document.addEventListener('keydown', e => { if (e.key==='Escape') closeModal(); });
+
+// ─── INIT ───
+renderCars('all');
+</script>
+</body>
+</html>

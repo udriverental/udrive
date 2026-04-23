@@ -28,7 +28,12 @@
       "Bash(node screenshot.mjs http://localhost:3000 clio-check)",
       "Bash(node -e ' *)",
       "Bash(git mv *)",
-      "Bash(git commit -m ' *)"
+      "Bash(git commit -m ' *)",
+      "Bash(sed -n '713,720p' index.html)",
+      "Bash(sed -n '990,1000p' index.html)",
+      "Bash(node screenshot.mjs http://localhost:3000 fleet-cta)",
+      "Bash(sed -n '288,310p' index.html)",
+      "Bash(sed -n '710,730p' index.html)"
     ]
   }
 }

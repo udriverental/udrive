@@ -1,0 +1,9 @@
+Car: Mercedes C Estate
+Year: 2005
+Category: Luxury
+Transmission: Automatic
+Fuel: Diesel
+Seats: 5
+Price: €45/day
+Deposit: €350
+Features: Estate Wagon, Navigation, Large Boot, A/C

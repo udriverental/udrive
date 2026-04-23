@@ -1,0 +1,9 @@
+Car: Skoda Karoq
+Year: 2021
+Category: SUV
+Transmission: Automatic
+Fuel: Diesel
+Seats: 5
+Price: €90/day
+Deposit: €450
+Features: Digital Dash, Navigation, LED Lights, Parking Sensors

@@ -1,0 +1,9 @@
+Car: Ford Explorer
+Year: 2014
+Category: SUV
+Transmission: Automatic
+Fuel: Petrol/LPG
+Seats: 7
+Price: €85/day
+Deposit: €500
+Features: Navigation, 7 Seats, Leather Seats, 4WD

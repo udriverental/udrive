@@ -1,0 +1,9 @@
+Car: VW Touran
+Year: 2008
+Category: Van/MPV
+Transmission: Automatic
+Fuel: Diesel
+Seats: 7
+Price: €60/day
+Deposit: €350
+Features: 7 Seats, Spacious, Navigation, A/C

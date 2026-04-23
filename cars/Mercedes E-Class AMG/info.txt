@@ -1,0 +1,9 @@
+Car: Mercedes E-Class (AMG Look)
+Year: 2016
+Category: Luxury
+Transmission: Automatic
+Fuel: Diesel
+Seats: 5
+Price: €70/day
+Deposit: €700
+Features: AMG Look, Navigation, Leather Seats, Panoramic Roof

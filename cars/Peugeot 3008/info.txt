@@ -1,0 +1,9 @@
+Car: Peugeot 3008
+Year: 2019
+Category: SUV
+Transmission: Automatic
+Fuel: Diesel
+Seats: 5
+Price: €90/day
+Deposit: €400
+Features: A/C, Navigation, Panoramic Roof, Parking Sensors

@@ -1,0 +1,9 @@
+Car: VW Golf 7 (Black)
+Year: 2017
+Category: Economy
+Transmission: Manual
+Fuel: Diesel
+Seats: 5
+Price: €55/day
+Deposit: €200
+Features: A/C, Bluetooth, USB Charging

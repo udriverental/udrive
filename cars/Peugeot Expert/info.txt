@@ -1,0 +1,9 @@
+Car: Peugeot Expert
+Year: 2020
+Category: Van/MPV
+Transmission: Automatic
+Fuel: Diesel
+Seats: 9
+Price: €150/day
+Deposit: €400
+Features: 9 Seats, A/C,  Ample Boot

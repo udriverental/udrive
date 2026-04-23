@@ -1,0 +1,9 @@
+Car: VW Transporter
+Year: 2012
+Category: Van/MPV
+Transmission: Automatic
+Fuel: Diesel
+Seats: 9
+Price: €110/day
+Deposit: €550
+Features: 9 Seats, A/C, Group Travel, Bluetooth

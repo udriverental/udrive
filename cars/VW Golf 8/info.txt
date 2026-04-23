@@ -1,0 +1,9 @@
+Car: VW Golf 8
+Year: 2022
+Category: Economy
+Transmission: Automatic
+Fuel: Diesel
+Seats: 5
+Price: €70/day
+Deposit: €300
+Features: Digital Cockpit, Navigation, Apple CarPlay, Parking Sensors

@@ -1,0 +1,9 @@
+Car: Ford Mondeo
+Year: 2020
+Category: Economy
+Transmission: Automatic
+Fuel: Diesel
+Seats: 5
+Price: €60/day
+Deposit: €250
+Features: A/C, Navigation, LED Lights, Parking Sensors

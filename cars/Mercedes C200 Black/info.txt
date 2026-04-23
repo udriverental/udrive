@@ -1,0 +1,9 @@
+Car: Mercedes C200 (Black)
+Year: 2018
+Category: Luxury
+Transmission: Automatic
+Fuel: Diesel
+Seats: 5
+Price: €110/day
+Deposit: €550
+Features: AMG Package, Navigation, Leather Seats, 360 Camera

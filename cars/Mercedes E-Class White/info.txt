@@ -1,0 +1,9 @@
+Car: Mercedes E-Class (White)
+Year: 2016
+Category: Luxury
+Transmission: Automatic
+Fuel: Diesel
+Seats: 5
+Price: €90/day
+Deposit: €650
+Features: Executive Sedan, Navigation, Leather Seats, Heated Seats

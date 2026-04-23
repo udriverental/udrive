@@ -1,0 +1,9 @@
+Car: VW Jetta
+Year: 2015
+Category: Economy
+Transmission: Automatic
+Fuel: Petrol
+Seats: 5
+Price: €45/day
+Deposit: €200
+Features: A/C, Bluetooth, USB Charging

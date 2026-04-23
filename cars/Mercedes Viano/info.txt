@@ -1,0 +1,9 @@
+Car: Mercedes Viano
+Year: 2008
+Category: Van/MPV
+Transmission: Automatic
+Fuel: Diesel
+Seats: 7
+Price: €110/day
+Deposit: €450
+Features: 7 Seats, Large Boot, A/C, Bluetooth

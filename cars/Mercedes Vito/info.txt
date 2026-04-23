@@ -1,0 +1,9 @@
+Car: Mercedes Vito
+Year: 2020
+Category: Van/MPV
+Transmission: Automatic
+Fuel: Diesel
+Seats: 7
+Price: €160/day
+Deposit: €500
+Features: 7 Seats, Navigation, LED Lights, A/C

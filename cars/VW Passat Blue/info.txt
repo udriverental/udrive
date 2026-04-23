@@ -1,0 +1,9 @@
+Car: VW Passat (Blue)
+Year: 2013
+Category: Economy
+Transmission: Automatic
+Fuel: Petrol
+Seats: 5
+Price: €50/day
+Deposit: €250
+Features: Panoramic Roof, Leather Seats, Navigation, Heated Seats

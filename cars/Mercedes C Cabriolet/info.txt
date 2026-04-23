@@ -1,0 +1,9 @@
+Car: Mercedes C Cabriolet
+Year: 2017
+Category: Luxury
+Transmission: Automatic
+Fuel: Diesel
+Seats: 4
+Price: €250/day
+Deposit: €800
+Features: Convertible, AMG Package, Leather Seats, Navigation

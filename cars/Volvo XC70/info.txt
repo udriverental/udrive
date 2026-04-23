@@ -1,0 +1,9 @@
+Car: Volvo XC70
+Year: 2012
+Category: Economy
+Transmission: Automatic
+Fuel: Petrol/LPG
+Seats: 5
+Price: €65/day
+Deposit: €300
+Features: A/C, Navigation, Leather Seats, Roof Rails

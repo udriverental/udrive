@@ -1,0 +1,9 @@
+Car: VW Tiguan
+Year: 2014
+Category: SUV
+Transmission: Automatic
+Fuel: Diesel
+Seats: 5
+Price: €80/day
+Deposit: €400
+Features: A/C, Navigation, 4WD, Roof Rails

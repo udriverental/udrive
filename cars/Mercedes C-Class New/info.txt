@@ -1,0 +1,9 @@
+Car: Mercedes C-Class (New)
+Year: 2020
+Category: Luxury
+Transmission: Automatic
+Fuel: Diesel
+Seats: 5
+Price: €120/day
+Deposit: €600
+Features: Latest Gen, Navigation, Leather Seats, Ambient Lighting

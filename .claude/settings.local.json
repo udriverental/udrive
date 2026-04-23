@@ -15,7 +15,13 @@
       "Bash(curl -s -o /dev/null -w \"%{http_code}\" \"http://localhost:3000/cars/Vw%20Transporter%209%20seater/IMG_0825%202.jpeg\")",
       "Bash(pkill -f \"node serve.mjs\")",
       "Bash(node serve.mjs)",
-      "Bash(node screenshot.mjs http://localhost:3000 fleet)"
+      "Bash(node screenshot.mjs http://localhost:3000 fleet)",
+      "Bash(mv \"A class white\"           \"Mercedes A-Class White\")",
+      "Bash(mv \"Benz Cabrio \"            \"Mercedes C Cabriolet\")",
+      "Bash(mv \"C class portobagazh\"     \"Mercedes C Estate\")",
+      "Bash(mv \"C200 zi \"                \"Mercedes C200 Black\")",
+      "Bash(mv \"Cclass i ri \"            \"Mercedes C-Class New\")",
+      "Bash(python3 -)"
     ]
   }
 }

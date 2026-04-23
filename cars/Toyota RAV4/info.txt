@@ -1,0 +1,9 @@
+Car: Toyota RAV4
+Year: 2015
+Category: SUV
+Transmission: Automatic
+Fuel: Petrol/LPG
+Seats: 5
+Price: €80/day
+Deposit: €400
+Features: A/C, Navigation, 4WD, Roof Rails

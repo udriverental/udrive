@@ -1,0 +1,9 @@
+Car: VW Golf 7 (White)
+Year: 2019
+Category: Economy
+Transmission: Automatic
+Fuel: Diesel
+Seats: 5
+Price: €60/day
+Deposit: €250
+Features: A/C, Navigation, Bluetooth, Parking Sensors

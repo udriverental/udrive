@@ -1,0 +1,9 @@
+Car: Kia Carnival
+Year: 2018
+Category: Van/MPV
+Transmission: Automatic
+Fuel: Diesel
+Seats: 7
+Price: €95/day
+Deposit: €500
+Features: 7 Seats, Navigation, Leather Seats, Panoramic Roof

@@ -1,0 +1,9 @@
+Car: VW Golf Plus
+Year: 2012
+Category: Economy
+Transmission: Automatic
+Fuel: Diesel
+Seats: 5
+Price: €50/day
+Deposit: €250
+Features: A/C, Navigation, Heated Seats

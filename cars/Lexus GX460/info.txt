@@ -1,0 +1,9 @@
+Car: Lexus GX460
+Year: 2014
+Category: SUV
+Transmission: Automatic
+Fuel: Petrol
+Seats: 7
+Price: €200/day
+Deposit: €800
+Features: Quilted Leather, Navigation, Premium Audio, 4WD

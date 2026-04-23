@@ -8,7 +8,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet" />
 
   <style>
     :root {
@@ -80,6 +80,32 @@
     .nav-wa:active { transform: none; }
     .nav-wa-label { display: none; }
     @media(min-width:540px){ .nav-wa-label { display: inline; } }
+    .lang-sw { display: flex; gap: 4px; align-items: center; }
+    .lang-btn {
+      padding: 5px 9px; border-radius: 100px;
+      background: transparent; border: 1px solid var(--line);
+      color: var(--muted); font-size: 11.5px; font-weight: 600;
+      cursor: pointer; letter-spacing: 0.04em;
+      font-family: 'DM Sans', sans-serif;
+      transition: border-color 0.18s, color 0.18s, background 0.18s;
+    }
+    .lang-btn:hover { border-color: rgba(255,255,255,0.22); color: var(--txt); }
+    .lang-btn.on { background: var(--or); border-color: var(--or); color: #fff; }
+
+    /* ── Arabic / RTL overrides ── */
+    html[lang="ar"] body { font-family: 'Cairo', sans-serif; }
+    html[lang="ar"] h1, html[lang="ar"] h2, html[lang="ar"] h3, html[lang="ar"] h4 { font-family: 'Cairo', sans-serif; }
+    html[lang="ar"] .hero-title { font-family: 'Cairo', sans-serif; font-style: normal; }
+    html[lang="ar"] .hero-title em { font-style: normal; }
+    html[lang="ar"] .f-label { text-align: right; display: block; }
+    html[lang="ar"] .booking-fields > div { direction: rtl; }
+    html[lang="ar"] .trust-item { flex-direction: row-reverse; text-align: right; }
+    html[lang="ar"] .deposit-chips { justify-content: flex-end; }
+    html[lang="ar"] .loc-card { text-align: right; }
+    html[lang="ar"] .slide-prev { left: auto; right: 8px; }
+    html[lang="ar"] .slide-next { right: auto; left: 8px; }
+    html[lang="ar"] .car-bottom { flex-direction: row-reverse; }
+    html[lang="ar"] .sum-row { flex-direction: row-reverse; }
 
     /* ════════════════════════════
        HERO
@@ -566,9 +592,14 @@
 <nav class="nav">
   <img src="brand_assets/Modern%20UDrive%20car%20rental%20logo.png" alt="UDrive Car Rental" class="nav-logo" />
   <div class="nav-right">
+    <div class="lang-sw">
+      <button class="lang-btn on" data-lang="en" onclick="setLang('en')">EN</button>
+      <button class="lang-btn" data-lang="sq" onclick="setLang('sq')">SQ</button>
+      <button class="lang-btn" data-lang="ar" onclick="setLang('ar')">AR</button>
+    </div>
     <a href="https://wa.me/355693755827?text=Hello%20UDrive!%20I'd%20like%20to%20inquire%20about%20renting%20a%20car." target="_blank" rel="noopener" class="nav-wa">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-      <span class="nav-wa-label">WhatsApp Us</span>
+      <span class="nav-wa-label" data-i18n="navWa">WhatsApp Us</span>
     </a>
   </div>
 </nav>
@@ -580,13 +611,13 @@
   <div class="hero-grid"></div>
 
   <div class="hero-inner">
-    <div class="hero-flag-pill">
+    <div class="hero-flag-pill" data-i18n="heroPill">
       <span>🇦🇱</span> Albania &amp; Kosovo <span>🇽🇰</span>
     </div>
 
-    <h1 class="hero-title">Your Road,<br/><em>Your Rules.</em></h1>
+    <h1 class="hero-title" data-i18n="heroTitle">Your Road,<br/><em>Your Rules.</em></h1>
 
-    <p class="hero-sub">
+    <p class="hero-sub" data-i18n="heroSub">
       Premium car rental from <strong>Tirana Airport (TIA)</strong> and <strong>Pristina Airport (PRN)</strong>.
       No hidden fees, no credit card, <strong>deposit returned in cash the moment you hand back the keys.</strong>
     </p>
@@ -594,31 +625,31 @@
     <div class="booking-card">
       <div class="booking-fields">
         <div>
-          <label class="f-label">📍 Pickup Location</label>
+          <label class="f-label" data-i18n="labelLoc">📍 Pickup Location</label>
           <select class="f-input" id="h-loc">
-            <option value="">Airport…</option>
+            <option value="" data-i18n-opt="optAirport">Airport…</option>
             <option value="Tirana International Airport (TIA)">🇦🇱 Tirana Airport — TIA</option>
             <option value="Pristina Airport (PRN)">🇽🇰 Pristina Airport — PRN</option>
           </select>
         </div>
         <div>
-          <label class="f-label">📅 Pickup Date</label>
+          <label class="f-label" data-i18n="labelPd">📅 Pickup Date</label>
           <input type="date" class="f-input" id="h-pd" />
         </div>
         <div>
-          <label class="f-label">⏰ Pickup Time</label>
+          <label class="f-label" data-i18n="labelPt">⏰ Pickup Time</label>
           <input type="time" class="f-input" id="h-pt" value="10:00" />
         </div>
         <div>
-          <label class="f-label">📅 Return Date</label>
+          <label class="f-label" data-i18n="labelRd">📅 Return Date</label>
           <input type="date" class="f-input" id="h-rd" />
         </div>
         <div>
-          <label class="f-label">⏰ Return Time</label>
+          <label class="f-label" data-i18n="labelRt">⏰ Return Time</label>
           <input type="time" class="f-input" id="h-rt" value="10:00" />
         </div>
         <div>
-          <button class="find-btn" onclick="scrollToFleet()">Find My Car →</button>
+          <button class="find-btn" onclick="scrollToFleet()" data-i18n="findBtn">Find My Car →</button>
         </div>
       </div>
     </div>
@@ -631,29 +662,29 @@
     <div class="trust-item">
       <div class="trust-ico">✅</div>
       <div>
-        <div class="trust-main">No Hidden Fees</div>
-        <div class="trust-sub">What you see is what you pay</div>
+        <div class="trust-main" data-i18n="trust1h">No Hidden Fees</div>
+        <div class="trust-sub" data-i18n="trust1s">What you see is what you pay</div>
       </div>
     </div>
     <div class="trust-item">
       <div class="trust-ico">📞</div>
       <div>
-        <div class="trust-main">24/7 Support</div>
-        <div class="trust-sub">Always on WhatsApp</div>
+        <div class="trust-main" data-i18n="trust2h">24/7 Support</div>
+        <div class="trust-sub" data-i18n="trust2s">Always on WhatsApp</div>
       </div>
     </div>
     <div class="trust-item">
       <div class="trust-ico">💎</div>
       <div>
-        <div class="trust-main">Albanian Hospitality</div>
-        <div class="trust-sub">Genuine care, every rental</div>
+        <div class="trust-main" data-i18n="trust3h">Albanian Hospitality</div>
+        <div class="trust-sub" data-i18n="trust3s">Genuine care, every rental</div>
       </div>
     </div>
     <div class="trust-item">
       <div class="trust-ico">💵</div>
       <div>
-        <div class="trust-main">Instant Cash Deposit Return</div>
-        <div class="trust-sub">On the spot — no waiting</div>
+        <div class="trust-main" data-i18n="trust4h">Instant Cash Deposit Return</div>
+        <div class="trust-sub" data-i18n="trust4s">On the spot — no waiting</div>
       </div>
     </div>
   </div>
@@ -664,18 +695,18 @@
   <div class="deposit-box">
     <div class="deposit-emoji">🔑</div>
     <div>
-      <h3 class="deposit-title">Deposit returned the moment you hand back the keys</h3>
-      <p class="deposit-body">
+      <h3 class="deposit-title" data-i18n="depTitle">Deposit returned the moment you hand back the keys</h3>
+      <p class="deposit-body" data-i18n="depBody">
         We believe in <strong>complete transparency</strong>. Your security deposit is returned
         <strong>in cash, immediately</strong> when you return the car — not in 2 weeks, not after a
         bank review, not "pending assessment". Right there at the airport,
         <strong>cash in hand.</strong>
       </p>
       <div class="deposit-chips">
-        <span class="chip">✓ No credit card required</span>
-        <span class="chip">✓ Cash deposit only</span>
-        <span class="chip chip-or">✓ Instant return on key handover</span>
-        <span class="chip chip-or">✓ Problem-free cars guaranteed</span>
+        <span class="chip" data-i18n="chip1">✓ No credit card required</span>
+        <span class="chip" data-i18n="chip2">✓ Cash deposit only</span>
+        <span class="chip chip-or" data-i18n="chip3">✓ Instant return on key handover</span>
+        <span class="chip chip-or" data-i18n="chip4">✓ Problem-free cars guaranteed</span>
       </div>
     </div>
   </div>
@@ -684,17 +715,17 @@
 <!-- ── FLEET ── -->
 <section class="fleet-wrap" id="fleet">
   <div class="sec-head fade-up">
-    <span class="sec-eye">Our Fleet</span>
-    <h2 class="sec-title">Choose Your Perfect Ride</h2>
+    <span class="sec-eye" data-i18n="fleetEye">Our Fleet</span>
+    <h2 class="sec-title" data-i18n="fleetTitle">Choose Your Perfect Ride</h2>
   </div>
 
   <div class="tabs-scroll">
     <div class="tabs" id="tabs">
-      <button class="tab on" data-cat="all">All Cars</button>
-      <button class="tab" data-cat="economy">Economy</button>
-      <button class="tab" data-cat="suv">SUV</button>
-      <button class="tab" data-cat="luxury">Luxury</button>
-      <button class="tab" data-cat="van">Van &amp; MPV</button>
+      <button class="tab on" data-cat="all" data-i18n="tabAll">All Cars</button>
+      <button class="tab" data-cat="economy" data-i18n="tabEco">Economy</button>
+      <button class="tab" data-cat="suv" data-i18n="tabSuv">SUV</button>
+      <button class="tab" data-cat="luxury" data-i18n="tabLux">Luxury</button>
+      <button class="tab" data-cat="van" data-i18n="tabVan">Van &amp; MPV</button>
     </div>
   </div>
 
@@ -705,23 +736,23 @@
 <section class="loc-section" id="locations">
   <div class="loc-inner">
     <div class="sec-head fade-up">
-      <span class="sec-eye">Pickup Points</span>
-      <h2 class="sec-title">Two Countries, One Service</h2>
+      <span class="sec-eye" data-i18n="locEye">Pickup Points</span>
+      <h2 class="sec-title" data-i18n="locTitle">Two Countries, One Service</h2>
     </div>
     <div class="loc-grid">
       <div class="loc-card fade-up">
         <span class="loc-flag">🇦🇱</span>
-        <div class="loc-name">Tirana International Airport</div>
-        <div class="loc-iata">TIA · Nënë Tereza</div>
-        <p class="loc-desc">Serving all arrivals at Albania's main international gateway. Meet &amp; greet at arrivals terminal — we'll be there whenever your flight lands.</p>
-        <div class="loc-badge">🕐 Open 24 / 7 — Always Available</div>
+        <div class="loc-name" data-i18n="tiaName">Tirana International Airport</div>
+        <div class="loc-iata" data-i18n="tiaIata">TIA · Nënë Tereza</div>
+        <p class="loc-desc" data-i18n="tiaDesc">Serving all arrivals at Albania's main international gateway. Meet &amp; greet at arrivals terminal — we'll be there whenever your flight lands.</p>
+        <div class="loc-badge" data-i18n="locOpen">🕐 Open 24 / 7 — Always Available</div>
       </div>
       <div class="loc-card fade-up" style="transition-delay:0.12s">
         <span class="loc-flag">🇽🇰</span>
-        <div class="loc-name">Pristina International Airport</div>
-        <div class="loc-iata">PRN · Adem Jashari</div>
-        <p class="loc-desc">Serving Kosovo's capital and the wider region. Full fleet available at Pristina Airport — Gulf, Albanian, and international guests welcome.</p>
-        <div class="loc-badge">🕐 Open 24 / 7 — Always Available</div>
+        <div class="loc-name" data-i18n="prnName">Pristina International Airport</div>
+        <div class="loc-iata" data-i18n="prnIata">PRN · Adem Jashari</div>
+        <p class="loc-desc" data-i18n="prnDesc">Serving Kosovo's capital and the wider region. Full fleet available at Pristina Airport — Gulf, Albanian, and international guests welcome.</p>
+        <div class="loc-badge" data-i18n="locOpen">🕐 Open 24 / 7 — Always Available</div>
       </div>
     </div>
   </div>
@@ -752,49 +783,49 @@
   <div class="modal" id="modal">
     <div class="modal-drag"></div>
     <button class="modal-close-btn" onclick="closeModal()">✕</button>
-    <h2 class="modal-title">Book Your Car</h2>
+    <h2 class="modal-title" data-i18n="modalTitle">Book Your Car</h2>
     <div class="modal-sub" id="modal-sub"></div>
 
     <div class="modal-grid">
       <div class="mg-full">
-        <label class="f-label">📍 Pickup Location</label>
+        <label class="f-label" data-i18n="labelLoc">📍 Pickup Location</label>
         <select class="f-input" id="m-loc">
-          <option value="">Select airport…</option>
+          <option value="" data-i18n-opt="modalAirport">Select airport…</option>
           <option value="Tirana International Airport (TIA)">🇦🇱 Tirana Airport — TIA</option>
           <option value="Pristina Airport (PRN)">🇽🇰 Pristina Airport — PRN</option>
         </select>
       </div>
       <div>
-        <label class="f-label">📅 Pickup Date</label>
+        <label class="f-label" data-i18n="labelPd">📅 Pickup Date</label>
         <input type="date" class="f-input" id="m-pd" />
       </div>
       <div>
-        <label class="f-label">⏰ Pickup Time</label>
+        <label class="f-label" data-i18n="labelPt">⏰ Pickup Time</label>
         <input type="time" class="f-input" id="m-pt" value="10:00" />
       </div>
       <div>
-        <label class="f-label">📅 Return Date</label>
+        <label class="f-label" data-i18n="labelRd">📅 Return Date</label>
         <input type="date" class="f-input" id="m-rd" />
       </div>
       <div>
-        <label class="f-label">⏰ Return Time</label>
+        <label class="f-label" data-i18n="labelRt">⏰ Return Time</label>
         <input type="time" class="f-input" id="m-rt" value="10:00" />
       </div>
     </div>
 
     <div class="summary" id="summary" style="display:none">
-      <div class="sum-row"><span class="sum-lbl">Duration</span><span class="sum-val" id="s-days">—</span></div>
-      <div class="sum-row"><span class="sum-lbl">Rate</span><span class="sum-val" id="s-rate">—</span></div>
+      <div class="sum-row"><span class="sum-lbl" data-i18n="sumDur">Duration</span><span class="sum-val" id="s-days">—</span></div>
+      <div class="sum-row"><span class="sum-lbl" data-i18n="sumRate">Rate</span><span class="sum-val" id="s-rate">—</span></div>
       <div class="sum-div"></div>
-      <div class="sum-row sum-total"><span class="sum-lbl">Total</span><span class="sum-val" id="s-total">—</span></div>
+      <div class="sum-row sum-total"><span class="sum-lbl" data-i18n="sumTotal">Total</span><span class="sum-val" id="s-total">—</span></div>
       <div class="sum-dep" id="s-dep"></div>
     </div>
 
     <button class="wa-book-btn" onclick="sendWA()">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-      Confirm Booking via WhatsApp
+      <span data-i18n="waBookBtn">Confirm Booking via WhatsApp</span>
     </button>
-    <p class="modal-note">💳 No credit card · Cash deposit · Returned instantly on key handover</p>
+    <p class="modal-note" data-i18n="modalNote">💳 No credit card · Cash deposit · Returned instantly on key handover</p>
   </div>
 </div>
 
@@ -935,12 +966,12 @@ function renderCars(cat) {
         <div class="car-bottom">
           <div>
             <div class="car-price-num">€${c.ppd}</div>
-            <div class="car-price-unit">per day</div>
-            <div class="car-deposit-line">Deposit: <b>€${c.dep}</b></div>
+            <div class="car-price-unit">${(T[lang]||T.en).perDay}</div>
+            <div class="car-deposit-line">${(T[lang]||T.en).depositLabel}: <b>€${c.dep}</b></div>
           </div>
-          <button class="book-btn" onclick="event.stopPropagation();openModal(${c.id})">Book Now</button>
+          <button class="book-btn" onclick="event.stopPropagation();openModal(${c.id})">${(T[lang]||T.en).bookNow}</button>
         </div>
-        <div class="card-note">✓ No credit card · Cash deposit only</div>
+        <div class="card-note">${(T[lang]||T.en).noCard}</div>
       </div>
     </div>
   `).join('');
@@ -1113,8 +1144,112 @@ document.querySelectorAll('.fade-up').forEach(el => revealObs.observe(el));
 // ─── ESC KEY ───
 document.addEventListener('keydown', e => { if (e.key==='Escape') closeModal(); });
 
+// ─── TRANSLATIONS ───
+let lang = 'en';
+const T = {
+  en: {
+    navWa:'WhatsApp Us', heroPill:'<span>🇦🇱</span> Albania &amp; Kosovo <span>🇽🇰</span>',
+    heroTitle:'Your Road,<br/><em>Your Rules.</em>',
+    heroSub:'Premium car rental from <strong>Tirana Airport (TIA)</strong> and <strong>Pristina Airport (PRN)</strong>. No hidden fees, no credit card, <strong>deposit returned in cash the moment you hand back the keys.</strong>',
+    labelLoc:'📍 Pickup Location', labelPd:'📅 Pickup Date', labelPt:'⏰ Pickup Time', labelRd:'📅 Return Date', labelRt:'⏰ Return Time',
+    optAirport:'Airport…', modalAirport:'Select airport…', findBtn:'Find My Car →',
+    trust1h:'No Hidden Fees', trust1s:'What you see is what you pay',
+    trust2h:'24/7 Support', trust2s:'Always on WhatsApp',
+    trust3h:'Albanian Hospitality', trust3s:'Genuine care, every rental',
+    trust4h:'Instant Cash Deposit Return', trust4s:'On the spot — no waiting',
+    depTitle:'Deposit returned the moment you hand back the keys',
+    depBody:'We believe in <strong>complete transparency</strong>. Your security deposit is returned <strong>in cash, immediately</strong> when you return the car — not in 2 weeks, not after a bank review, not "pending assessment". Right there at the airport, <strong>cash in hand.</strong>',
+    chip1:'✓ No credit card required', chip2:'✓ Cash deposit only', chip3:'✓ Instant return on key handover', chip4:'✓ Problem-free cars guaranteed',
+    fleetEye:'Our Fleet', fleetTitle:'Choose Your Perfect Ride',
+    tabAll:'All Cars', tabEco:'Economy', tabSuv:'SUV', tabLux:'Luxury', tabVan:'Van &amp; MPV',
+    perDay:'per day', depositLabel:'Deposit', bookNow:'Book Now', noCard:'✓ No credit card · Cash deposit only',
+    locEye:'Pickup Points', locTitle:'Two Countries, One Service',
+    tiaName:'Tirana International Airport', tiaIata:'TIA · Nënë Tereza',
+    tiaDesc:"Serving all arrivals at Albania's main international gateway. Meet &amp; greet at arrivals terminal — we'll be there whenever your flight lands.",
+    prnName:'Pristina International Airport', prnIata:'PRN · Adem Jashari',
+    prnDesc:"Serving Kosovo's capital and the wider region. Full fleet available at Pristina Airport — Gulf, Albanian, and international guests welcome.",
+    locOpen:'🕐 Open 24 / 7 — Always Available',
+    modalTitle:'Book Your Car', waBookBtn:'Confirm Booking via WhatsApp',
+    modalNote:'💳 No credit card · Cash deposit · Returned instantly on key handover',
+    sumDur:'Duration', sumRate:'Rate', sumTotal:'Total',
+    sumDepTag:'returned in cash on key handover', sumDepPrefix:'Security deposit:',
+  },
+  sq: {
+    navWa:'Na Kontaktoni', heroPill:'<span>🇦🇱</span> Shqipëri &amp; Kosovë <span>🇽🇰</span>',
+    heroTitle:'Rruga Jote,<br/><em>Rregullat Tua.</em>',
+    heroSub:'Marrje me qira makinash nga <strong>Aeroporti i Tiranës (TIA)</strong> dhe <strong>Aeroporti i Prishtinës (PRN)</strong>. Pa tarifa të fshehura, pa kartë krediti, <strong>depozita kthehet në cash sapo dorëzoni çelësat.</strong>',
+    labelLoc:'📍 Pika e Marrjes', labelPd:'📅 Data e Marrjes', labelPt:'⏰ Ora e Marrjes', labelRd:'📅 Data e Kthimit', labelRt:'⏰ Ora e Kthimit',
+    optAirport:'Aeroporti…', modalAirport:'Zgjidh aeroportin…', findBtn:'Gjej Makinën →',
+    trust1h:'Pa Tarifa të Fshehura', trust1s:'Çfarë shihni, atë paguani',
+    trust2h:'Mbështetje 24/7', trust2s:'Gjithmonë në WhatsApp',
+    trust3h:'Mikpritja Shqiptare', trust3s:'Kujdes i vërtetë, çdo herë',
+    trust4h:'Kthim i Menjëhershëm', trust4s:'Menjëherë — pa pritje',
+    depTitle:'Depozita kthehet sapo dorëzoni çelësat',
+    depBody:'Besojmë në <strong>transparencë të plotë</strong>. Depozita juaj kthehet <strong>në cash, menjëherë</strong> kur ktheni makinën — jo pas 2 javëve, jo pas rishikimit bankar. Menjëherë në aeroport, <strong>cash në dorë.</strong>',
+    chip1:'✓ Nuk kërkohet kartë krediti', chip2:'✓ Vetëm depozitë cash', chip3:'✓ Kthim i menjëhershëm', chip4:'✓ Makina të garantuara',
+    fleetEye:'Flotëza Jonë', fleetTitle:'Zgjidhni Makinën e Duhur',
+    tabAll:'Të Gjitha', tabEco:'Ekonomike', tabSuv:'SUV', tabLux:'Luksoze', tabVan:'Van &amp; MPV',
+    perDay:'në ditë', depositLabel:'Depozitë', bookNow:'Rezervo', noCard:'✓ Pa kartë · Vetëm cash',
+    locEye:'Pikat e Marrjes', locTitle:'Dy Vende, Një Shërbim',
+    tiaName:'Aeroporti Ndërkombëtar i Tiranës', tiaIata:'TIA · Nënë Tereza',
+    tiaDesc:'Duke shërbyer të gjithë pasagjerët në portën kryesore ndërkombëtare të Shqipërisë. Takim dhe përshëndetje në terminalin e mbërritjeve — jemi aty kur zbret fluturimi juaj.',
+    prnName:'Aeroporti Ndërkombëtar i Prishtinës', prnIata:'PRN · Adem Jashari',
+    prnDesc:'Duke shërbyer kryeqytetin e Kosovës dhe rajonin e gjerë. Flotëza e plotë disponueshme në Aeroportin e Prishtinës — mysafirë nga Gjiri, shqiptarë dhe ndërkombëtarë të mirëpritur.',
+    locOpen:'🕐 Hapur 24/7 — Gjithmonë i Disponueshëm',
+    modalTitle:'Rezervoni Makinën', waBookBtn:'Konfirmo Rezervimin në WhatsApp',
+    modalNote:'💳 Pa kartë krediti · Depozitë cash · Kthim i menjëhershëm',
+    sumDur:'Kohëzgjatja', sumRate:'Tarifa', sumTotal:'Totali',
+    sumDepTag:'kthehet cash sapo dorëzoni çelësat', sumDepPrefix:'Depozita e sigurisë:',
+  },
+  ar: {
+    navWa:'واتساب', heroPill:'<span>🇦🇱</span> ألبانيا وكوسوفو <span>🇽🇰</span>',
+    heroTitle:'طريقك،<br/><em>قواعدك.</em>',
+    heroSub:'تأجير سيارات فاخر من <strong>مطار تيرانا (TIA)</strong> و<strong>مطار بريشتينا (PRN)</strong>. لا رسوم خفية، لا بطاقة ائتمان، <strong>الوديعة تُرجع نقداً فور تسليم المفاتيح.</strong>',
+    labelLoc:'📍 موقع الاستلام', labelPd:'📅 تاريخ الاستلام', labelPt:'⏰ وقت الاستلام', labelRd:'📅 تاريخ الإرجاع', labelRt:'⏰ وقت الإرجاع',
+    optAirport:'المطار…', modalAirport:'اختر المطار…', findBtn:'← ابحث عن سيارتي',
+    trust1h:'بدون رسوم خفية', trust1s:'ما تراه هو ما تدفعه',
+    trust2h:'دعم على مدار الساعة', trust2s:'متاحون دائماً على واتساب',
+    trust3h:'الضيافة الألبانية', trust3s:'اهتمام حقيقي في كل تأجير',
+    trust4h:'استرداد الوديعة فوراً', trust4s:'في الحال — بدون انتظار',
+    depTitle:'الوديعة تُرجع فور تسليم المفاتيح',
+    depBody:'نؤمن بـ<strong>الشفافية الكاملة</strong>. تُرجع وديعتك <strong>نقداً وفوراً</strong> عند إعادة السيارة — لا بعد أسبوعين، لا بعد مراجعة بنكية. في المطار مباشرةً، <strong>الأموال في يدك.</strong>',
+    chip1:'✓ لا تحتاج بطاقة ائتمان', chip2:'✓ وديعة نقدية فقط', chip3:'✓ استرداد فوري عند التسليم', chip4:'✓ سيارات مضمونة',
+    fleetEye:'أسطولنا', fleetTitle:'اختر سيارتك المثالية',
+    tabAll:'الكل', tabEco:'اقتصادية', tabSuv:'SUV', tabLux:'فاخرة', tabVan:'فان',
+    perDay:'في اليوم', depositLabel:'الوديعة', bookNow:'احجز الآن', noCard:'✓ بدون بطاقة · وديعة نقدية',
+    locEye:'نقاط الاستلام', locTitle:'دولتان، خدمة واحدة',
+    tiaName:'مطار تيرانا الدولي', tiaIata:'TIA · نينا تيريزا',
+    tiaDesc:'نخدم جميع الوافدين إلى البوابة الدولية الرئيسية لألبانيا. استقبال وترحيب في صالة الوصول — سنكون هناك متى هبطت طائرتك.',
+    prnName:'مطار بريشتينا الدولي', prnIata:'PRN · آدم ياشاري',
+    prnDesc:'نخدم عاصمة كوسوفو والمنطقة الأوسع. أسطول كامل متاح في مطار بريشتينا — مرحباً بالضيوف من الخليج وألبانيا والعالم.',
+    locOpen:'🕐 مفتوح 24/7 — متاح دائماً',
+    modalTitle:'احجز سيارتك', waBookBtn:'تأكيد الحجز عبر واتساب',
+    modalNote:'💳 بدون بطاقة ائتمان · وديعة نقدية · تُرجع فوراً عند التسليم',
+    sumDur:'المدة', sumRate:'السعر', sumTotal:'الإجمالي',
+    sumDepTag:'تُرجع نقداً عند تسليم المفاتيح', sumDepPrefix:'وديعة الأمان:',
+  },
+};
+
 // ─── INIT ───
 renderCars('all');
+
+function setLang(code) {
+  lang = code;
+  const t = T[code];
+  document.documentElement.lang = code;
+  document.documentElement.dir = code === 'ar' ? 'rtl' : 'ltr';
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const k = el.dataset.i18n;
+    if (t[k] !== undefined) el.innerHTML = t[k];
+  });
+  document.querySelectorAll('[data-i18n-opt]').forEach(el => {
+    const k = el.dataset.i18nOpt;
+    if (t[k] !== undefined) el.textContent = t[k];
+  });
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('on', b.dataset.lang === code));
+  const activeTab = document.querySelector('.tab.on');
+  renderCars(activeTab ? activeTab.dataset.cat : 'all');
+}
 </script>
 </body>
 </html>

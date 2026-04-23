@@ -21,7 +21,8 @@
       "Bash(mv \"C class portobagazh\"     \"Mercedes C Estate\")",
       "Bash(mv \"C200 zi \"                \"Mercedes C200 Black\")",
       "Bash(mv \"Cclass i ri \"            \"Mercedes C-Class New\")",
-      "Bash(python3 -)"
+      "Bash(python3 -)",
+      "Bash(xargs -I{} sh -c 'echo \"=== {} ===\"; cat \"{}\"')"
     ]
   }
 }

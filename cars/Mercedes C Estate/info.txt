@@ -4,6 +4,6 @@ Category: Luxury
 Transmission: Automatic
 Fuel: Diesel
 Seats: 5
-Price: €45/day
+Price: €40/day
 Deposit: €350
 Features: Estate Wagon, Navigation, Large Boot, A/C

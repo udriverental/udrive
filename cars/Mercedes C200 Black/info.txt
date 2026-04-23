@@ -4,6 +4,6 @@ Category: Luxury
 Transmission: Automatic
 Fuel: Diesel
 Seats: 5
-Price: €110/day
+Price: €90/day
 Deposit: €550
 Features: AMG Package, Navigation, Leather Seats, 360 Camera

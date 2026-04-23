@@ -5,5 +5,5 @@ Transmission: Automatic
 Fuel: Diesel
 Seats: 5
 Price: €50/day
-Deposit: €250
+Deposit: €100
 Features: A/C, Navigation, Heated Seats

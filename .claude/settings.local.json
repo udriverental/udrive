@@ -22,7 +22,10 @@
       "Bash(mv \"C200 zi \"                \"Mercedes C200 Black\")",
       "Bash(mv \"Cclass i ri \"            \"Mercedes C-Class New\")",
       "Bash(python3 -)",
-      "Bash(xargs -I{} sh -c 'echo \"=== {} ===\"; cat \"{}\"')"
+      "Bash(xargs -I{} sh -c 'echo \"=== {} ===\"; cat \"{}\"')",
+      "Bash(sed -n '838,842p' index.html)",
+      "Bash(sed -n '884,888p' index.html)",
+      "Bash(node screenshot.mjs http://localhost:3000 clio-check)"
     ]
   }
 }

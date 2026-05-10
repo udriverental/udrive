@@ -348,7 +348,6 @@
       background: var(--card);
       border: 1px solid var(--line);
       border-radius: 16px; overflow: hidden;
-      cursor: pointer;
       transition: transform 0.28s cubic-bezier(0.34,1.56,0.64,1),
                   box-shadow 0.28s ease, border-color 0.28s;
     }
@@ -609,7 +608,10 @@
 <!-- ── NAV ── -->
 <nav class="nav">
   <div class="nav-left">
-    <img src="brand_assets/Modern%20UDrive%20car%20rental%20logo.png" alt="UDrive Car Rental" class="nav-logo" />
+    <picture>
+      <source srcset="brand_assets/udrive-logo-dark.png" media="(prefers-color-scheme: dark)" />
+      <img src="brand_assets/udrive-logo-light.png" alt="UDrive Car Rental" class="nav-logo" />
+    </picture>
     <span class="nav-tagline" data-i18n="navTagline">🇦🇱 Albania &amp; Kosovo · Airport pickup · No credit card 🇽🇰</span>
   </div>
   <div class="nav-right">
@@ -703,7 +705,10 @@
 
 <!-- ── FOOTER ── -->
 <footer class="footer">
-  <img src="brand_assets/Modern%20UDrive%20car%20rental%20logo.png" alt="UDrive" class="footer-logo" />
+  <picture>
+    <source srcset="brand_assets/udrive-logo-dark.png" media="(prefers-color-scheme: dark)" />
+    <img src="brand_assets/udrive-logo-light.png" alt="UDrive" class="footer-logo" />
+  </picture>
   <p class="footer-txt">
     UDrive Car Rental · Albania &amp; Kosovo<br/>
     Tirana International Airport (TIA) &amp; Pristina Airport (PRN)
@@ -888,15 +893,15 @@ function renderCars(cat) {
   }
 
   grid.innerHTML = list.map((c, i) => `
-    <div class="car-card fade-up" style="transition-delay:${(i % 6) * 0.055}s" data-carid="${c.id}" onclick="openModal('${c.id}')">
-      <div class="car-img-wrap">
+    <div class="car-card fade-up" style="transition-delay:${(i % 6) * 0.055}s" data-carid="${c.id}">
+      <div class="car-img-wrap" data-carid="${c.id}">
         <img class="car-img" id="cimg-${c.id}" src="${c.imgs[0]}" alt="${c.name} ${c.year}" loading="lazy"
           onerror="this.src='https://placehold.co/400x300/111120/3a3a58?text=${encodeURIComponent(c.name)}'" />
         <div class="car-img-shade"></div>
         <span class="cat-badge cat-${c.cat}">${CAT_LABEL[c.cat]}</span>
         ${c.imgs.length > 1 ? `
-          <button class="slide-btn slide-prev" onclick="event.stopPropagation();slidePhoto('${c.id}',-1)">&#8249;</button>
-          <button class="slide-btn slide-next" onclick="event.stopPropagation();slidePhoto('${c.id}',1)">&#8250;</button>
+          <button class="slide-btn slide-prev" onclick="manualSlide('${c.id}',-1)">&#8249;</button>
+          <button class="slide-btn slide-next" onclick="manualSlide('${c.id}',1)">&#8250;</button>
           <div class="slide-dots">${c.imgs.map((_,idx)=>`<span class="sdot${idx===0?' on':''}" id="sdot-${c.id}-${idx}"></span>`).join('')}</div>
         ` : ''}
       </div>
@@ -914,7 +919,7 @@ function renderCars(cat) {
             <div class="car-price-unit">${(T[lang]||T.en).perDay}</div>
             <div class="car-deposit-line">${(T[lang]||T.en).depositLabel}: <b>€${c.dep}</b></div>
           </div>
-          <button class="book-btn" onclick="event.stopPropagation();openModal('${c.id}')">${(T[lang]||T.en).bookNow}</button>
+          <button class="book-btn" onclick="openModal('${c.id}')">${(T[lang]||T.en).bookNow}</button>
         </div>
         <div class="card-note">${(T[lang]||T.en).noCard}</div>
       </div>
@@ -924,6 +929,7 @@ function renderCars(cat) {
   setTimeout(() => {
     grid.querySelectorAll('.fade-up').forEach(el => el.classList.add('vis'));
     initCarousel();
+    initAutoCycle();
     CARS.forEach(c => { if (c.imgs.length > 1) { const p = new Image(); p.src = c.imgs[1]; } });
   }, 40);
 }
@@ -945,6 +951,10 @@ function slidePhoto(carId, dir) {
     if (dot) dot.classList.toggle('on', i === next);
   });
 }
+function manualSlide(carId, dir) {
+  manuallySwiped.add(String(carId));
+  slidePhoto(carId, dir);
+}
 function initCarousel() {
   document.querySelectorAll('.car-img-wrap').forEach(wrap => {
     let startX = 0;
@@ -958,10 +968,68 @@ function initCarousel() {
       const dx = e.changedTouches[0].clientX - startX;
       if (Math.abs(dx) < 30) return;
       const card = wrap.closest('[data-carid]');
-      if (card) slidePhoto(card.dataset.carid, dx < 0 ? 1 : -1);
+      if (card) {
+        manuallySwiped.add(String(card.dataset.carid));
+        slidePhoto(card.dataset.carid, dx < 0 ? 1 : -1);
+      }
     });
   });
 }
+
+// ─── AUTO-CYCLE (mobile only): the card nearest viewport center advances photos every 2.5s ───
+const AUTO_CYCLE_MS = 2500;
+const isMobile = () => window.matchMedia('(max-width: 768px)').matches;
+const manuallySwiped = new Set();
+let centeredCarId = null;
+let cycleTimerId = null;
+let cardObserver = null;
+const visibleCards = new Map(); // carId -> .car-img-wrap element
+
+function pickCentered() {
+  if (!visibleCards.size) { centeredCarId = null; return; }
+  const mid = window.innerHeight / 2;
+  let bestId = null, bestDist = Infinity;
+  visibleCards.forEach((el, id) => {
+    const r = el.getBoundingClientRect();
+    const dist = Math.abs((r.top + r.bottom) / 2 - mid);
+    if (dist < bestDist) { bestDist = dist; bestId = id; }
+  });
+  centeredCarId = bestId;
+}
+
+function tickCycle() {
+  if (!isMobile()) return;
+  if (!centeredCarId) return;
+  if (manuallySwiped.has(String(centeredCarId))) return;
+  const car = CARS.find(c => String(c.id) === String(centeredCarId));
+  if (!car || !car.imgs || car.imgs.length <= 1) return;
+  slidePhoto(centeredCarId, 1);
+}
+
+function teardownAutoCycle() {
+  if (cardObserver) { cardObserver.disconnect(); cardObserver = null; }
+  if (cycleTimerId) { clearInterval(cycleTimerId); cycleTimerId = null; }
+  visibleCards.clear();
+  centeredCarId = null;
+}
+
+function initAutoCycle() {
+  teardownAutoCycle();
+  if (!isMobile()) return;
+  cardObserver = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      const id = e.target.dataset.carid;
+      if (!id) return;
+      if (e.isIntersecting) visibleCards.set(id, e.target);
+      else visibleCards.delete(id);
+    });
+    pickCentered();
+  }, { rootMargin: '-40% 0px -40% 0px', threshold: 0 });
+  document.querySelectorAll('.car-img-wrap[data-carid]').forEach(el => cardObserver.observe(el));
+  cycleTimerId = setInterval(tickCycle, AUTO_CYCLE_MS);
+}
+
+window.addEventListener('resize', () => initAutoCycle());
 
 // ─── TABS ───
 document.getElementById('tabs').addEventListener('click', e => {

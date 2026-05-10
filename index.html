@@ -109,15 +109,12 @@
     html[lang="ar"] h1, html[lang="ar"] h2, html[lang="ar"] h3, html[lang="ar"] h4 { font-family: 'Cairo', sans-serif; }
     html[lang="ar"] .hero-title { font-family: 'Cairo', sans-serif; font-style: normal; }
     html[lang="ar"] .hero-title em { font-style: normal; }
-    html[lang="ar"] .f-label { text-align: right; display: block; }
-    html[lang="ar"] .booking-fields > div { direction: rtl; }
     html[lang="ar"] .trust-item { flex-direction: row-reverse; text-align: right; }
     html[lang="ar"] .deposit-chips { justify-content: flex-end; }
     html[lang="ar"] .loc-card { text-align: right; }
     html[lang="ar"] .slide-prev { left: auto; right: 8px; }
     html[lang="ar"] .slide-next { right: auto; left: 8px; }
     html[lang="ar"] .car-bottom { flex-direction: row-reverse; }
-    html[lang="ar"] .sum-row { flex-direction: row-reverse; }
 
     /* ════════════════════════════
        HERO
@@ -196,47 +193,6 @@
         0 4px 24px rgba(249,115,22,0.07);
       backdrop-filter: blur(16px);
     }
-    .booking-fields {
-      display: grid; gap: 10px;
-      grid-template-columns: 1fr;
-    }
-    @media(min-width:560px){
-      .booking-fields { grid-template-columns: 1fr 1fr; }
-    }
-    @media(min-width:1000px){
-      .booking-fields { grid-template-columns: 1.6fr 1fr 1fr 1fr 1fr auto; align-items: end; }
-    }
-
-    .f-label {
-      display: block; font-size: 10.5px; font-weight: 600;
-      color: var(--muted); text-transform: uppercase; letter-spacing: 0.09em;
-      margin-bottom: 6px;
-    }
-    .f-input {
-      width: 100%; padding: 11px 13px;
-      background: var(--raised); border: 1px solid var(--line);
-      border-radius: 10px; color: var(--txt);
-      font-family: 'DM Sans', sans-serif; font-size: 14px;
-      outline: none; appearance: none; -webkit-appearance: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-    .f-input:focus {
-      border-color: var(--or);
-      box-shadow: 0 0 0 3px rgba(249,115,22,0.13);
-    }
-    .f-input option { background: var(--raised); }
-
-    .find-btn {
-      width: 100%; padding: 13px 24px;
-      background: var(--or); color: #fff; border: none; border-radius: 10px;
-      font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600;
-      cursor: pointer; white-space: nowrap;
-      box-shadow: 0 4px 22px rgba(249,115,22,0.38);
-      transition: background 0.18s, transform 0.14s, box-shadow 0.18s;
-    }
-    .find-btn:hover { background: var(--or-d); transform: translateY(-1px); box-shadow: 0 8px 30px rgba(249,115,22,0.46); }
-    .find-btn:active { transform: none; }
-
     /* ════════════════════════════
        TRUST BAR
     ════════════════════════════ */
@@ -552,101 +508,6 @@
     }
 
     /* ════════════════════════════
-       MODAL
-    ════════════════════════════ */
-    .modal-bg {
-      position: fixed; inset: 0; z-index: 700;
-      background: rgba(0,0,0,0.72);
-      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-      display: flex; align-items: flex-end; justify-content: center;
-      opacity: 0; pointer-events: none;
-      transition: opacity 0.28s;
-    }
-    @media(min-width:600px){ .modal-bg { align-items: center; } }
-    .modal-bg.open { opacity: 1; pointer-events: all; }
-
-    .modal {
-      position: relative;
-      background: var(--card);
-      border: 1px solid rgba(255,255,255,0.09);
-      border-radius: 22px 22px 0 0;
-      padding: 26px 22px 44px;
-      width: 100%; max-width: 500px; max-height: 92svh; overflow-y: auto;
-      transform: translateY(100%);
-      transition: transform 0.38s cubic-bezier(0.34,1.56,0.64,1);
-    }
-    @media(min-width:600px){
-      .modal {
-        border-radius: 22px;
-        transform: translateY(16px) scale(0.96);
-        max-height: 88svh;
-      }
-    }
-    .modal-bg.open .modal { transform: translateY(0) scale(1); }
-
-    .modal-drag {
-      width: 38px; height: 4px; background: var(--line);
-      border-radius: 2px; margin: 0 auto 20px;
-    }
-    @media(min-width:600px){ .modal-drag { display:none; } }
-
-    .modal-close-btn {
-      position: absolute; top: 18px; right: 18px;
-      width: 30px; height: 30px; border-radius: 50%;
-      background: var(--raised); border: none; color: var(--muted);
-      font-size: 15px; cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      transition: background 0.18s, color 0.18s;
-    }
-    .modal-close-btn:hover { background: var(--line); color: var(--txt); }
-
-    .modal-title { font-size: 1.55rem; font-weight: 600; margin-bottom: 4px; }
-    .modal-sub { font-family:'DM Sans',sans-serif; font-size:12.5px; color:var(--or); font-weight:500; margin-bottom:20px; }
-
-    .modal-grid {
-      display: grid; gap: 10px; grid-template-columns: 1fr;
-      margin-bottom: 16px;
-    }
-    @media(min-width:380px){ .modal-grid { grid-template-columns: 1fr 1fr; } }
-    .mg-full { grid-column: 1 / -1; }
-
-    /* Summary box */
-    .summary {
-      background: var(--raised); border: 1px solid var(--line);
-      border-radius: 13px; padding: 15px; margin-bottom: 14px;
-    }
-    .sum-row {
-      display: flex; justify-content: space-between; align-items: center;
-      font-size: 12.5px; padding: 3px 0;
-    }
-    .sum-lbl { color: var(--muted); }
-    .sum-val { font-weight: 500; }
-    .sum-div { height:1px; background: var(--line); margin: 8px 0; }
-    .sum-total .sum-lbl { font-size:14px; font-weight:600; color:var(--txt); }
-    .sum-total .sum-val { font-size:20px; font-weight:700; color:var(--or); }
-    .sum-dep {
-      font-size: 11.5px; color: var(--muted);
-      margin-top: 8px; padding: 7px 11px;
-      background: rgba(34,197,94,0.05);
-      border: 1px solid rgba(34,197,94,0.13);
-      border-radius: 8px; line-height: 1.55;
-    }
-    .sum-dep b { color: var(--txt); }
-
-    .wa-book-btn {
-      width: 100%; padding: 15px;
-      background: var(--wa); color: #fff; border: none; border-radius: 13px;
-      font-family: 'DM Sans',sans-serif; font-size: 15px; font-weight: 600;
-      cursor: pointer;
-      display: flex; align-items: center; justify-content: center; gap: 10px;
-      box-shadow: 0 4px 22px rgba(37,211,102,0.28);
-      transition: background 0.18s, transform 0.14s;
-    }
-    .wa-book-btn:hover { background: #1ea851; transform: translateY(-1px); }
-    .wa-book-btn:active { transform: none; }
-    .modal-note { text-align:center; font-size:11px; color:var(--dim); margin-top:9px; }
-
-    /* ════════════════════════════
        SCROLL REVEAL
     ════════════════════════════ */
     .fade-up {
@@ -797,57 +658,6 @@
   <svg width="27" height="27" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
 </a>
 
-<!-- ── BOOKING MODAL ── -->
-<div class="modal-bg" id="modal-bg" onclick="closeBg(event)">
-  <div class="modal" id="modal">
-    <div class="modal-drag"></div>
-    <button class="modal-close-btn" onclick="closeModal()">✕</button>
-    <h2 class="modal-title" data-i18n="modalTitle">Book Your Car</h2>
-    <div class="modal-sub" id="modal-sub"></div>
-
-    <div class="modal-grid">
-      <div class="mg-full">
-        <label class="f-label" data-i18n="labelLoc">📍 Pickup Location</label>
-        <select class="f-input" id="m-loc">
-          <option value="" data-i18n-opt="modalAirport">Select airport…</option>
-          <option value="Tirana International Airport (TIA)">🇦🇱 Tirana Airport — TIA</option>
-          <option value="Pristina Airport (PRN)">🇽🇰 Pristina Airport — PRN</option>
-        </select>
-      </div>
-      <div>
-        <label class="f-label" data-i18n="labelPd">📅 Pickup Date</label>
-        <input type="date" class="f-input" id="m-pd" />
-      </div>
-      <div>
-        <label class="f-label" data-i18n="labelPt">⏰ Pickup Time</label>
-        <input type="time" class="f-input" id="m-pt" value="10:00" />
-      </div>
-      <div>
-        <label class="f-label" data-i18n="labelRd">📅 Return Date</label>
-        <input type="date" class="f-input" id="m-rd" />
-      </div>
-      <div>
-        <label class="f-label" data-i18n="labelRt">⏰ Return Time</label>
-        <input type="time" class="f-input" id="m-rt" value="10:00" />
-      </div>
-    </div>
-
-    <div class="summary" id="summary" style="display:none">
-      <div class="sum-row"><span class="sum-lbl" data-i18n="sumDur">Duration</span><span class="sum-val" id="s-days">—</span></div>
-      <div class="sum-row"><span class="sum-lbl" data-i18n="sumRate">Rate</span><span class="sum-val" id="s-rate">—</span></div>
-      <div class="sum-div"></div>
-      <div class="sum-row sum-total"><span class="sum-lbl" data-i18n="sumTotal">Total</span><span class="sum-val" id="s-total">—</span></div>
-      <div class="sum-dep" id="s-dep"></div>
-    </div>
-
-    <button class="wa-book-btn" onclick="sendWA()">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-      <span data-i18n="waBookBtn">Confirm Booking via WhatsApp</span>
-    </button>
-    <p class="modal-note" data-i18n="modalNote">💳 No credit card · Cash deposit · Returned instantly on key handover</p>
-  </div>
-</div>
-
 <script>
 // ═══════════════════════════════════
 // CAR DATA
@@ -857,7 +667,6 @@ let CARS = (window.CARS || []).slice();
 const CAT_LABEL = { economy:'Economy', suv:'SUV', luxury:'Luxury', van:'Van & MPV' };
 const FUEL_ICON  = { Petrol:'⛽', Diesel:'🛢', Hybrid:'🌿', 'Petrol+LPG':'⛽', 'Petrol/LPG':'⛽' };
 
-let activeCar = null;
 let activeCat = 'all';
 
 // ─── RENDER ───
@@ -1055,123 +864,11 @@ function scrollToFleet() {
   document.getElementById('fleet').scrollIntoView({ behavior:'smooth', block:'start' });
 }
 
-// ─── MODAL ───
-function openModal(id) {
-  activeCar = CARS.find(c => String(c.id) === String(id));
-  if (!activeCar) return;
-
-  document.getElementById('modal-sub').textContent =
-    `${activeCar.name} ${activeCar.year} · €${activeCar.ppd}/day`;
-
-  // Default dates if not yet filled
-  const mPd = document.getElementById('m-pd');
-  const mRd = document.getElementById('m-rd');
-  if (!mPd.value) mPd.value = mPd.dataset.default || '';
-  if (!mRd.value) mRd.value = mRd.dataset.default || '';
-
-  document.getElementById('modal-bg').classList.add('open');
-  document.body.style.overflow = 'hidden';
-  calcSummary();
-}
-
-function closeModal() {
-  document.getElementById('modal-bg').classList.remove('open');
-  document.body.style.overflow = '';
-}
-function closeBg(e) { if (e.target === document.getElementById('modal-bg')) closeModal(); }
-
-// ─── SUMMARY CALC ───
-function calcSummary() {
-  const pd = document.getElementById('m-pd').value;
-  const pt = document.getElementById('m-pt').value;
-  const rd = document.getElementById('m-rd').value;
-  const rt = document.getElementById('m-rt').value;
-  const box = document.getElementById('summary');
-
-  if (!pd || !rd || !activeCar) { box.style.display='none'; return; }
-
-  const pickup = new Date(`${pd}T${pt||'00:00'}`);
-  const ret    = new Date(`${rd}T${rt||'00:00'}`);
-  const ms = ret - pickup;
-  if (ms <= 0) { box.style.display='none'; return; }
-
-  const days  = Math.ceil(ms / 86400000);
-  const total = days * activeCar.ppd;
-
-  document.getElementById('s-days').textContent  = `${days} day${days!==1?'s':''}`;
-  document.getElementById('s-rate').textContent  = `€${activeCar.ppd}/day`;
-  document.getElementById('s-total').textContent = `€${total}`;
-  document.getElementById('s-dep').innerHTML =
-    `💵 Security deposit: <b>€${activeCar.dep}</b> — returned in cash immediately when you hand back the keys. No delays.`;
-  box.style.display = 'block';
-}
-
-['m-pd','m-pt','m-rd','m-rt'].forEach(id =>
-  document.getElementById(id).addEventListener('change', calcSummary)
-);
-
-// ─── WHATSAPP SEND ───
-function sendWA() {
-  const loc = document.getElementById('m-loc').value;
-  const pd  = document.getElementById('m-pd').value;
-  const pt  = document.getElementById('m-pt').value  || '00:00';
-  const rd  = document.getElementById('m-rd').value;
-  const rt  = document.getElementById('m-rt').value  || '00:00';
-
-  if (!loc || !pd || !rd || !activeCar) {
-    alert('Please fill in all details before confirming.'); return;
-  }
-  const pickup = new Date(`${pd}T${pt}`);
-  const ret    = new Date(`${rd}T${rt}`);
-  if (ret <= pickup) { alert('Return date must be after pickup date.'); return; }
-
-  const days  = Math.ceil((ret - pickup) / 86400000);
-  const total = days * activeCar.ppd;
-
-  const fmtDate = d => d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
-  const fmtTime = d => d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
-
-  const lines = [
-    'Hello UDrive! 🚗',
-    '',
-    '*Booking Request*',
-    '',
-    `🚙 Car: *${activeCar.name} ${activeCar.year}*`,
-    `📍 Pickup: *${loc}*`,
-    `📅 From: *${fmtDate(pickup)} at ${fmtTime(pickup)}*`,
-    `📅 To:   *${fmtDate(ret)} at ${fmtTime(ret)}*`,
-    `⏱️ Duration: *${days} day${days!==1?'s':''}*`,
-    `💰 Rate: €${activeCar.ppd}/day`,
-    `💳 Total Rental: *€${total}*`,
-    `🏦 Deposit: *€${activeCar.dep}* _(returned in cash on key handover)_`,
-    '',
-    'Please confirm availability. Thank you!',
-  ];
-  window.open(`https://wa.me/355693755827?text=${encodeURIComponent(lines.join('\n'))}`, '_blank');
-}
-
 // ─── SCROLL REVEAL ───
 const revealObs = new IntersectionObserver(entries => {
   entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('vis'); revealObs.unobserve(e.target); } });
 }, { threshold: 0.08 });
 document.querySelectorAll('.fade-up').forEach(el => revealObs.observe(el));
-
-// ─── DEFAULT DATES ───
-(function setDates() {
-  const fmt = d => d.toISOString().split('T')[0];
-  const today    = new Date();
-  const tomorrow = new Date(today); tomorrow.setDate(today.getDate()+1);
-  const weekOut  = new Date(today); weekOut.setDate(today.getDate()+7);
-  const mPd = document.getElementById('m-pd');
-  const mRd = document.getElementById('m-rd');
-  mPd.min = fmt(today);
-  mRd.min = fmt(today);
-  mPd.dataset.default = fmt(tomorrow);
-  mRd.dataset.default = fmt(weekOut);
-})();
-
-// ─── ESC KEY ───
-document.addEventListener('keydown', e => { if (e.key==='Escape') closeModal(); });
 
 // ─── TRANSLATIONS ───
 let lang = 'en';
@@ -1180,8 +877,6 @@ const T = {
     navWa:'WhatsApp Us', navTagline:'🇦🇱 Albania &amp; Kosovo · Airport pickup · No credit card 🇽🇰', heroPill:'<span>🇦🇱</span> Albania &amp; Kosovo Car Rental <span>🇽🇰</span>',
     heroTitle:'',
     heroSub:'Premium car rental from <strong>Tirana Airport (TIA)</strong> and <strong>Pristina Airport (PRN)</strong>. No hidden fees, no credit card, <strong>deposit returned in cash the moment you hand back the keys.</strong>',
-    labelLoc:'📍 Pickup Location', labelPd:'📅 Pickup Date', labelPt:'⏰ Pickup Time', labelRd:'📅 Return Date', labelRt:'⏰ Return Time',
-    optAirport:'Airport…', modalAirport:'Select airport…', findBtn:'View Our Fleet →',
     trust1h:'No Hidden Fees', trust1s:'What you see is what you pay',
     trust2h:'24/7 Support', trust2s:'Always on WhatsApp',
     trust3h:'Albanian Hospitality', trust3s:'Genuine care, every rental',
@@ -1198,17 +893,11 @@ const T = {
     prnName:'Pristina International Airport', prnIata:'PRN · Adem Jashari',
     prnDesc:"Serving Kosovo's capital and the wider region. Full fleet available at Pristina Airport — Gulf, Albanian, and international guests welcome.",
     locOpen:'🕐 Open 24 / 7 — Always Available',
-    modalTitle:'Book Your Car', waBookBtn:'Confirm Booking via WhatsApp',
-    modalNote:'💳 No credit card · Cash deposit · Returned instantly on key handover',
-    sumDur:'Duration', sumRate:'Rate', sumTotal:'Total',
-    sumDepTag:'returned in cash on key handover', sumDepPrefix:'Security deposit:',
   },
   sq: {
     navWa:'Na Kontaktoni', navTagline:'🇦🇱 Shqipëri &amp; Kosovë · Marrje në aeroport · Pa kartë 🇽🇰', heroPill:'<span>🇦🇱</span> Shqipëri &amp; Kosovë - Marrje me Qira <span>🇽🇰</span>',
     heroTitle:'',
     heroSub:'Marrje me qira makinash nga <strong>Aeroporti i Tiranës (TIA)</strong> dhe <strong>Aeroporti i Prishtinës (PRN)</strong>. Pa tarifa të fshehura, pa kartë krediti, <strong>depozita kthehet në cash sapo dorëzoni çelësat.</strong>',
-    labelLoc:'📍 Pika e Marrjes', labelPd:'📅 Data e Marrjes', labelPt:'⏰ Ora e Marrjes', labelRd:'📅 Data e Kthimit', labelRt:'⏰ Ora e Kthimit',
-    optAirport:'Aeroporti…', modalAirport:'Zgjidh aeroportin…', findBtn:'Shiko Flotën →',
     trust1h:'Pa Tarifa të Fshehura', trust1s:'Çfarë shihni, atë paguani',
     trust2h:'Mbështetje 24/7', trust2s:'Gjithmonë në WhatsApp',
     trust3h:'Mikpritja Shqiptare', trust3s:'Kujdes i vërtetë, çdo herë',
@@ -1225,17 +914,11 @@ const T = {
     prnName:'Aeroporti Ndërkombëtar i Prishtinës', prnIata:'PRN · Adem Jashari',
     prnDesc:'Duke shërbyer kryeqytetin e Kosovës dhe rajonin e gjerë. Flotëza e plotë disponueshme në Aeroportin e Prishtinës — mysafirë nga Gjiri, shqiptarë dhe ndërkombëtarë të mirëpritur.',
     locOpen:'🕐 Hapur 24/7 — Gjithmonë i Disponueshëm',
-    modalTitle:'Rezervoni Makinën', waBookBtn:'Konfirmo Rezervimin në WhatsApp',
-    modalNote:'💳 Pa kartë krediti · Depozitë cash · Kthim i menjëhershëm',
-    sumDur:'Kohëzgjatja', sumRate:'Tarifa', sumTotal:'Totali',
-    sumDepTag:'kthehet cash sapo dorëzoni çelësat', sumDepPrefix:'Depozita e sigurisë:',
   },
   ar: {
     navWa:'واتساب', navTagline:'🇦🇱 ألبانيا وكوسوفو · استلام من المطار · بدون بطاقة 🇽🇰', heroPill:'<span>🇦🇱</span> تأجير سيارات — ألبانيا وكوسوفو <span>🇽🇰</span>',
     heroTitle:'',
     heroSub:'تأجير سيارات فاخر من <strong>مطار تيرانا (TIA)</strong> و<strong>مطار بريشتينا (PRN)</strong>. لا رسوم خفية، لا بطاقة ائتمان، <strong>الوديعة تُرجع نقداً فور تسليم المفاتيح.</strong>',
-    labelLoc:'📍 موقع الاستلام', labelPd:'📅 تاريخ الاستلام', labelPt:'⏰ وقت الاستلام', labelRd:'📅 تاريخ الإرجاع', labelRt:'⏰ وقت الإرجاع',
-    optAirport:'المطار…', modalAirport:'اختر المطار…', findBtn:'← شاهد أسطولنا',
     trust1h:'بدون رسوم خفية', trust1s:'ما تراه هو ما تدفعه',
     trust2h:'دعم على مدار الساعة', trust2s:'متاحون دائماً على واتساب',
     trust3h:'الضيافة الألبانية', trust3s:'اهتمام حقيقي في كل تأجير',
@@ -1252,10 +935,6 @@ const T = {
     prnName:'مطار بريشتينا الدولي', prnIata:'PRN · آدم ياشاري',
     prnDesc:'نخدم عاصمة كوسوفو والمنطقة الأوسع. أسطول كامل متاح في مطار بريشتينا — مرحباً بالضيوف من الخليج وألبانيا والعالم.',
     locOpen:'🕐 مفتوح 24/7 — متاح دائماً',
-    modalTitle:'احجز سيارتك', waBookBtn:'تأكيد الحجز عبر واتساب',
-    modalNote:'💳 بدون بطاقة ائتمان · وديعة نقدية · تُرجع فوراً عند التسليم',
-    sumDur:'المدة', sumRate:'السعر', sumTotal:'الإجمالي',
-    sumDepTag:'تُرجع نقداً عند تسليم المفاتيح', sumDepPrefix:'وديعة الأمان:',
   },
 };
 

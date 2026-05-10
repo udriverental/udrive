@@ -499,7 +499,12 @@
 
   // ── Booking ──
   function initBooking() {
-    const fmt = d => d.toISOString().split('T')[0];
+    const fmt = d => {
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${y}-${m}-${day}`;
+    };
     const today    = new Date();
     const tomorrow = new Date(today); tomorrow.setDate(today.getDate()+1);
     const weekOut  = new Date(today); weekOut.setDate(today.getDate()+7);

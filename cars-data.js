@@ -46,12 +46,12 @@ window.CARS = [
     features:['A/C','Navigation','LED Lights','Parking Sensors'],
     desc:"A near-new Mondeo with full LED lights, navigation, and a quiet, planted feel on the highway. Punches well above its price for executive comfort." },
 
-  { id:9,  name:'VW Passat',        year:2013, cat:'economy', tx:'Automatic', fuel:'Petrol',      seats:5, ppd:50,  dep:300,
+  { id:9,  name:'VW Passat',        year:2013, variant:'blue', cat:'economy', tx:'Automatic', fuel:'Petrol',      seats:5, ppd:50,  dep:300,
     imgs:['cars/VW%20Passat%20Blue/17CF6CC1-E5A1-4B44-B1BD-7017C2E1A2A0.JPG','cars/VW%20Passat%20Blue/3D042D47-A67C-4BF0-A95A-F0E5C476EC09.jpeg','cars/VW%20Passat%20Blue/C6BD6875-C95B-46C5-9F7C-170D8A663B61.JPG'],
     features:['Panoramic Roof','Leather Seats','Navigation','Heated Seats'],
     desc:"Panoramic roof, leather seats, and heated seats make this Passat feel a class above its price tag. A favourite for couples on longer Albania–Kosovo loops." },
 
-  { id:10, name:'VW Passat',        year:2013, cat:'economy', tx:'Automatic', fuel:'Petrol',      seats:5, ppd:50,  dep:300,
+  { id:10, name:'VW Passat',        year:2013, variant:'grey', cat:'economy', tx:'Automatic', fuel:'Petrol',      seats:5, ppd:50,  dep:300,
     imgs:['cars/VW%20Passat%20Grey/5C60D808-82AD-4B30-AF6C-9D5B2194D87D.jpeg','cars/VW%20Passat%20Grey/71DB31AF-06F4-4604-A65E-A940E748A59E.jpg','cars/VW%20Passat%20Grey/7329BE88-B8F3-4DA1-8E22-146EEE0D7930.JPG','cars/VW%20Passat%20Grey/C702DF3E-3D95-4477-A7E7-18359CA6119A.jpeg'],
     features:['A/C','Navigation','Bluetooth','Parking Sensors'],
     desc:"Roomy executive sedan with navigation and parking sensors. Comfortable enough for four adults plus luggage on a full-day drive." },
@@ -108,12 +108,12 @@ window.CARS = [
     features:['Estate Wagon','Navigation','Large Boot','A/C'],
     desc:"A surprisingly affordable Mercedes — the older estate body gives you a huge boot and the trademark Mercedes ride quality at economy-car money." },
 
-  { id:22, name:'Mercedes E-Class', year:2016, cat:'luxury',  tx:'Automatic', fuel:'Diesel',      seats:5, ppd:90,  dep:300,
+  { id:22, name:'Mercedes E-Class', year:2016, variant:'white', cat:'luxury',  tx:'Automatic', fuel:'Diesel',      seats:5, ppd:90,  dep:300,
     imgs:['cars/Mercedes%20E-Class%20White/IMG_0533.jpg','cars/Mercedes%20E-Class%20White/IMG_0535.jpg','cars/Mercedes%20E-Class%20White/IMG_0745.jpeg','cars/Mercedes%20E-Class%20White/IMG_0747.jpeg'],
     features:['Executive Sedan','Navigation','Leather Seats','Heated Seats'],
     desc:"Executive sedan in elegant white with leather and heated seats. The car you book when you want clients or family to arrive feeling looked-after." },
 
-  { id:23, name:'Mercedes E-Class', year:2016, cat:'luxury',  tx:'Automatic', fuel:'Diesel',      seats:5, ppd:70,  dep:300,
+  { id:23, name:'Mercedes E-Class', year:2016, variant:'amg', cat:'luxury',  tx:'Automatic', fuel:'Diesel',      seats:5, ppd:70,  dep:300,
     imgs:['cars/Mercedes%20E-Class%20AMG/IMG_4659.jpeg','cars/Mercedes%20E-Class%20AMG/IMG_4660.jpeg','cars/Mercedes%20E-Class%20AMG/IMG_4661.jpeg','cars/Mercedes%20E-Class%20AMG/IMG_4662.jpeg','cars/Mercedes%20E-Class%20AMG/IMG_4674.jpeg'],
     features:['AMG Look','Navigation','Leather Seats','Panoramic Roof'],
     desc:"AMG-styled E-Class with a panoramic roof and full leather — the closest thing in our fleet to driving a chauffeur car yourself." },
@@ -159,7 +159,7 @@ window.CARS = [
 // Used by both pages: index.html builds the share link, car.html resolves ?car=.
 window.carSlug = function(c) {
   if (!c) return '';
-  const base = `${c.name} ${c.year || ''}`.toLowerCase().trim();
+  const base = `${c.name} ${c.year || ''} ${c.variant || ''}`.toLowerCase().trim();
   return base
     .replace(/[^a-z0-9]+/g, '-')   // non-alphanumeric -> hyphen
     .replace(/^-+|-+$/g, '');       // trim leading/trailing hyphens

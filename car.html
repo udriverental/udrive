@@ -10,7 +10,7 @@
   <script src="cars-data.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet" />
 
   <style>
     :root {
@@ -65,6 +65,28 @@
       transition: background .18s ease, transform .18s ease;
     }
     .nav-back:hover { background: var(--card); transform: translateY(-1px); }
+
+    .nav-right { display: flex; align-items: center; gap: 10px; }
+    .lang-sw { display: flex; gap: 4px; align-items: center; }
+    .lang-btn {
+      padding: 5px 9px; border-radius: 100px;
+      background: transparent; border: 1px solid var(--line);
+      color: var(--muted); font-size: 11.5px; font-weight: 600;
+      cursor: pointer; letter-spacing: 0.04em;
+      font-family: 'DM Sans', sans-serif;
+      transition: border-color 0.18s, color 0.18s, background 0.18s;
+    }
+    .lang-btn:hover { border-color: rgba(255,255,255,0.22); color: var(--txt); }
+    .lang-btn.on { background: var(--or); border-color: var(--or); color: #fff; }
+
+    /* ── Arabic / RTL overrides ── */
+    html[lang="ar"] body { font-family: 'Cairo', sans-serif; }
+    html[lang="ar"] h1, html[lang="ar"] h2, html[lang="ar"] h3, html[lang="ar"] h4 { font-family: 'Cairo', sans-serif; }
+    html[lang="ar"] .price-dep { margin-left: 0; margin-right: auto; }
+    html[lang="ar"] .gal-prev { left: auto; right: 12px; }
+    html[lang="ar"] .gal-next { right: auto; left: 12px; }
+    html[lang="ar"] .gal-counter { right: auto; left: 12px; }
+    html:not([lang="en"]) .car-desc { display: none !important; }
 
     /* ── PAGE ── */
     .page {
@@ -343,16 +365,189 @@
       <img src="brand_assets/udrive-logo-light.png" alt="UDrive" class="nav-logo" />
     </picture>
   </a>
-  <a href="index.html" class="nav-back">← All cars</a>
+  <div class="nav-right">
+    <div class="lang-sw">
+      <button class="lang-btn on" data-lang="en" onclick="setLang('en')">ENG</button>
+      <button class="lang-btn" data-lang="sq" onclick="setLang('sq')">SHQ</button>
+      <button class="lang-btn" data-lang="ar" onclick="setLang('ar')">عربي</button>
+    </div>
+    <a href="index.html" class="nav-back" id="nav-back-link">← All cars</a>
+  </div>
 </nav>
 
 <main id="main">
-  <div style="min-height:60vh;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:14px;">
+  <div id="loading-msg" style="min-height:60vh;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:14px;">
     Loading…
   </div>
 </main>
 
 <script>
+
+  // ── Translations ──
+  const T = {
+    en: {
+      navBack:'← All cars',
+      catEconomy:'Economy', catSuv:'SUV', catLuxury:'Luxury', catVan:'Van & MPV',
+      perDay:'per day',
+      depositLine:(dep)=>`Deposit: <b>€${dep}</b> (cash, returned instantly)`,
+      specTx:'Transmission', specFuel:'Fuel', specSeats:'Seats', specYear:'Year',
+      featuresTitle:'Features',
+      bookTitle:'Book this car',
+      labelLoc:'📍 Pickup Location',
+      airportPlaceholder:'Select airport…',
+      airportTia:'🇦🇱 Tirana Airport — TIA',
+      airportPrn:'🇽🇰 Pristina Airport — PRN',
+      labelPd:'📅 Pickup Date', labelPt:'⏰ Pickup Time',
+      labelRd:'📅 Return Date', labelRt:'⏰ Return Time',
+      sumDur:'Duration', sumRate:'Rate', sumTotal:'Total',
+      sumDays:(d)=>`${d} day${d!==1?'s':''}`,
+      sumRateVal:(p)=>`€${p}/day`,
+      sumDepLine:(dep)=>`💵 Security deposit: <b>€${dep}</b> — returned in cash immediately when you hand back the keys. No delays.`,
+      waBtn:'Confirm Booking via WhatsApp',
+      bookingNote:'💳 No credit card · Cash deposit · Returned instantly on key handover',
+      copyBtn:"🔗 Copy this car's link",
+      copyToast:'Link copied!', copyToastFail:'Could not copy.',
+      alertFill:'Please fill in all details before confirming.',
+      alertDates:'Return date must be after pickup date.',
+      notFoundTitle:'Car not found',
+      notFoundBody:"The link you opened doesn't match any car in our fleet. It may have been removed or the link is mistyped.",
+      notFoundCta:'See all cars →',
+      titleSuffix:' — UDrive Car Rental',
+      metaDesc:(name,year,ppd)=>`Rent the ${name} ${year} from UDrive — €${ppd}/day, deposit returned in cash on key handover.`,
+      photoAlt:(name,year,n)=>`${name} ${year} photo ${n}`,
+      ariaPrev:'Previous photo', ariaNext:'Next photo',
+      loading:'Loading…',
+      // WhatsApp message template
+      waHello:'Hello UDrive! 🚗',
+      waHeader:'*Booking Request*',
+      waCar:(n,y)=>`🚙 Car: *${n} ${y}*`,
+      waPickup:(loc)=>`📍 Pickup: *${loc}*`,
+      waFrom:(d,t)=>`📅 From: *${d} at ${t}*`,
+      waTo:(d,t)=>`📅 To:   *${d} at ${t}*`,
+      waDur:(d)=>`⏱️ Duration: *${d} day${d!==1?'s':''}*`,
+      waRate:(p)=>`💰 Rate: €${p}/day`,
+      waTotal:(t)=>`💳 Total Rental: *€${t}*`,
+      waDep:(dep)=>`🏦 Deposit: *€${dep}* _(returned in cash on key handover)_`,
+      waPlease:'Please confirm availability. Thank you!',
+    },
+    sq: {
+      navBack:'← Të gjitha makinat',
+      catEconomy:'Ekonomike', catSuv:'SUV', catLuxury:'Luksoze', catVan:'Van & MPV',
+      perDay:'në ditë',
+      depositLine:(dep)=>`Depozitë: <b>€${dep}</b> (cash, kthim i menjëhershëm)`,
+      specTx:'Transmisioni', specFuel:'Karburanti', specSeats:'Vendet', specYear:'Viti',
+      featuresTitle:'Veçoritë',
+      bookTitle:'Rezervoni këtë makinë',
+      labelLoc:'📍 Pika e Marrjes',
+      airportPlaceholder:'Zgjidh aeroportin…',
+      airportTia:'🇦🇱 Aeroporti i Tiranës — TIA',
+      airportPrn:'🇽🇰 Aeroporti i Prishtinës — PRN',
+      labelPd:'📅 Data e Marrjes', labelPt:'⏰ Ora e Marrjes',
+      labelRd:'📅 Data e Kthimit', labelRt:'⏰ Ora e Kthimit',
+      sumDur:'Kohëzgjatja', sumRate:'Tarifa', sumTotal:'Totali',
+      sumDays:(d)=>`${d} ditë`,
+      sumRateVal:(p)=>`€${p}/ditë`,
+      sumDepLine:(dep)=>`💵 Depozita e sigurisë: <b>€${dep}</b> — kthehet në cash menjëherë sapo dorëzoni çelësat. Pa vonesa.`,
+      waBtn:'Konfirmo Rezervimin në WhatsApp',
+      bookingNote:'💳 Pa kartë krediti · Depozitë cash · Kthim i menjëhershëm',
+      copyBtn:'🔗 Kopjo linkun e kësaj makine',
+      copyToast:'Linku u kopjua!', copyToastFail:'Nuk u kopjua dot.',
+      alertFill:'Ju lutemi plotësoni të gjitha të dhënat para konfirmimit.',
+      alertDates:'Data e kthimit duhet të jetë pas datës së marrjes.',
+      notFoundTitle:'Makina nuk u gjet',
+      notFoundBody:'Linku që hapet nuk përputhet me asnjë makinë në flotën tonë. Mund të jetë hequr ose linku është gabim.',
+      notFoundCta:'Shiko të gjitha makinat →',
+      titleSuffix:' — UDrive Marrje me Qira',
+      metaDesc:(name,year,ppd)=>`Merrni me qira ${name} ${year} nga UDrive — €${ppd}/ditë, depozita kthehet në cash sapo dorëzoni çelësat.`,
+      photoAlt:(name,year,n)=>`${name} ${year} foto ${n}`,
+      ariaPrev:'Foto e mëparshme', ariaNext:'Foto tjetër',
+      loading:'Duke u ngarkuar…',
+      waHello:'Përshëndetje UDrive! 🚗',
+      waHeader:'*Kërkesë Rezervimi*',
+      waCar:(n,y)=>`🚙 Makina: *${n} ${y}*`,
+      waPickup:(loc)=>`📍 Marrja: *${loc}*`,
+      waFrom:(d,t)=>`📅 Nga: *${d} në ${t}*`,
+      waTo:(d,t)=>`📅 Deri: *${d} në ${t}*`,
+      waDur:(d)=>`⏱️ Kohëzgjatja: *${d} ditë*`,
+      waRate:(p)=>`💰 Tarifa: €${p}/ditë`,
+      waTotal:(t)=>`💳 Totali: *€${t}*`,
+      waDep:(dep)=>`🏦 Depozita: *€${dep}* _(kthim në cash sapo dorëzoni çelësat)_`,
+      waPlease:'Ju lutem konfirmoni disponueshmërinë. Faleminderit!',
+    },
+    ar: {
+      navBack:'→ كل السيارات',
+      catEconomy:'اقتصادية', catSuv:'SUV', catLuxury:'فاخرة', catVan:'فان',
+      perDay:'في اليوم',
+      depositLine:(dep)=>`الوديعة: <b>€${dep}</b> (نقداً، تُرجع فوراً)`,
+      specTx:'ناقل الحركة', specFuel:'الوقود', specSeats:'المقاعد', specYear:'السنة',
+      featuresTitle:'المميزات',
+      bookTitle:'احجز هذه السيارة',
+      labelLoc:'📍 موقع الاستلام',
+      airportPlaceholder:'اختر المطار…',
+      airportTia:'🇦🇱 مطار تيرانا — TIA',
+      airportPrn:'🇽🇰 مطار بريشتينا — PRN',
+      labelPd:'📅 تاريخ الاستلام', labelPt:'⏰ وقت الاستلام',
+      labelRd:'📅 تاريخ الإرجاع', labelRt:'⏰ وقت الإرجاع',
+      sumDur:'المدة', sumRate:'السعر', sumTotal:'الإجمالي',
+      sumDays:(d)=>`${d} يوم`,
+      sumRateVal:(p)=>`€${p}/يوم`,
+      sumDepLine:(dep)=>`💵 وديعة الأمان: <b>€${dep}</b> — تُرجع نقداً فوراً عند تسليم المفاتيح. بدون تأخير.`,
+      waBtn:'تأكيد الحجز عبر واتساب',
+      bookingNote:'💳 بدون بطاقة ائتمان · وديعة نقدية · تُرجع فوراً عند التسليم',
+      copyBtn:'🔗 انسخ رابط هذه السيارة',
+      copyToast:'تم نسخ الرابط!', copyToastFail:'تعذر النسخ.',
+      alertFill:'يرجى ملء جميع التفاصيل قبل التأكيد.',
+      alertDates:'يجب أن يكون تاريخ الإرجاع بعد تاريخ الاستلام.',
+      notFoundTitle:'لم يتم العثور على السيارة',
+      notFoundBody:'الرابط الذي فتحته لا يطابق أي سيارة في أسطولنا. ربما تمت إزالتها أو أن الرابط غير صحيح.',
+      notFoundCta:'← شاهد كل السيارات',
+      titleSuffix:' — UDrive لتأجير السيارات',
+      metaDesc:(name,year,ppd)=>`استأجر ${name} ${year} من UDrive — €${ppd}/يوم، الوديعة تُرجع نقداً عند تسليم المفاتيح.`,
+      photoAlt:(name,year,n)=>`${name} ${year} صورة ${n}`,
+      ariaPrev:'الصورة السابقة', ariaNext:'الصورة التالية',
+      loading:'جارٍ التحميل…',
+      waHello:'مرحباً UDrive! 🚗',
+      waHeader:'*طلب حجز*',
+      waCar:(n,y)=>`🚙 السيارة: *${n} ${y}*`,
+      waPickup:(loc)=>`📍 الاستلام: *${loc}*`,
+      waFrom:(d,t)=>`📅 من: *${d} في ${t}*`,
+      waTo:(d,t)=>`📅 إلى: *${d} في ${t}*`,
+      waDur:(d)=>`⏱️ المدة: *${d} يوم*`,
+      waRate:(p)=>`💰 السعر: €${p}/يوم`,
+      waTotal:(t)=>`💳 الإجمالي: *€${t}*`,
+      waDep:(dep)=>`🏦 الوديعة: *€${dep}* _(تُرجع نقداً عند تسليم المفاتيح)_`,
+      waPlease:'يرجى تأكيد التوفر. شكراً!',
+    },
+  };
+
+  let lang = 'en';
+  try {
+    const saved = localStorage.getItem('udriveLang');
+    if (saved && T[saved]) lang = saved;
+  } catch {}
+  // Apply lang/dir + localized loading message and back-link before first render.
+  document.documentElement.lang = lang;
+  document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+  document.addEventListener('DOMContentLoaded', () => {
+    const t = T[lang] || T.en;
+    const loading = document.getElementById('loading-msg');
+    if (loading) loading.textContent = t.loading;
+    const back = document.getElementById('nav-back-link');
+    if (back) back.textContent = t.navBack;
+    document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('on', b.dataset.lang === lang));
+  });
+
+  function setLang(code) {
+    if (!T[code]) code = 'en';
+    lang = code;
+    try { localStorage.setItem('udriveLang', code); } catch {}
+    document.documentElement.lang = code;
+    document.documentElement.dir = code === 'ar' ? 'rtl' : 'ltr';
+    document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('on', b.dataset.lang === code));
+    const back = document.getElementById('nav-back-link');
+    if (back) back.textContent = T[code].navBack;
+    renderInner();
+  }
 
   // ── Resolve which car to show ──
   const params = new URLSearchParams(location.search);
@@ -370,19 +565,26 @@
   }
 
   function renderInner() {
+  const t = T[lang] || T.en;
+  document.documentElement.lang = lang;
+  document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('on', b.dataset.lang === lang));
+  const back = document.getElementById('nav-back-link');
+  if (back) back.textContent = t.navBack;
+
   if (!car) {
     main.innerHTML = `
       <div class="notfound">
-        <h1>Car not found</h1>
-        <p>The link you opened doesn't match any car in our fleet. It may have been removed or the link is mistyped.</p>
-        <a href="index.html">See all cars →</a>
+        <h1>${t.notFoundTitle}</h1>
+        <p>${t.notFoundBody}</p>
+        <a href="index.html">${t.notFoundCta}</a>
       </div>`;
   } else {
-    document.title = `${car.name} ${car.year} — UDrive Car Rental`;
+    document.title = `${car.name} ${car.year}${t.titleSuffix}`;
     const meta = document.querySelector('meta[name="description"]');
-    if (meta) meta.setAttribute('content', `Rent the ${car.name} ${car.year} from UDrive — €${car.ppd}/day, deposit returned in cash on key handover.`);
+    if (meta) meta.setAttribute('content', t.metaDesc(car.name, car.year, car.ppd));
 
-    const CAT_LABEL = { economy:'Economy', suv:'SUV', luxury:'Luxury', van:'Van & MPV' };
+    const CAT_LABEL = { economy:t.catEconomy, suv:t.catSuv, luxury:t.catLuxury, van:t.catVan };
     const FUEL_ICON = { Petrol:'⛽', Diesel:'🛢', Hybrid:'🌿', 'Petrol+LPG':'⛽', 'Petrol/LPG':'⛽' };
 
     main.innerHTML = `
@@ -391,13 +593,13 @@
           <div class="gal-main" id="gal-main">
             ${car.imgs.map((src, i) => `
               <img class="gal-img${i===0?' on':''}" data-idx="${i}"
-                src="${src}" alt="${car.name} ${car.year} photo ${i+1}"
+                src="${src}" alt="${t.photoAlt(car.name, car.year, i+1)}"
                 ${i===0?'':'loading="lazy"'} />
             `).join('')}
             <div class="gal-shade"></div>
             ${car.imgs.length > 1 ? `
-              <button class="gal-btn gal-prev" onclick="slideGal(-1)" aria-label="Previous photo">&#8249;</button>
-              <button class="gal-btn gal-next" onclick="slideGal(1)" aria-label="Next photo">&#8250;</button>
+              <button class="gal-btn gal-prev" onclick="slideGal(-1)" aria-label="${t.ariaPrev}">&#8249;</button>
+              <button class="gal-btn gal-next" onclick="slideGal(1)" aria-label="${t.ariaNext}">&#8250;</button>
               <div class="gal-counter"><span id="gal-cur">1</span> / ${car.imgs.length}</div>
             ` : ''}
           </div>
@@ -409,83 +611,83 @@
                 </div>
               `).join('')}
             </div>` : ''}
-          ${car.desc ? `<p class="car-desc car-desc-desktop">${car.desc}</p>` : ''}
+          ${car.desc && lang === 'en' ? `<p class="car-desc car-desc-desktop">${car.desc}</p>` : ''}
         </div>
 
         <div class="details">
           <span class="cat-badge cat-${car.cat}">${CAT_LABEL[car.cat] || car.cat}</span>
           <h1 class="car-title">${car.name}<span class="car-title-year">${car.year}</span></h1>
-          ${car.desc ? `<p class="car-desc car-desc-mobile">${car.desc}</p>` : ''}
+          ${car.desc && lang === 'en' ? `<p class="car-desc car-desc-mobile">${car.desc}</p>` : ''}
 
           <div class="price-row">
             <span class="price-num">€${car.ppd}</span>
-            <span class="price-unit">per day</span>
-            <span class="price-dep">Deposit: <b>€${car.dep}</b> (cash, returned instantly)</span>
+            <span class="price-unit">${t.perDay}</span>
+            <span class="price-dep">${t.depositLine(car.dep)}</span>
           </div>
 
           <div class="specs">
-            <div class="spec"><span class="spec-lbl">Transmission</span><span class="spec-val">⚙️ ${car.tx}</span></div>
-            <div class="spec"><span class="spec-lbl">Fuel</span><span class="spec-val">${FUEL_ICON[car.fuel]||'⛽'} ${car.fuel}</span></div>
-            <div class="spec"><span class="spec-lbl">Seats</span><span class="spec-val">👤 ${car.seats}</span></div>
-            <div class="spec"><span class="spec-lbl">Year</span><span class="spec-val">📅 ${car.year}</span></div>
+            <div class="spec"><span class="spec-lbl">${t.specTx}</span><span class="spec-val">⚙️ ${car.tx}</span></div>
+            <div class="spec"><span class="spec-lbl">${t.specFuel}</span><span class="spec-val">${FUEL_ICON[car.fuel]||'⛽'} ${car.fuel}</span></div>
+            <div class="spec"><span class="spec-lbl">${t.specSeats}</span><span class="spec-val">👤 ${car.seats}</span></div>
+            <div class="spec"><span class="spec-lbl">${t.specYear}</span><span class="spec-val">📅 ${car.year}</span></div>
           </div>
 
           ${car.features && car.features.length ? `
             <div>
-              <div class="features-title">Features</div>
+              <div class="features-title">${t.featuresTitle}</div>
               <div class="features">
                 ${car.features.map(f => `<span class="feat">${f}</span>`).join('')}
               </div>
             </div>` : ''}
 
           <div class="booking">
-            <h2 class="booking-title">Book this car</h2>
-            <div class="booking-sub">${car.name} ${car.year} · €${car.ppd}/day</div>
+            <h2 class="booking-title">${t.bookTitle}</h2>
+            <div class="booking-sub">${car.name} ${car.year} · €${car.ppd} ${t.perDay}</div>
 
             <div class="form-grid">
               <div class="mg-full">
-                <label class="f-label" for="m-loc">📍 Pickup Location</label>
+                <label class="f-label" for="m-loc">${t.labelLoc}</label>
                 <select class="f-input" id="m-loc">
-                  <option value="">Select airport…</option>
-                  <option value="Tirana International Airport (TIA)">🇦🇱 Tirana Airport — TIA</option>
-                  <option value="Pristina Airport (PRN)">🇽🇰 Pristina Airport — PRN</option>
+                  <option value="">${t.airportPlaceholder}</option>
+                  <option value="Tirana International Airport (TIA)">${t.airportTia}</option>
+                  <option value="Pristina Airport (PRN)">${t.airportPrn}</option>
                 </select>
               </div>
               <div>
-                <label class="f-label" for="m-pd">📅 Pickup Date</label>
+                <label class="f-label" for="m-pd">${t.labelPd}</label>
                 <input type="date" class="f-input" id="m-pd" />
               </div>
               <div>
-                <label class="f-label" for="m-pt">⏰ Pickup Time</label>
+                <label class="f-label" for="m-pt">${t.labelPt}</label>
                 <input type="time" class="f-input" id="m-pt" value="10:00" />
               </div>
               <div>
-                <label class="f-label" for="m-rd">📅 Return Date</label>
+                <label class="f-label" for="m-rd">${t.labelRd}</label>
                 <input type="date" class="f-input" id="m-rd" />
               </div>
               <div>
-                <label class="f-label" for="m-rt">⏰ Return Time</label>
+                <label class="f-label" for="m-rt">${t.labelRt}</label>
                 <input type="time" class="f-input" id="m-rt" value="10:00" />
               </div>
             </div>
 
             <div class="summary" id="summary" style="display:none">
-              <div class="sum-row"><span class="sum-lbl">Duration</span><span class="sum-val" id="s-days">—</span></div>
-              <div class="sum-row"><span class="sum-lbl">Rate</span><span class="sum-val" id="s-rate">—</span></div>
+              <div class="sum-row"><span class="sum-lbl">${t.sumDur}</span><span class="sum-val" id="s-days">—</span></div>
+              <div class="sum-row"><span class="sum-lbl">${t.sumRate}</span><span class="sum-val" id="s-rate">—</span></div>
               <div class="sum-div"></div>
-              <div class="sum-row sum-total"><span class="sum-lbl">Total</span><span class="sum-val" id="s-total">—</span></div>
+              <div class="sum-row sum-total"><span class="sum-lbl">${t.sumTotal}</span><span class="sum-val" id="s-total">—</span></div>
               <div class="sum-dep" id="s-dep"></div>
             </div>
 
             <button class="wa-book-btn" onclick="sendWA()">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
-              Confirm Booking via WhatsApp
+              ${t.waBtn}
             </button>
 
-            <div class="booking-note">💳 No credit card · Cash deposit · Returned instantly on key handover</div>
+            <div class="booking-note">${t.bookingNote}</div>
 
             <div class="share-row">
-              <button class="btn" onclick="copyLink()">🔗 Copy this car's link</button>
+              <button class="btn" onclick="copyLink()">${t.copyBtn}</button>
             </div>
           </div>
         </div>
@@ -590,11 +792,11 @@
 
     const days  = Math.ceil(ms / 86400000);
     const total = days * car.ppd;
-    document.getElementById('s-days').textContent  = `${days} day${days!==1?'s':''}`;
-    document.getElementById('s-rate').textContent  = `€${car.ppd}/day`;
+    const t = T[lang] || T.en;
+    document.getElementById('s-days').textContent  = t.sumDays(days);
+    document.getElementById('s-rate').textContent  = t.sumRateVal(car.ppd);
     document.getElementById('s-total').textContent = `€${total}`;
-    document.getElementById('s-dep').innerHTML =
-      `💵 Security deposit: <b>€${car.dep}</b> — returned in cash immediately when you hand back the keys. No delays.`;
+    document.getElementById('s-dep').innerHTML     = t.sumDepLine(car.dep);
     box.style.display = 'block';
   }
 
@@ -605,32 +807,35 @@
     const pt  = document.getElementById('m-pt').value || '00:00';
     const rd  = document.getElementById('m-rd').value;
     const rt  = document.getElementById('m-rt').value || '00:00';
-    if (!loc || !pd || !rd) { alert('Please fill in all details before confirming.'); return; }
+    const t = T[lang] || T.en;
+    if (!loc || !pd || !rd) { alert(t.alertFill); return; }
     const pickup = new Date(`${pd}T${pt}`);
     const ret    = new Date(`${rd}T${rt}`);
-    if (ret <= pickup) { alert('Return date must be after pickup date.'); return; }
+    if (ret <= pickup) { alert(t.alertDates); return; }
 
     const days = Math.ceil((ret - pickup) / 86400000);
     const total = days * car.ppd;
-    const fmtDate = d => d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
-    const fmtTime = d => d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+    const localeMap = { en:'en-GB', sq:'sq-AL', ar:'ar' };
+    const locale = localeMap[lang] || 'en-GB';
+    const fmtDate = d => d.toLocaleDateString(locale,{day:'2-digit',month:'short',year:'numeric'});
+    const fmtTime = d => d.toLocaleTimeString(locale,{hour:'2-digit',minute:'2-digit'});
     const lines = [
-      'Hello UDrive! 🚗',
+      t.waHello,
       '',
-      '*Booking Request*',
+      t.waHeader,
       '',
-      `🚙 Car: *${car.name} ${car.year}*`,
-      `📍 Pickup: *${loc}*`,
-      `📅 From: *${fmtDate(pickup)} at ${fmtTime(pickup)}*`,
-      `📅 To:   *${fmtDate(ret)} at ${fmtTime(ret)}*`,
-      `⏱️ Duration: *${days} day${days!==1?'s':''}*`,
-      `💰 Rate: €${car.ppd}/day`,
-      `💳 Total Rental: *€${total}*`,
-      `🏦 Deposit: *€${car.dep}* _(returned in cash on key handover)_`,
+      t.waCar(car.name, car.year),
+      t.waPickup(loc),
+      t.waFrom(fmtDate(pickup), fmtTime(pickup)),
+      t.waTo(fmtDate(ret), fmtTime(ret)),
+      t.waDur(days),
+      t.waRate(car.ppd),
+      t.waTotal(total),
+      t.waDep(car.dep),
       '',
       `🔗 ${location.href}`,
       '',
-      'Please confirm availability. Thank you!',
+      t.waPlease,
     ];
     window.open(`https://wa.me/355693755827?text=${encodeURIComponent(lines.join('\n'))}`, '_blank');
   }
@@ -646,7 +851,7 @@
   }
   function doCopy(text) {
     if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(text).then(() => showToast('Link copied!')).catch(() => fallbackCopy(text));
+      navigator.clipboard.writeText(text).then(() => showToast((T[lang]||T.en).copyToast)).catch(() => fallbackCopy(text));
     } else {
       fallbackCopy(text);
     }
@@ -655,7 +860,7 @@
     const ta = document.createElement('textarea');
     ta.value = text; ta.style.position = 'fixed'; ta.style.left = '-9999px';
     document.body.appendChild(ta); ta.select();
-    try { document.execCommand('copy'); showToast('Link copied!'); } catch { showToast('Could not copy.'); }
+    try { document.execCommand('copy'); showToast((T[lang]||T.en).copyToast); } catch { showToast((T[lang]||T.en).copyToastFail); }
     document.body.removeChild(ta);
   }
   let __toastTimer = null;

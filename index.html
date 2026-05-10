@@ -970,7 +970,9 @@ window.__udriveApplyCars = function(arr) {
 window.__udriveFleetReady = __firstRender;
 
 function setLang(code) {
+  if (!T[code]) code = 'en';
   lang = code;
+  try { localStorage.setItem('udriveLang', code); } catch {}
   const t = T[code];
   document.documentElement.lang = code;
   document.documentElement.dir = code === 'ar' ? 'rtl' : 'ltr';
@@ -986,6 +988,13 @@ function setLang(code) {
   const activeTab = document.querySelector('.tab.on');
   renderCars(activeTab ? activeTab.dataset.cat : 'all');
 }
+
+// Restore previously chosen language across pages.
+(function restoreLang() {
+  let saved = null;
+  try { saved = localStorage.getItem('udriveLang'); } catch {}
+  if (saved && saved !== 'en' && T[saved]) setLang(saved);
+})();
 </script>
 
 <!-- ═══════════════════════════════════════════════════════════

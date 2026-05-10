@@ -20,10 +20,10 @@
       --card:    #111120;
       --raised:  #181826;
       --line:    rgba(255,255,255,0.07);
-      --glow:    rgba(249,115,22,0.18);
-      --or:      #F97316;
-      --or-d:    #d9620d;
-      --or-l:    #fb923c;
+      --glow:    rgba(234,90,30,0.18);
+      --or:      #EA5A1E;
+      --or-d:    #B33E0E;
+      --or-l:    #FF7A3D;
       --gold:    #d4a843;
       --gold-l:  #f0c96a;
       --txt:     #eeeef5;
@@ -127,21 +127,24 @@
       overflow: hidden;
     }
     .hero-orb1 {
-      position: absolute; border-radius: 50%; pointer-events: none;
-      width: 900px; height: 600px; top: -200px; left: 50%; transform: translateX(-50%);
-      background: radial-gradient(ellipse at center, rgba(249,115,22,0.10) 0%, transparent 68%);
-      filter: blur(2px);
+      position: absolute; pointer-events: none;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 70% 50% at 28% 18%, rgba(234,90,30,0.13) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 78% 35%, rgba(212,168,67,0.07) 0%, transparent 65%),
+        radial-gradient(ellipse 80% 60% at 50% 100%, rgba(38,32,82,0.45) 0%, transparent 70%);
     }
     .hero-orb2 {
       position: absolute; border-radius: 50%; pointer-events: none;
-      width: 500px; height: 500px; bottom: 0; right: -150px;
-      background: radial-gradient(ellipse at center, rgba(212,168,67,0.05) 0%, transparent 70%);
+      width: 500px; height: 500px; bottom: -120px; right: -150px;
+      background: radial-gradient(ellipse at center, rgba(255,122,61,0.06) 0%, transparent 70%);
+      filter: blur(8px);
     }
     .hero-grid {
       position: absolute; inset: 0; pointer-events: none;
       background-image:
-        linear-gradient(rgba(249,115,22,0.025) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(249,115,22,0.025) 1px, transparent 1px);
+        linear-gradient(rgba(234,90,30,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(234,90,30,0.025) 1px, transparent 1px);
       background-size: 64px 64px;
       mask-image: radial-gradient(ellipse 80% 60% at 50% 30%, black 30%, transparent 80%);
     }
@@ -153,9 +156,9 @@
     .hero-flag-pill {
       display: inline-flex; align-items: center; gap: 8px;
       padding: 5px 15px 5px 10px;
-      border: 1px solid rgba(249,115,22,0.22);
+      border: 1px solid rgba(234,90,30,0.22);
       border-radius: 100px; font-size: 12px; font-weight: 600;
-      color: var(--or-l); background: rgba(249,115,22,0.06);
+      color: var(--or-l); background: rgba(234,90,30,0.06);
       letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 26px;
     }
     .hero-flag-pill span { font-size: 16px; }
@@ -188,9 +191,9 @@
       border: 1px solid rgba(255,255,255,0.08);
       border-radius: 20px; padding: 22px 20px;
       box-shadow:
-        0 0 0 1px rgba(249,115,22,0.04),
+        0 0 0 1px rgba(234,90,30,0.04),
         0 24px 64px rgba(0,0,0,0.65),
-        0 4px 24px rgba(249,115,22,0.07);
+        0 4px 24px rgba(234,90,30,0.07);
       backdrop-filter: blur(16px);
     }
     /* ════════════════════════════
@@ -211,8 +214,8 @@
     .trust-item { display: flex; align-items: center; gap: 12px; }
     .trust-ico {
       width: 42px; height: 42px; flex-shrink: 0;
-      background: rgba(249,115,22,0.09);
-      border: 1px solid rgba(249,115,22,0.16);
+      background: rgba(234,90,30,0.09);
+      border: 1px solid rgba(234,90,30,0.16);
       border-radius: 11px;
       display: flex; align-items: center; justify-content: center;
       font-size: 19px;
@@ -228,8 +231,9 @@
     }
     .deposit-box {
       border-radius: 20px; padding: 30px 28px;
-      background: linear-gradient(135deg, rgba(249,115,22,0.07) 0%, rgba(212,168,67,0.04) 100%);
-      border: 1px solid rgba(249,115,22,0.2);
+      background: linear-gradient(135deg, rgba(234,90,30,0.08) 0%, rgba(212,168,67,0.05) 100%);
+      border: 1px solid rgba(234,90,30,0.22);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 12px 36px rgba(0,0,0,0.35);
       display: flex; flex-direction: column; gap: 20px;
     }
     @media(min-width:700px){
@@ -254,8 +258,8 @@
       color: #4ade80;
     }
     .chip-or {
-      background: rgba(249,115,22,0.08);
-      border-color: rgba(249,115,22,0.2);
+      background: rgba(234,90,30,0.08);
+      border-color: rgba(234,90,30,0.2);
       color: var(--or-l);
     }
 
@@ -300,7 +304,7 @@
     .view-toggle button:hover { color: var(--txt); }
     .view-toggle button.on {
       background: var(--or); color: #fff;
-      box-shadow: 0 4px 12px rgba(249,115,22,0.28);
+      box-shadow: 0 4px 12px rgba(234,90,30,0.28);
     }
     .view-toggle svg { width: 14px; height: 14px; display: block; }
     .view-toggle .vt-desktop { display: none; }
@@ -315,10 +319,10 @@
       cursor: pointer; white-space: nowrap;
       transition: all 0.18s;
     }
-    .tab:hover { border-color: rgba(249,115,22,0.3); color: var(--txt); }
+    .tab:hover { border-color: rgba(234,90,30,0.3); color: var(--txt); }
     .tab.on {
       background: var(--or); border-color: var(--or); color: #fff;
-      box-shadow: 0 4px 18px rgba(249,115,22,0.32);
+      box-shadow: 0 4px 18px rgba(234,90,30,0.32);
     }
 
     /* Grid */
@@ -357,14 +361,15 @@
       border-radius: 16px; overflow: hidden;
       color: inherit; text-decoration: none;
       cursor: pointer;
-      transition: transform 0.28s cubic-bezier(0.34,1.56,0.64,1),
-                  box-shadow 0.28s ease, border-color 0.28s;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.04), 0 1px 0 rgba(0,0,0,0.4);
+      transition: transform 0.32s cubic-bezier(0.34,1.56,0.64,1),
+                  box-shadow 0.18s ease-out;
     }
     .car-card:focus-visible { outline: 2px solid var(--or-l); outline-offset: 3px; }
     .car-card:hover {
       transform: translateY(-5px);
-      border-color: rgba(249,115,22,0.22);
-      box-shadow: 0 16px 48px rgba(0,0,0,0.55), 0 0 0 1px rgba(249,115,22,0.07);
+      border-color: rgba(234,90,30,0.22);
+      box-shadow: 0 16px 48px rgba(0,0,0,0.55), 0 0 0 1px rgba(234,90,30,0.07);
     }
     .car-img-wrap {
       position: relative; aspect-ratio: 4/3; overflow: hidden;
@@ -380,6 +385,13 @@
       position: absolute; inset: 0;
       background: linear-gradient(to bottom, transparent 45%, rgba(7,7,15,0.72) 100%);
     }
+    .car-img-wrap::after {
+      content: ''; position: absolute; inset: 0; pointer-events: none;
+      background: rgba(234,90,30,0.10); mix-blend-mode: multiply;
+      opacity: 0; transition: opacity 0.35s ease;
+      z-index: 2;
+    }
+    .car-card:hover .car-img-wrap::after { opacity: 1; }
     .slide-btn {
       position: absolute; top: 50%; transform: translateY(-50%);
       background: rgba(7,7,15,0.58); border: 1px solid rgba(255,255,255,0.13);
@@ -391,7 +403,7 @@
     .slide-prev { left: 8px; }
     .slide-next { right: 8px; }
     .slide-btn { opacity: 1; }
-    .slide-btn:hover { background: rgba(249,115,22,0.72); }
+    .slide-btn:hover { background: rgba(234,90,30,0.72); }
     .slide-dots {
       position: absolute; bottom: 9px; left: 50%; transform: translateX(-50%);
       display: flex; gap: 5px; z-index: 6; pointer-events: none;
@@ -465,7 +477,7 @@
       border-radius: 18px; padding: 28px;
       transition: border-color 0.25s;
     }
-    .loc-card:hover { border-color: rgba(249,115,22,0.2); }
+    .loc-card:hover { border-color: rgba(234,90,30,0.2); }
     .loc-flag { font-size: 2.2rem; display: block; margin-bottom: 14px; }
     .loc-name { font-size: 1.35rem; font-weight: 600; margin-bottom: 4px; }
     .loc-iata { font-size: 12px; color: var(--or); font-weight: 600; letter-spacing: 0.1em; margin-bottom: 12px; }
@@ -474,7 +486,7 @@
       display: inline-flex; align-items: center; gap: 6px; margin-top: 14px;
       padding: 6px 13px; border-radius: 100px;
       font-size: 12px; color: var(--or-l); font-weight: 500;
-      background: rgba(249,115,22,0.07); border: 1px solid rgba(249,115,22,0.15);
+      background: rgba(234,90,30,0.07); border: 1px solid rgba(234,90,30,0.15);
     }
 
     /* ════════════════════════════
@@ -585,7 +597,7 @@
     }
     .f-input:focus {
       outline: none; border-color: var(--or);
-      box-shadow: 0 0 0 3px rgba(249,115,22,0.18);
+      box-shadow: 0 0 0 3px rgba(234,90,30,0.18);
     }
     .f-input option { background: var(--raised); }
     .summary {

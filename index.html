@@ -347,7 +347,10 @@
       box-shadow: 0 4px 12px rgba(249,115,22,0.28);
     }
     .view-toggle svg { width: 14px; height: 14px; display: block; }
-    @media(min-width:560px){ .view-toggle { display: none; } }
+    .view-toggle .vt-desktop { display: none; }
+    @media(min-width:560px) and (max-width:959px){ .view-toggle { display: none; } }
+    @media(min-width:560px){ .view-toggle .vt-mobile { display: none; } }
+    @media(min-width:960px){ .view-toggle .vt-desktop { display: flex; align-items:center; justify-content:center; } }
     .tab {
       padding: 9px 20px; border-radius: 100px;
       border: 1px solid var(--line);
@@ -369,6 +372,7 @@
     }
     @media(min-width:560px){ .cars-grid { grid-template-columns: repeat(2,1fr); } }
     @media(min-width:960px){ .cars-grid { grid-template-columns: repeat(3,1fr); } }
+    @media(min-width:960px){ .cars-grid.cols-4 { grid-template-columns: repeat(4,1fr); gap: 14px; } }
 
     /* Mobile compact 2-col view */
     @media(max-width:559px){
@@ -446,6 +450,31 @@
     .cat-suv     { background: rgba(59,130,246,0.14); border:1px solid rgba(59,130,246,0.24); color:#60a5fa; }
     .cat-luxury  { background: rgba(212,168,67,0.14); border:1px solid rgba(212,168,67,0.24); color:#d4a843; }
     .cat-van     { background: rgba(168,85,247,0.14); border:1px solid rgba(168,85,247,0.24); color:#c084fc; }
+
+    .share-btn {
+      position: absolute; top: 9px; right: 9px;
+      width: 32px; height: 32px; border-radius: 100px;
+      background: rgba(7,7,15,0.72); border: 1px solid rgba(255,255,255,0.14);
+      color: #fff; font-size: 14px; line-height: 1;
+      display: inline-flex; align-items: center; justify-content: center;
+      cursor: pointer; z-index: 5;
+      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+      transition: transform .18s ease, background .18s ease, border-color .18s ease;
+    }
+    .share-btn:hover { background: rgba(249,115,22,0.85); border-color: rgba(249,115,22,0.95); transform: translateY(-1px); }
+    .share-btn:active { transform: none; }
+    .share-btn:focus-visible { outline: 2px solid var(--or-l); outline-offset: 2px; }
+
+    .toast {
+      position: fixed; left: 50%; bottom: 28px; transform: translate(-50%, 20px);
+      background: rgba(13,13,26,0.96); color: var(--txt);
+      border: 1px solid var(--line); border-radius: 12px;
+      padding: 11px 18px; font-size: 13.5px; font-weight: 500;
+      box-shadow: 0 14px 40px rgba(0,0,0,0.45), 0 0 0 1px rgba(249,115,22,0.18);
+      opacity: 0; pointer-events: none; z-index: 9000;
+      transition: opacity .2s ease, transform .25s ease;
+    }
+    .toast.show { opacity: 1; transform: translate(-50%, 0); }
 
     .car-body { padding: 15px; }
     .car-name { font-size: 1.15rem; font-weight: 600; line-height: 1.2; margin-bottom: 11px; }
@@ -692,11 +721,17 @@
       </div>
     </div>
     <div class="view-toggle" id="view-toggle" aria-label="View density">
-      <button data-view="1" class="on" aria-label="One per row">
+      <button class="vt-mobile on" data-view="1" aria-label="One per row">
         <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1.5" y="2" width="11" height="4" rx="1"/><rect x="1.5" y="8" width="11" height="4" rx="1"/></svg>
       </button>
-      <button data-view="2" aria-label="Two per row">
+      <button class="vt-mobile" data-view="2" aria-label="Two per row">
         <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1.5" y="2" width="4.5" height="10" rx="1"/><rect x="8" y="2" width="4.5" height="10" rx="1"/></svg>
+      </button>
+      <button class="vt-desktop on" data-view="3" aria-label="Three per row">
+        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="2" width="3.3" height="10" rx="0.8"/><rect x="5.35" y="2" width="3.3" height="10" rx="0.8"/><rect x="9.7" y="2" width="3.3" height="10" rx="0.8"/></svg>
+      </button>
+      <button class="vt-desktop" data-view="4" aria-label="Four per row">
+        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="2" width="2.5" height="10" rx="0.6"/><rect x="4.25" y="2" width="2.5" height="10" rx="0.6"/><rect x="7.5" y="2" width="2.5" height="10" rx="0.6"/><rect x="10.75" y="2" width="2.5" height="10" rx="0.6"/></svg>
       </button>
     </div>
   </div>
@@ -864,6 +899,8 @@ function renderCars(cat) {
           onerror="this.src='https://placehold.co/400x300/111120/3a3a58?text=${encodeURIComponent(c.name)}'" />
         <div class="car-img-shade"></div>
         <span class="cat-badge cat-${c.cat}">${CAT_LABEL[c.cat]}</span>
+        <button class="share-btn" title="Share this car" aria-label="Share this car"
+          onclick="event.stopPropagation(); shareCar('${c.id}')">🔗</button>
         ${c.imgs.length > 1 ? `
           <button class="slide-btn slide-prev" onclick="manualSlide('${c.id}',-1)">&#8249;</button>
           <button class="slide-btn slide-next" onclick="manualSlide('${c.id}',1)">&#8250;</button>
@@ -1005,18 +1042,26 @@ document.getElementById('tabs').addEventListener('click', e => {
   renderCars(btn.dataset.cat);
 });
 
-// ─── VIEW TOGGLE (mobile) ───
+// ─── VIEW TOGGLE (mobile 1/2 + desktop 3/4) ───
 (function initViewToggle(){
   const grid = document.getElementById('cars-grid');
   const toggle = document.getElementById('view-toggle');
   if (!grid || !toggle) return;
-  const saved = localStorage.getItem('fleetView') === '2' ? '2' : '1';
+  const mobileSaved = localStorage.getItem('fleetView') === '2' ? '2' : '1';
+  const desktopSaved = localStorage.getItem('fleetViewDesktop') === '4' ? '4' : '3';
   const apply = (v) => {
-    grid.classList.toggle('cols-2', v === '2');
-    toggle.querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.view === v));
-    localStorage.setItem('fleetView', v);
+    if (v === '1' || v === '2') {
+      grid.classList.toggle('cols-2', v === '2');
+      localStorage.setItem('fleetView', v);
+      toggle.querySelectorAll('.vt-mobile').forEach(b => b.classList.toggle('on', b.dataset.view === v));
+    } else {
+      grid.classList.toggle('cols-4', v === '4');
+      localStorage.setItem('fleetViewDesktop', v);
+      toggle.querySelectorAll('.vt-desktop').forEach(b => b.classList.toggle('on', b.dataset.view === v));
+    }
   };
-  apply(saved);
+  apply(mobileSaved);
+  apply(desktopSaved);
   toggle.addEventListener('click', e => {
     const btn = e.target.closest('button[data-view]');
     if (!btn) return;
@@ -1027,6 +1072,53 @@ document.getElementById('tabs').addEventListener('click', e => {
 // ─── SCROLL TO FLEET ───
 function scrollToFleet() {
   document.getElementById('fleet').scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+// ─── SHARE CAR LINK ───
+// Builds an absolute URL to the per-car page and copies it to the clipboard.
+// Uses the native Web Share API on mobile when available so users can send straight to WhatsApp.
+function shareCar(carId) {
+  const car = (window.CARS || []).find(c => String(c.id) === String(carId));
+  if (!car) return;
+  const slug = window.carSlug ? window.carSlug(car) : car.id;
+  const url  = `${location.origin}${location.pathname.replace(/index\.html$/,'')}car.html?car=${slug}`;
+  const title = `${car.name} ${car.year} — UDrive Car Rental`;
+  const text  = `Check out this car: ${car.name} ${car.year} — €${car.ppd}/day`;
+
+  if (navigator.share) {
+    navigator.share({ title, text, url }).catch(()=>{ copyToClipboard(url); });
+  } else {
+    copyToClipboard(url);
+  }
+}
+function copyToClipboard(text) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(() => showToast('Link copied — paste it anywhere!'))
+      .catch(() => fallbackCopy(text));
+  } else {
+    fallbackCopy(text);
+  }
+}
+function fallbackCopy(text) {
+  const ta = document.createElement('textarea');
+  ta.value = text; ta.style.position = 'fixed'; ta.style.left = '-9999px';
+  document.body.appendChild(ta); ta.select();
+  try { document.execCommand('copy'); showToast('Link copied — paste it anywhere!'); }
+  catch { showToast('Could not copy link.'); }
+  document.body.removeChild(ta);
+}
+let __toastTimer = null;
+function showToast(msg) {
+  let el = document.getElementById('toast');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'toast'; el.className = 'toast';
+    document.body.appendChild(el);
+  }
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(__toastTimer);
+  __toastTimer = setTimeout(() => el.classList.remove('show'), 2200);
 }
 
 // ─── MODAL ───

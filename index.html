@@ -941,7 +941,7 @@ document.getElementById('tabs').addEventListener('click', e => {
   const grid = document.getElementById('cars-grid');
   const toggle = document.getElementById('view-toggle');
   if (!grid || !toggle) return;
-  const mobileSaved = localStorage.getItem('fleetView') === '2' ? '2' : '1';
+  const mobileSaved = localStorage.getItem('fleetView') === '1' ? '1' : '2';
   const desktopSaved = localStorage.getItem('fleetViewDesktop') === '4' ? '4' : '3';
   const apply = (v) => {
     if (v === '1' || v === '2') {

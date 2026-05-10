@@ -261,17 +261,23 @@
     .banner b{color:#fff}
     .banner .x{font-size:20px;line-height:1}
 
+    .m-lbl{display:none}
+
     /* ── responsive table ── */
     @media(max-width:780px){
       .list-head{display:none}
-      .row{grid-template-columns:56px 1fr;grid-template-areas:'thumb name' 'meta meta' 'actions actions';gap:8px;padding:14px}
-      .row .c-thumb{grid-area:thumb}
-      .row .c-name{grid-area:name}
-      .row .c-cat,.row .c-price,.row .c-dep{grid-area:meta;display:inline}
-      .row .c-cat::after{content:' · '}
-      .row .c-price::after{content:' · '}
-      .row .c-meta-line{grid-area:meta;color:var(--muted);font-size:13px}
-      .row-actions{grid-area:actions;justify-content:flex-start;margin-top:6px}
+      .row{
+        display:flex;flex-wrap:wrap;align-items:center;
+        gap:6px 12px;padding:14px;
+        grid-template-columns:none;
+      }
+      .row .c-thumb{flex:0 0 56px;order:1}
+      .row .c-name{flex:1 1 auto;order:2;min-width:0}
+      .row .c-cat{order:3;flex-basis:100%;margin-top:2px}
+      .row .c-price{order:4;font-weight:700}
+      .row .c-dep{order:5;font-weight:500;color:var(--muted);font-size:13px}
+      .row-actions{order:6;flex-basis:100%;justify-content:flex-start;margin-top:6px}
+      .m-lbl{display:inline;color:var(--muted);font-weight:400;font-size:12.5px}
     }
   </style>
 </head>
@@ -598,8 +604,8 @@ if (!isFirebaseConfigured()) {
           <div class="year">${c.year||''}</div>
         </div>
         <div class="c-cat"><span class="cat-pill ${c.cat}">${CAT_LABEL[c.cat]||c.cat}</span></div>
-        <div class="c-price price-cell">€${c.ppd||0}</div>
-        <div class="c-dep price-cell">€${c.dep||0}</div>
+        <div class="c-price price-cell">€${c.ppd||0}<span class="m-lbl"> /day</span></div>
+        <div class="c-dep price-cell"><span class="m-lbl">deposit </span>€${c.dep||0}</div>
         <div class="row-actions">
           <button class="btn" data-act="edit">Edit</button>
           <button class="btn btn-danger" data-act="del">Delete</button>

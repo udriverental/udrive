@@ -214,11 +214,25 @@
       display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));
       gap:8px;margin-top:14px;
     }
+    .photo-hint{font-size:12px;color:var(--muted);margin-top:8px}
     .ph{
       position:relative;aspect-ratio:4/3;border-radius:9px;overflow:hidden;
       border:1px solid var(--line);background:#1a1a26;
+      cursor:grab;user-select:none;
+      transition:opacity .15s, box-shadow .15s, transform .15s;
     }
-    .ph img{width:100%;height:100%;object-fit:cover;display:block}
+    .ph:active{cursor:grabbing}
+    .ph.drag-over{box-shadow:0 0 0 2px var(--or);transform:scale(1.03)}
+    .ph.dragging{opacity:0.35}
+    .ph img{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
+    .ph-num{
+      position:absolute;top:5px;left:5px;
+      min-width:22px;height:22px;border-radius:6px;padding:0 5px;
+      background:rgba(0,0,0,0.75);color:#fff;
+      font-size:11px;font-weight:700;font-family:'DM Sans',sans-serif;
+      display:grid;place-items:center;line-height:1;
+    }
+    .ph-num.first{background:var(--or);color:#fff}
     .ph-rm{
       position:absolute;top:5px;right:5px;
       width:24px;height:24px;border-radius:50%;
@@ -399,7 +413,7 @@
       </div>
 
       <div class="field">
-        <label>Photos</label>
+        <label>Photos — drag to reorder (first photo is the cover)</label>
         <label class="drop" id="drop">
           <strong>Click to upload</strong> or drag & drop photos here
           <div style="margin-top:4px;font-size:11.5px;color:var(--dim)">JPG / PNG / WebP — multiple allowed</div>
@@ -629,19 +643,54 @@ if (!isFirebaseConfigured()) {
   $('#edit-bg').addEventListener('click', e => { if (e.target.id==='edit-bg') closeEdit(); });
   document.addEventListener('keydown', e => { if (e.key==='Escape') closeEdit(); });
 
+  let dragSrcIdx = null;
+
   function renderPhotos(){
     const wrap = $('#photo-list');
     wrap.innerHTML = editPhotos.map((p,i)=>`
-      <div class="ph">
+      <div class="ph" draggable="${!p.uploading}" data-i="${i}">
         <img src="${p.url || 'https://placehold.co/120x90/111120/3a3a58?text=...'}" alt="" />
+        <div class="ph-num ${i===0?'first':''}">${i===0?'Cover':i+1}</div>
         ${p.uploading ? `<div class="ph-progress">${p.progress||'Uploading…'}</div>` : ''}
         <button type="button" class="ph-rm" data-i="${i}" title="Remove">×</button>
       </div>
     `).join('');
-    wrap.querySelectorAll('[data-i]').forEach(b => b.addEventListener('click', () => {
-      editPhotos.splice(Number(b.dataset.i), 1);
-      renderPhotos();
-    }));
+
+    wrap.querySelectorAll('.ph').forEach(el => {
+      const i = Number(el.dataset.i);
+
+      // remove button
+      el.querySelector('.ph-rm').addEventListener('click', e => {
+        e.stopPropagation();
+        editPhotos.splice(i, 1);
+        renderPhotos();
+      });
+
+      // drag-and-drop reorder
+      el.addEventListener('dragstart', e => {
+        dragSrcIdx = i;
+        el.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+      });
+      el.addEventListener('dragend', () => {
+        wrap.querySelectorAll('.ph').forEach(x => x.classList.remove('dragging','drag-over'));
+      });
+      el.addEventListener('dragover', e => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        wrap.querySelectorAll('.ph').forEach(x => x.classList.remove('drag-over'));
+        el.classList.add('drag-over');
+      });
+      el.addEventListener('dragleave', () => el.classList.remove('drag-over'));
+      el.addEventListener('drop', e => {
+        e.preventDefault();
+        if (dragSrcIdx === null || dragSrcIdx === i) return;
+        const moved = editPhotos.splice(dragSrcIdx, 1)[0];
+        editPhotos.splice(i, 0, moved);
+        dragSrcIdx = null;
+        renderPhotos();
+      });
+    });
   }
 
   // drop zone

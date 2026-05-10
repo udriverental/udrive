@@ -805,7 +805,7 @@
 // ═══════════════════════════════════
 // CAR DATA
 // ═══════════════════════════════════
-const CARS = [
+let CARS = [
   // ─── ECONOMY ───
   { id:1,  name:'Renault Clio',     year:2019, cat:'economy', tx:'Automatic', fuel:'Diesel',      seats:5, ppd:65,  dep:200,
     imgs:['cars/Renault%20Clio/IMG_3653.jpeg','cars/Renault%20Clio/IMG_3654.jpeg','cars/Renault%20Clio/IMG_3656.jpg','cars/Renault%20Clio/IMG_3658.jpg'],
@@ -903,11 +903,13 @@ const CAT_LABEL = { economy:'Economy', suv:'SUV', luxury:'Luxury', van:'Van & MP
 const FUEL_ICON  = { Petrol:'⛽', Diesel:'🛢', Hybrid:'🌿', 'Petrol+LPG':'⛽', 'Petrol/LPG':'⛽' };
 
 let activeCar = null;
+let activeCat = 'all';
 
 // ─── RENDER ───
 function renderCars(cat) {
+  activeCat = cat || 'all';
   const grid = document.getElementById('cars-grid');
-  const list = cat === 'all' ? CARS : CARS.filter(c => c.cat === cat);
+  const list = activeCat === 'all' ? CARS : CARS.filter(c => c.cat === activeCat);
 
   if (!list.length) {
     grid.innerHTML = '<div class="empty-state">No cars available in this category.</div>';
@@ -915,15 +917,15 @@ function renderCars(cat) {
   }
 
   grid.innerHTML = list.map((c, i) => `
-    <div class="car-card fade-up" style="transition-delay:${(i % 6) * 0.055}s" data-carid="${c.id}" onclick="openModal(${c.id})">
+    <div class="car-card fade-up" style="transition-delay:${(i % 6) * 0.055}s" data-carid="${c.id}" onclick="openModal('${c.id}')">
       <div class="car-img-wrap">
         <img class="car-img" id="cimg-${c.id}" src="${c.imgs[0]}" alt="${c.name} ${c.year}" loading="lazy"
           onerror="this.src='https://placehold.co/400x300/111120/3a3a58?text=${encodeURIComponent(c.name)}'" />
         <div class="car-img-shade"></div>
         <span class="cat-badge cat-${c.cat}">${CAT_LABEL[c.cat]}</span>
         ${c.imgs.length > 1 ? `
-          <button class="slide-btn slide-prev" onclick="event.stopPropagation();slidePhoto(${c.id},-1)">&#8249;</button>
-          <button class="slide-btn slide-next" onclick="event.stopPropagation();slidePhoto(${c.id},1)">&#8250;</button>
+          <button class="slide-btn slide-prev" onclick="event.stopPropagation();slidePhoto('${c.id}',-1)">&#8249;</button>
+          <button class="slide-btn slide-next" onclick="event.stopPropagation();slidePhoto('${c.id}',1)">&#8250;</button>
           <div class="slide-dots">${c.imgs.map((_,idx)=>`<span class="sdot${idx===0?' on':''}" id="sdot-${c.id}-${idx}"></span>`).join('')}</div>
         ` : ''}
       </div>
@@ -941,7 +943,7 @@ function renderCars(cat) {
             <div class="car-price-unit">${(T[lang]||T.en).perDay}</div>
             <div class="car-deposit-line">${(T[lang]||T.en).depositLabel}: <b>€${c.dep}</b></div>
           </div>
-          <button class="book-btn" onclick="event.stopPropagation();openModal(${c.id})">${(T[lang]||T.en).bookNow}</button>
+          <button class="book-btn" onclick="event.stopPropagation();openModal('${c.id}')">${(T[lang]||T.en).bookNow}</button>
         </div>
         <div class="card-note">${(T[lang]||T.en).noCard}</div>
       </div>
@@ -957,7 +959,7 @@ function renderCars(cat) {
 // ─── CAROUSEL ───
 const carPhotoIdx = {};
 function slidePhoto(carId, dir) {
-  const car = CARS.find(c => c.id === carId);
+  const car = CARS.find(c => String(c.id) === String(carId));
   if (!car || car.imgs.length <= 1) return;
   const prev = carPhotoIdx[carId] || 0;
   const next = (prev + dir + car.imgs.length) % car.imgs.length;
@@ -977,7 +979,7 @@ function initCarousel() {
       const dx = e.changedTouches[0].clientX - startX;
       if (Math.abs(dx) < 30) return;
       const card = wrap.closest('[data-carid]');
-      if (card) slidePhoto(parseInt(card.dataset.carid), dx < 0 ? 1 : -1);
+      if (card) slidePhoto(card.dataset.carid, dx < 0 ? 1 : -1);
     });
   });
 }
@@ -998,7 +1000,7 @@ function scrollToFleet() {
 
 // ─── MODAL ───
 function openModal(id) {
-  activeCar = CARS.find(c => c.id === id);
+  activeCar = CARS.find(c => String(c.id) === String(id));
   if (!activeCar) return;
 
   document.getElementById('modal-sub').textContent =
@@ -1205,6 +1207,13 @@ const T = {
 // ─── INIT ───
 renderCars('all');
 
+// Expose hook for the Firebase loader (added below as a module)
+window.__udriveApplyCars = function(arr) {
+  if (!Array.isArray(arr) || !arr.length) return;
+  CARS = arr;
+  renderCars(activeCat);
+};
+
 function setLang(code) {
   lang = code;
   const t = T[code];
@@ -1222,6 +1231,52 @@ function setLang(code) {
   const activeTab = document.querySelector('.tab.on');
   renderCars(activeTab ? activeTab.dataset.cat : 'all');
 }
+</script>
+
+<!-- ═══════════════════════════════════════════════════════════
+     FIREBASE LIVE-DATA LOADER
+     Reads cars from Firestore once Firebase is configured.
+     If config is missing/invalid, falls back silently to the
+     hardcoded CARS array above so the site keeps working.
+     ═══════════════════════════════════════════════════════════ -->
+<script type="module">
+  import { firebaseConfig, isFirebaseConfigured } from './firebase-config.js';
+
+  if (isFirebaseConfigured()) {
+    try {
+      const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js');
+      const { getFirestore, collection, getDocs, query, orderBy } =
+        await import('https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js');
+
+      const app = initializeApp(firebaseConfig);
+      const db  = getFirestore(app);
+
+      const snap = await getDocs(query(collection(db, 'cars'), orderBy('order', 'asc')));
+      const cars = [];
+      snap.forEach(doc => {
+        const d = doc.data();
+        cars.push({
+          id:       doc.id,
+          name:     d.name || '',
+          year:     d.year || '',
+          cat:      d.cat || 'economy',
+          tx:       d.tx || 'Automatic',
+          fuel:     d.fuel || 'Diesel',
+          seats:    d.seats || 5,
+          ppd:      Number(d.ppd) || 0,
+          dep:      Number(d.dep) || 0,
+          imgs:     Array.isArray(d.imgs) ? d.imgs : [],
+          features: Array.isArray(d.features) ? d.features : [],
+        });
+      });
+
+      if (cars.length && typeof window.__udriveApplyCars === 'function') {
+        window.__udriveApplyCars(cars);
+      }
+    } catch (err) {
+      console.warn('[UDrive] Firebase fetch failed — using built-in fleet data.', err);
+    }
+  }
 </script>
 </body>
 </html>

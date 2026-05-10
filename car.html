@@ -349,9 +349,19 @@
   // ── Resolve which car to show ──
   const params = new URLSearchParams(location.search);
   const slugOrId = params.get('car') || params.get('id');
-  const car = window.findCarBySlugOrId ? window.findCarBySlugOrId(slugOrId) : null;
   const main = document.getElementById('main');
+  let car = window.findCarBySlugOrId ? window.findCarBySlugOrId(slugOrId) : null;
+  let galIdx = 0;
 
+  // Single render pass — runs on initial load with hardcoded CARS,
+  // and again after Firebase data arrives (see __udriveApplyCars below).
+  function render() {
+    car = window.findCarBySlugOrId ? window.findCarBySlugOrId(slugOrId) : car;
+    galIdx = 0;
+    renderInner();
+  }
+
+  function renderInner() {
   if (!car) {
     main.innerHTML = `
       <div class="notfound">
@@ -476,9 +486,21 @@
     initGallery();
     initBooking();
   }
+  } // end renderInner
+
+  // Run the first render immediately (uses hardcoded fleet)
+  render();
+
+  // Hook for the Firebase loader at the bottom of this file: when fresh data
+  // arrives from Firestore, swap window.CARS and re-render so the per-car
+  // page reflects the latest admin edits (added/removed photos, price, etc.).
+  window.__udriveApplyCars = function(arr) {
+    if (!Array.isArray(arr) || !arr.length) return;
+    window.CARS = arr;
+    render();
+  };
 
   // ── Gallery ──
-  let galIdx = 0;
   function setGal(i) {
     if (!car) return;
     const n = car.imgs.length;
@@ -628,6 +650,63 @@
     el.classList.add('show');
     clearTimeout(__toastTimer);
     __toastTimer = setTimeout(() => el.classList.remove('show'), 2200);
+  }
+</script>
+
+<!-- ═══════════════════════════════════════════════════════════
+     FIREBASE LIVE-DATA LOADER
+     Same loader as index.html so admin edits (added/removed
+     photos, price changes, etc.) reach the per-car page too.
+     If Firebase is not configured, falls back silently to the
+     hardcoded fleet from cars-data.js.
+     ═══════════════════════════════════════════════════════════ -->
+<script type="module">
+  import { firebaseConfig, isFirebaseConfigured } from './firebase-config.js';
+
+  function toDeliveryUrl(url){
+    if (!url || typeof url !== 'string' || !url.includes('/upload/')) return url;
+    let out = url.replace(/\.(heic|heif)(\?.*)?$/i, '.jpg$2');
+    if (!/\/upload\/(f_auto|.*[,/]f_auto)/.test(out)) {
+      out = out.replace('/upload/', '/upload/f_auto,q_auto/');
+    }
+    return out;
+  }
+
+  if (isFirebaseConfigured()) {
+    try {
+      const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js');
+      const { getFirestore, collection, getDocs, query, orderBy } =
+        await import('https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js');
+
+      const app = initializeApp(firebaseConfig);
+      const db  = getFirestore(app);
+
+      const snap = await getDocs(query(collection(db, 'cars'), orderBy('order', 'asc')));
+      const cars = [];
+      snap.forEach(doc => {
+        const d = doc.data();
+        cars.push({
+          id:       doc.id,
+          name:     d.name || '',
+          year:     d.year || '',
+          cat:      d.cat || 'economy',
+          tx:       d.tx || 'Automatic',
+          fuel:     d.fuel || 'Diesel',
+          seats:    d.seats || 5,
+          ppd:      Number(d.ppd) || 0,
+          dep:      300,
+          imgs:     Array.isArray(d.imgs) ? d.imgs.map(toDeliveryUrl) : [],
+          features: Array.isArray(d.features) ? d.features : [],
+          desc:     d.desc || '',
+        });
+      });
+
+      if (cars.length && typeof window.__udriveApplyCars === 'function') {
+        window.__udriveApplyCars(cars);
+      }
+    } catch (err) {
+      console.warn('[UDrive] Firebase fetch failed — using built-in fleet data.', err);
+    }
   }
 </script>
 

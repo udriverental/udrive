@@ -66,6 +66,15 @@
       border-bottom: 1px solid var(--line);
     }
     .nav-logo { height: 42px; object-fit: contain; display: block; }
+    .nav-left { display: flex; align-items: center; gap: 14px; min-width: 0; }
+    .nav-tagline {
+      display: none;
+      font-size: 12px; font-weight: 500; color: var(--muted);
+      letter-spacing: 0.02em; line-height: 1.3;
+      padding-left: 14px; border-left: 1px solid var(--line);
+      white-space: nowrap;
+    }
+    @media(min-width:768px){ .nav-tagline { display: block; } }
     .nav-right { display: flex; align-items: center; gap: 10px; }
     .nav-wa {
       display: inline-flex; align-items: center; gap: 7px;
@@ -295,7 +304,7 @@
        FLEET SECTION
     ════════════════════════════ */
     .fleet-wrap {
-      max-width: 1140px; margin: 72px auto 80px; padding: 0 20px;
+      max-width: 1140px; margin: 110px auto 80px; padding: 0 20px;
     }
     .sec-eye {
       display: block; font-size: 11px; font-weight: 600;
@@ -599,7 +608,10 @@
 
 <!-- ── NAV ── -->
 <nav class="nav">
-  <img src="brand_assets/Modern%20UDrive%20car%20rental%20logo.png" alt="UDrive Car Rental" class="nav-logo" />
+  <div class="nav-left">
+    <img src="brand_assets/Modern%20UDrive%20car%20rental%20logo.png" alt="UDrive Car Rental" class="nav-logo" />
+    <span class="nav-tagline" data-i18n="navTagline">🇦🇱 Albania &amp; Kosovo · Airport pickup · No credit card 🇽🇰</span>
+  </div>
   <div class="nav-right">
     <div class="lang-sw">
       <button class="lang-btn on" data-lang="en" onclick="setLang('en')">ENG</button>
@@ -613,26 +625,24 @@
   </div>
 </nav>
 
-<!-- ── HERO ── -->
-<section class="hero">
-  <div class="hero-orb1"></div>
-  <div class="hero-orb2"></div>
-  <div class="hero-grid"></div>
+<!-- ── FLEET ── -->
+<section class="fleet-wrap" id="fleet">
+  <div class="sec-head fade-up">
+    <span class="sec-eye" data-i18n="fleetEye">Our Fleet</span>
+    <h2 class="sec-title" data-i18n="fleetTitle">Choose Your Perfect Ride</h2>
+  </div>
 
-  <div class="hero-inner">
-    <div class="hero-flag-pill" data-i18n="heroPill">
-      <span>🇦🇱</span> Albania &amp; Kosovo Car Rental <span>🇽🇰</span>
-    </div>
-
-    <p class="hero-sub" data-i18n="heroSub">
-      Premium car rental from <strong>Tirana Airport (TIA)</strong> and <strong>Pristina Airport (PRN)</strong>.
-      No hidden fees, no credit card, <strong>deposit returned in cash the moment you hand back the keys.</strong>
-    </p>
-
-    <div class="hero-cta-wrap">
-      <button class="find-btn hero-cta" onclick="scrollToFleet()" data-i18n="findBtn">View Our Fleet →</button>
+  <div class="tabs-scroll">
+    <div class="tabs" id="tabs">
+      <button class="tab on" data-cat="all" data-i18n="tabAll">All Cars</button>
+      <button class="tab" data-cat="economy" data-i18n="tabEco">Economy</button>
+      <button class="tab" data-cat="suv" data-i18n="tabSuv">SUV</button>
+      <button class="tab" data-cat="luxury" data-i18n="tabLux">Luxury</button>
+      <button class="tab" data-cat="van" data-i18n="tabVan">Van &amp; MPV</button>
     </div>
   </div>
+
+  <div class="cars-grid" id="cars-grid"></div>
 </section>
 
 <!-- ── TRUST BAR ── -->
@@ -690,26 +700,6 @@
     </div>
   </div>
 </div>
-
-<!-- ── FLEET ── -->
-<section class="fleet-wrap" id="fleet">
-  <div class="sec-head fade-up">
-    <span class="sec-eye" data-i18n="fleetEye">Our Fleet</span>
-    <h2 class="sec-title" data-i18n="fleetTitle">Choose Your Perfect Ride</h2>
-  </div>
-
-  <div class="tabs-scroll">
-    <div class="tabs" id="tabs">
-      <button class="tab on" data-cat="all" data-i18n="tabAll">All Cars</button>
-      <button class="tab" data-cat="economy" data-i18n="tabEco">Economy</button>
-      <button class="tab" data-cat="suv" data-i18n="tabSuv">SUV</button>
-      <button class="tab" data-cat="luxury" data-i18n="tabLux">Luxury</button>
-      <button class="tab" data-cat="van" data-i18n="tabVan">Van &amp; MPV</button>
-    </div>
-  </div>
-
-  <div class="cars-grid" id="cars-grid"></div>
-</section>
 
 <!-- ── FOOTER ── -->
 <footer class="footer">
@@ -1109,7 +1099,7 @@ document.addEventListener('keydown', e => { if (e.key==='Escape') closeModal(); 
 let lang = 'en';
 const T = {
   en: {
-    navWa:'WhatsApp Us', heroPill:'<span>🇦🇱</span> Albania &amp; Kosovo Car Rental <span>🇽🇰</span>',
+    navWa:'WhatsApp Us', navTagline:'🇦🇱 Albania &amp; Kosovo · Airport pickup · No credit card 🇽🇰', heroPill:'<span>🇦🇱</span> Albania &amp; Kosovo Car Rental <span>🇽🇰</span>',
     heroTitle:'',
     heroSub:'Premium car rental from <strong>Tirana Airport (TIA)</strong> and <strong>Pristina Airport (PRN)</strong>. No hidden fees, no credit card, <strong>deposit returned in cash the moment you hand back the keys.</strong>',
     labelLoc:'📍 Pickup Location', labelPd:'📅 Pickup Date', labelPt:'⏰ Pickup Time', labelRd:'📅 Return Date', labelRt:'⏰ Return Time',
@@ -1136,7 +1126,7 @@ const T = {
     sumDepTag:'returned in cash on key handover', sumDepPrefix:'Security deposit:',
   },
   sq: {
-    navWa:'Na Kontaktoni', heroPill:'<span>🇦🇱</span> Shqipëri &amp; Kosovë - Marrje me Qira <span>🇽🇰</span>',
+    navWa:'Na Kontaktoni', navTagline:'🇦🇱 Shqipëri &amp; Kosovë · Marrje në aeroport · Pa kartë 🇽🇰', heroPill:'<span>🇦🇱</span> Shqipëri &amp; Kosovë - Marrje me Qira <span>🇽🇰</span>',
     heroTitle:'',
     heroSub:'Marrje me qira makinash nga <strong>Aeroporti i Tiranës (TIA)</strong> dhe <strong>Aeroporti i Prishtinës (PRN)</strong>. Pa tarifa të fshehura, pa kartë krediti, <strong>depozita kthehet në cash sapo dorëzoni çelësat.</strong>',
     labelLoc:'📍 Pika e Marrjes', labelPd:'📅 Data e Marrjes', labelPt:'⏰ Ora e Marrjes', labelRd:'📅 Data e Kthimit', labelRt:'⏰ Ora e Kthimit',
@@ -1163,7 +1153,7 @@ const T = {
     sumDepTag:'kthehet cash sapo dorëzoni çelësat', sumDepPrefix:'Depozita e sigurisë:',
   },
   ar: {
-    navWa:'واتساب', heroPill:'<span>🇦🇱</span> تأجير سيارات — ألبانيا وكوسوفو <span>🇽🇰</span>',
+    navWa:'واتساب', navTagline:'🇦🇱 ألبانيا وكوسوفو · استلام من المطار · بدون بطاقة 🇽🇰', heroPill:'<span>🇦🇱</span> تأجير سيارات — ألبانيا وكوسوفو <span>🇽🇰</span>',
     heroTitle:'',
     heroSub:'تأجير سيارات فاخر من <strong>مطار تيرانا (TIA)</strong> و<strong>مطار بريشتينا (PRN)</strong>. لا رسوم خفية، لا بطاقة ائتمان، <strong>الوديعة تُرجع نقداً فور تسليم المفاتيح.</strong>',
     labelLoc:'📍 موقع الاستلام', labelPd:'📅 تاريخ الاستلام', labelPt:'⏰ وقت الاستلام', labelRd:'📅 تاريخ الإرجاع', labelRt:'⏰ وقت الإرجاع',

@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UDrive — Car Details</title>
+  <meta name="description" content="UDrive Car Rental — premium fleet at Tirana Airport (TIA) and Pristina Airport (PRN). Cash deposit, returned instantly." />
+  <link rel="icon" type="image/png" href="brand_assets/Modern%20UDrive%20car%20rental%20logo.png" />
+  <link rel="apple-touch-icon" href="brand_assets/Modern%20UDrive%20car%20rental%20logo.png" />
+  <script src="cars-data.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg:      #07070f;
+      --surface: #0d0d1a;
+      --card:    #111120;
+      --raised:  #181826;
+      --line:    rgba(255,255,255,0.07);
+      --or:      #F97316;
+      --or-d:    #d9620d;
+      --or-l:    #fb923c;
+      --gold:    #d4a843;
+      --txt:     #eeeef5;
+      --muted:   #7878a0;
+      --dim:     #3a3a58;
+      --wa:      #25D366;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg); color: var(--txt);
+      font-family: 'DM Sans', sans-serif;
+      overflow-x: hidden; -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+    h1, h2, h3, h4 { font-family: 'Cormorant Garamond', serif; }
+
+    body::after {
+      content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 9999;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+      opacity: 0.5;
+    }
+
+    /* ── NAV ── */
+    .nav {
+      position: sticky; top: 0; z-index: 500;
+      padding: 14px 20px;
+      display: flex; align-items: center; justify-content: space-between;
+      background: rgba(7,7,15,0.82);
+      backdrop-filter: blur(24px) saturate(1.4);
+      -webkit-backdrop-filter: blur(24px) saturate(1.4);
+      border-bottom: 1px solid var(--line);
+    }
+    .nav-logo { height: 38px; object-fit: contain; display: block; }
+    .nav-back {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 14px;
+      background: var(--raised); color: var(--txt);
+      border-radius: 100px; font-size: 13px; font-weight: 500;
+      text-decoration: none; border: 1px solid var(--line);
+      transition: background .18s ease, transform .18s ease;
+    }
+    .nav-back:hover { background: var(--card); transform: translateY(-1px); }
+
+    /* ── PAGE ── */
+    .page {
+      max-width: 1100px; margin: 0 auto;
+      padding: 28px 20px 80px;
+      display: grid; gap: 28px;
+      grid-template-columns: 1fr;
+    }
+    @media (min-width: 900px) {
+      .page { grid-template-columns: 1.15fr 0.85fr; align-items: start; padding-top: 38px; }
+    }
+
+    /* ── GALLERY ── */
+    .gallery { position: relative; }
+    .gal-main {
+      position: relative; width: 100%;
+      aspect-ratio: 4 / 3;
+      background: var(--card); border-radius: 16px; overflow: hidden;
+      border: 1px solid var(--line);
+      box-shadow: 0 30px 60px -20px rgba(0,0,0,0.5), 0 0 0 1px rgba(249,115,22,0.05);
+    }
+    .gal-img {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%; object-fit: cover;
+      opacity: 0; transition: opacity .35s ease;
+    }
+    .gal-img.on { opacity: 1; }
+    .gal-shade {
+      position: absolute; inset: 0; pointer-events: none;
+      background: linear-gradient(to top, rgba(7,7,15,0.55), transparent 35%);
+    }
+    .gal-btn {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      width: 44px; height: 44px; border-radius: 100px;
+      background: rgba(7,7,15,0.7); border: 1px solid rgba(255,255,255,0.16);
+      color: #fff; font-size: 22px; line-height: 1;
+      display: inline-flex; align-items: center; justify-content: center;
+      cursor: pointer; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+      transition: background .18s ease, transform .18s ease;
+    }
+    .gal-btn:hover { background: rgba(249,115,22,0.85); transform: translateY(-50%) scale(1.05); }
+    .gal-prev { left: 12px; }
+    .gal-next { right: 12px; }
+    .gal-counter {
+      position: absolute; bottom: 12px; right: 12px;
+      background: rgba(7,7,15,0.7); color: #fff;
+      padding: 4px 10px; border-radius: 100px;
+      font-size: 12px; font-weight: 500;
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+
+    .thumbs {
+      margin-top: 12px;
+      display: flex; gap: 8px; overflow-x: auto;
+      padding-bottom: 4px;
+      scrollbar-width: thin;
+    }
+    .thumbs::-webkit-scrollbar { height: 6px; }
+    .thumbs::-webkit-scrollbar-thumb { background: var(--raised); border-radius: 100px; }
+    .thumb {
+      flex: 0 0 78px; height: 58px;
+      border-radius: 8px; overflow: hidden; cursor: pointer;
+      border: 2px solid transparent;
+      background: var(--card);
+      transition: border-color .15s ease, transform .15s ease;
+    }
+    .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .thumb:hover { transform: translateY(-1px); border-color: rgba(249,115,22,0.5); }
+    .thumb.on { border-color: var(--or); }
+
+    /* ── DETAILS ── */
+    .details { display: flex; flex-direction: column; gap: 18px; }
+    .cat-badge {
+      align-self: flex-start;
+      padding: 4px 11px; border-radius: 100px;
+      font-size: 10.5px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase;
+    }
+    .cat-economy { background: rgba(34,197,94,0.14); border:1px solid rgba(34,197,94,0.24); color:#4ade80; }
+    .cat-suv     { background: rgba(59,130,246,0.14); border:1px solid rgba(59,130,246,0.24); color:#60a5fa; }
+    .cat-luxury  { background: rgba(212,168,67,0.14); border:1px solid rgba(212,168,67,0.24); color:#d4a843; }
+    .cat-van     { background: rgba(168,85,247,0.14); border:1px solid rgba(168,85,247,0.24); color:#c084fc; }
+
+    .car-title {
+      font-size: clamp(2rem, 5vw, 2.8rem); font-weight: 600;
+      line-height: 1.05; letter-spacing: -0.02em;
+    }
+    .car-title-year { color: var(--muted); font-weight: 400; font-size: 0.65em; margin-left: 8px; }
+
+    .price-row {
+      display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap;
+      padding: 14px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
+    }
+    .price-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.6rem; font-weight: 700; line-height: 1; color: var(--or);
+    }
+    .price-unit { color: var(--muted); font-size: 14px; }
+    .price-dep {
+      margin-left: auto; font-size: 13px; color: var(--muted);
+    }
+    .price-dep b { color: var(--txt); }
+
+    .specs {
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;
+    }
+    .spec {
+      background: var(--card); border: 1px solid var(--line);
+      border-radius: 10px; padding: 11px 13px;
+      display: flex; flex-direction: column; gap: 2px;
+    }
+    .spec-lbl { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+    .spec-val { font-size: 14px; font-weight: 500; }
+
+    .features-title {
+      margin-top: 6px; margin-bottom: 6px;
+      font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600;
+      color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em;
+    }
+    .features { display: flex; flex-wrap: wrap; gap: 6px; }
+    .feat {
+      background: var(--raised); border-radius: 6px;
+      padding: 5px 10px; font-size: 12px; color: var(--txt);
+      border: 1px solid var(--line);
+    }
+
+    /* ── BOOKING CARD ── */
+    .booking {
+      margin-top: 8px;
+      background: linear-gradient(180deg, rgba(24,24,38,0.95), rgba(13,13,26,0.95));
+      border: 1px solid var(--line); border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 20px 50px -25px rgba(0,0,0,0.6);
+    }
+    .booking-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.5rem; font-weight: 600; margin-bottom: 4px;
+    }
+    .booking-sub { font-size: 12.5px; color: var(--or); font-weight: 500; margin-bottom: 16px; }
+
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 11px; }
+    .mg-full { grid-column: 1 / -1; }
+    .f-label {
+      display: block;
+      font-size: 11.5px; font-weight: 500; color: var(--muted);
+      margin-bottom: 5px; letter-spacing: 0.02em;
+    }
+    .f-input {
+      width: 100%;
+      background: var(--surface); color: var(--txt);
+      border: 1px solid var(--line); border-radius: 9px;
+      padding: 10px 12px; font-size: 14px;
+      font-family: 'DM Sans', sans-serif;
+      transition: border-color .18s ease, box-shadow .18s ease;
+    }
+    .f-input:focus {
+      outline: none;
+      border-color: var(--or);
+      box-shadow: 0 0 0 3px rgba(249,115,22,0.18);
+    }
+    .f-input option { background: var(--raised); }
+
+    .summary {
+      margin-top: 14px; padding: 13px 14px;
+      background: var(--surface); border: 1px solid var(--line);
+      border-radius: 11px;
+    }
+    .sum-row { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; font-size: 13px; }
+    .sum-lbl { color: var(--muted); }
+    .sum-val { font-weight: 500; }
+    .sum-div { height: 1px; background: var(--line); margin: 8px 0; }
+    .sum-total .sum-lbl { font-size: 14px; font-weight: 600; color: var(--txt); }
+    .sum-total .sum-val { font-size: 20px; font-weight: 700; color: var(--or); }
+    .sum-dep {
+      margin-top: 9px; padding: 9px 11px;
+      background: rgba(212,168,67,0.07); border: 1px solid rgba(212,168,67,0.18);
+      border-radius: 8px; font-size: 12px; color: var(--muted); line-height: 1.45;
+    }
+    .sum-dep b { color: var(--txt); }
+
+    .wa-book-btn {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      width: 100%; margin-top: 14px;
+      background: var(--wa); color: #fff;
+      border: none; border-radius: 11px;
+      padding: 13px 18px; font-size: 15px; font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 8px 22px rgba(37,211,102,0.32);
+      transition: background .18s ease, transform .18s ease, box-shadow .18s ease;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .wa-book-btn:hover { background: #1ea851; transform: translateY(-1px); box-shadow: 0 10px 26px rgba(37,211,102,0.4); }
+    .wa-book-btn:active { transform: none; }
+
+    .booking-note {
+      text-align: center; margin-top: 10px;
+      font-size: 11.5px; color: var(--muted);
+    }
+
+    .share-row {
+      display: flex; gap: 8px; margin-top: 10px;
+    }
+    .share-row .btn {
+      flex: 1;
+      background: var(--raised); color: var(--txt);
+      border: 1px solid var(--line); border-radius: 9px;
+      padding: 9px; font-size: 12.5px; font-weight: 500;
+      cursor: pointer; font-family: 'DM Sans', sans-serif;
+      transition: background .18s ease, border-color .18s ease;
+    }
+    .share-row .btn:hover { background: var(--card); border-color: rgba(249,115,22,0.5); }
+
+    .toast {
+      position: fixed; left: 50%; bottom: 28px; transform: translate(-50%, 20px);
+      background: rgba(13,13,26,0.96); color: var(--txt);
+      border: 1px solid var(--line); border-radius: 12px;
+      padding: 11px 18px; font-size: 13.5px; font-weight: 500;
+      box-shadow: 0 14px 40px rgba(0,0,0,0.45), 0 0 0 1px rgba(249,115,22,0.18);
+      opacity: 0; pointer-events: none; z-index: 9000;
+      transition: opacity .2s ease, transform .25s ease;
+    }
+    .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+    /* ── NOT FOUND ── */
+    .notfound {
+      min-height: 60vh;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      text-align: center; padding: 40px 20px;
+    }
+    .notfound h1 { font-size: 2.4rem; margin-bottom: 12px; }
+    .notfound p { color: var(--muted); margin-bottom: 22px; max-width: 420px; }
+    .notfound a {
+      display: inline-block; padding: 11px 22px;
+      background: var(--or); color: #fff; border-radius: 100px;
+      text-decoration: none; font-weight: 600; font-size: 14px;
+      box-shadow: 0 8px 22px rgba(249,115,22,0.32);
+      transition: transform .18s ease, background .18s ease;
+    }
+    .notfound a:hover { background: var(--or-d); transform: translateY(-1px); }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="index.html" style="display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit;">
+    <picture>
+      <source srcset="brand_assets/udrive-logo-dark.png" media="(prefers-color-scheme: dark)" />
+      <img src="brand_assets/udrive-logo-light.png" alt="UDrive" class="nav-logo" />
+    </picture>
+  </a>
+  <a href="index.html" class="nav-back">← All cars</a>
+</nav>
+
+<main id="main"></main>
+
+<script>
+
+  // ── Resolve which car to show ──
+  const params = new URLSearchParams(location.search);
+  const slugOrId = params.get('car') || params.get('id');
+  const car = window.findCarBySlugOrId ? window.findCarBySlugOrId(slugOrId) : null;
+  const main = document.getElementById('main');
+
+  if (!car) {
+    main.innerHTML = `
+      <div class="notfound">
+        <h1>Car not found</h1>
+        <p>The link you opened doesn't match any car in our fleet. It may have been removed or the link is mistyped.</p>
+        <a href="index.html">See all cars →</a>
+      </div>`;
+  } else {
+    document.title = `${car.name} ${car.year} — UDrive Car Rental`;
+    const meta = document.querySelector('meta[name="description"]');
+    if (meta) meta.setAttribute('content', `Rent the ${car.name} ${car.year} from UDrive — €${car.ppd}/day, deposit returned in cash on key handover.`);
+
+    const CAT_LABEL = { economy:'Economy', suv:'SUV', luxury:'Luxury', van:'Van & MPV' };
+    const FUEL_ICON = { Petrol:'⛽', Diesel:'🛢', Hybrid:'🌿', 'Petrol+LPG':'⛽', 'Petrol/LPG':'⛽' };
+
+    main.innerHTML = `
+      <section class="page">
+        <div class="gallery">
+          <div class="gal-main" id="gal-main">
+            ${car.imgs.map((src, i) => `
+              <img class="gal-img${i===0?' on':''}" data-idx="${i}"
+                src="${src}" alt="${car.name} ${car.year} photo ${i+1}"
+                ${i===0?'':'loading="lazy"'} />
+            `).join('')}
+            <div class="gal-shade"></div>
+            ${car.imgs.length > 1 ? `
+              <button class="gal-btn gal-prev" onclick="slideGal(-1)" aria-label="Previous photo">&#8249;</button>
+              <button class="gal-btn gal-next" onclick="slideGal(1)" aria-label="Next photo">&#8250;</button>
+              <div class="gal-counter"><span id="gal-cur">1</span> / ${car.imgs.length}</div>
+            ` : ''}
+          </div>
+          ${car.imgs.length > 1 ? `
+            <div class="thumbs" id="thumbs">
+              ${car.imgs.map((src, i) => `
+                <div class="thumb${i===0?' on':''}" data-idx="${i}" onclick="goGal(${i})">
+                  <img src="${src}" alt="" loading="lazy" />
+                </div>
+              `).join('')}
+            </div>` : ''}
+        </div>
+
+        <div class="details">
+          <span class="cat-badge cat-${car.cat}">${CAT_LABEL[car.cat] || car.cat}</span>
+          <h1 class="car-title">${car.name}<span class="car-title-year">${car.year}</span></h1>
+
+          <div class="price-row">
+            <span class="price-num">€${car.ppd}</span>
+            <span class="price-unit">per day</span>
+            <span class="price-dep">Deposit: <b>€${car.dep}</b> (cash, returned instantly)</span>
+          </div>
+
+          <div class="specs">
+            <div class="spec"><span class="spec-lbl">Transmission</span><span class="spec-val">⚙️ ${car.tx}</span></div>
+            <div class="spec"><span class="spec-lbl">Fuel</span><span class="spec-val">${FUEL_ICON[car.fuel]||'⛽'} ${car.fuel}</span></div>
+            <div class="spec"><span class="spec-lbl">Seats</span><span class="spec-val">👤 ${car.seats}</span></div>
+            <div class="spec"><span class="spec-lbl">Year</span><span class="spec-val">📅 ${car.year}</span></div>
+          </div>
+
+          ${car.features && car.features.length ? `
+            <div>
+              <div class="features-title">Features</div>
+              <div class="features">
+                ${car.features.map(f => `<span class="feat">${f}</span>`).join('')}
+              </div>
+            </div>` : ''}
+
+          <div class="booking">
+            <h2 class="booking-title">Book this car</h2>
+            <div class="booking-sub">${car.name} ${car.year} · €${car.ppd}/day</div>
+
+            <div class="form-grid">
+              <div class="mg-full">
+                <label class="f-label" for="m-loc">📍 Pickup Location</label>
+                <select class="f-input" id="m-loc">
+                  <option value="">Select airport…</option>
+                  <option value="Tirana International Airport (TIA)">🇦🇱 Tirana Airport — TIA</option>
+                  <option value="Pristina Airport (PRN)">🇽🇰 Pristina Airport — PRN</option>
+                </select>
+              </div>
+              <div>
+                <label class="f-label" for="m-pd">📅 Pickup Date</label>
+                <input type="date" class="f-input" id="m-pd" />
+              </div>
+              <div>
+                <label class="f-label" for="m-pt">⏰ Pickup Time</label>
+                <input type="time" class="f-input" id="m-pt" value="10:00" />
+              </div>
+              <div>
+                <label class="f-label" for="m-rd">📅 Return Date</label>
+                <input type="date" class="f-input" id="m-rd" />
+              </div>
+              <div>
+                <label class="f-label" for="m-rt">⏰ Return Time</label>
+                <input type="time" class="f-input" id="m-rt" value="10:00" />
+              </div>
+            </div>
+
+            <div class="summary" id="summary" style="display:none">
+              <div class="sum-row"><span class="sum-lbl">Duration</span><span class="sum-val" id="s-days">—</span></div>
+              <div class="sum-row"><span class="sum-lbl">Rate</span><span class="sum-val" id="s-rate">—</span></div>
+              <div class="sum-div"></div>
+              <div class="sum-row sum-total"><span class="sum-lbl">Total</span><span class="sum-val" id="s-total">—</span></div>
+              <div class="sum-dep" id="s-dep"></div>
+            </div>
+
+            <button class="wa-book-btn" onclick="sendWA()">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+              Confirm Booking via WhatsApp
+            </button>
+
+            <div class="booking-note">💳 No credit card · Cash deposit · Returned instantly on key handover</div>
+
+            <div class="share-row">
+              <button class="btn" onclick="copyLink()">🔗 Copy this car's link</button>
+            </div>
+          </div>
+        </div>
+      </section>`;
+
+    initGallery();
+    initBooking();
+  }
+
+  // ── Gallery ──
+  let galIdx = 0;
+  function setGal(i) {
+    if (!car) return;
+    const n = car.imgs.length;
+    galIdx = ((i % n) + n) % n;
+    document.querySelectorAll('.gal-img').forEach(el => {
+      el.classList.toggle('on', Number(el.dataset.idx) === galIdx);
+    });
+    document.querySelectorAll('.thumb').forEach(el => {
+      el.classList.toggle('on', Number(el.dataset.idx) === galIdx);
+    });
+    const cur = document.getElementById('gal-cur');
+    if (cur) cur.textContent = String(galIdx + 1);
+  }
+  function slideGal(dir) { setGal(galIdx + dir); }
+  function goGal(i) { setGal(i); }
+
+  function initGallery() {
+    if (!car || car.imgs.length <= 1) return;
+    // Prefetch next image
+    const pre = new Image(); pre.src = car.imgs[1 % car.imgs.length];
+    // Touch swipe
+    const wrap = document.getElementById('gal-main');
+    let startX = 0;
+    wrap.addEventListener('touchstart', e => { startX = e.touches[0].clientX; }, { passive: true });
+    wrap.addEventListener('touchend', e => {
+      const dx = e.changedTouches[0].clientX - startX;
+      if (Math.abs(dx) < 30) return;
+      slideGal(dx < 0 ? 1 : -1);
+    });
+    // Keyboard arrows
+    document.addEventListener('keydown', e => {
+      if (e.key === 'ArrowRight') slideGal(1);
+      else if (e.key === 'ArrowLeft') slideGal(-1);
+    });
+  }
+
+  // ── Booking ──
+  function initBooking() {
+    const fmt = d => d.toISOString().split('T')[0];
+    const today    = new Date();
+    const tomorrow = new Date(today); tomorrow.setDate(today.getDate()+1);
+    const weekOut  = new Date(today); weekOut.setDate(today.getDate()+7);
+    const mPd = document.getElementById('m-pd');
+    const mRd = document.getElementById('m-rd');
+    mPd.min = fmt(today); mRd.min = fmt(today);
+    mPd.value = fmt(tomorrow); mRd.value = fmt(weekOut);
+    ['m-pd','m-pt','m-rd','m-rt'].forEach(id =>
+      document.getElementById(id).addEventListener('change', calcSummary)
+    );
+    calcSummary();
+  }
+
+  function calcSummary() {
+    if (!car) return;
+    const pd = document.getElementById('m-pd').value;
+    const pt = document.getElementById('m-pt').value;
+    const rd = document.getElementById('m-rd').value;
+    const rt = document.getElementById('m-rt').value;
+    const box = document.getElementById('summary');
+    if (!pd || !rd) { box.style.display = 'none'; return; }
+
+    const pickup = new Date(`${pd}T${pt||'00:00'}`);
+    const ret    = new Date(`${rd}T${rt||'00:00'}`);
+    const ms = ret - pickup;
+    if (ms <= 0) { box.style.display = 'none'; return; }
+
+    const days  = Math.ceil(ms / 86400000);
+    const total = days * car.ppd;
+    document.getElementById('s-days').textContent  = `${days} day${days!==1?'s':''}`;
+    document.getElementById('s-rate').textContent  = `€${car.ppd}/day`;
+    document.getElementById('s-total').textContent = `€${total}`;
+    document.getElementById('s-dep').innerHTML =
+      `💵 Security deposit: <b>€${car.dep}</b> — returned in cash immediately when you hand back the keys. No delays.`;
+    box.style.display = 'block';
+  }
+
+  function sendWA() {
+    if (!car) return;
+    const loc = document.getElementById('m-loc').value;
+    const pd  = document.getElementById('m-pd').value;
+    const pt  = document.getElementById('m-pt').value || '00:00';
+    const rd  = document.getElementById('m-rd').value;
+    const rt  = document.getElementById('m-rt').value || '00:00';
+    if (!loc || !pd || !rd) { alert('Please fill in all details before confirming.'); return; }
+    const pickup = new Date(`${pd}T${pt}`);
+    const ret    = new Date(`${rd}T${rt}`);
+    if (ret <= pickup) { alert('Return date must be after pickup date.'); return; }
+
+    const days = Math.ceil((ret - pickup) / 86400000);
+    const total = days * car.ppd;
+    const fmtDate = d => d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+    const fmtTime = d => d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+    const lines = [
+      'Hello UDrive! 🚗',
+      '',
+      '*Booking Request*',
+      '',
+      `🚙 Car: *${car.name} ${car.year}*`,
+      `📍 Pickup: *${loc}*`,
+      `📅 From: *${fmtDate(pickup)} at ${fmtTime(pickup)}*`,
+      `📅 To:   *${fmtDate(ret)} at ${fmtTime(ret)}*`,
+      `⏱️ Duration: *${days} day${days!==1?'s':''}*`,
+      `💰 Rate: €${car.ppd}/day`,
+      `💳 Total Rental: *€${total}*`,
+      `🏦 Deposit: *€${car.dep}* _(returned in cash on key handover)_`,
+      '',
+      `🔗 ${location.href}`,
+      '',
+      'Please confirm availability. Thank you!',
+    ];
+    window.open(`https://wa.me/355693755827?text=${encodeURIComponent(lines.join('\n'))}`, '_blank');
+  }
+
+  // ── Copy link ──
+  function copyLink() {
+    const url = location.href;
+    if (navigator.share) {
+      navigator.share({ title: document.title, url }).catch(() => doCopy(url));
+    } else {
+      doCopy(url);
+    }
+  }
+  function doCopy(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(() => showToast('Link copied!')).catch(() => fallbackCopy(text));
+    } else {
+      fallbackCopy(text);
+    }
+  }
+  function fallbackCopy(text) {
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.style.position = 'fixed'; ta.style.left = '-9999px';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); showToast('Link copied!'); } catch { showToast('Could not copy.'); }
+    document.body.removeChild(ta);
+  }
+  let __toastTimer = null;
+  function showToast(msg) {
+    let el = document.getElementById('toast');
+    if (!el) { el = document.createElement('div'); el.id = 'toast'; el.className = 'toast'; document.body.appendChild(el); }
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(__toastTimer);
+    __toastTimer = setTimeout(() => el.classList.remove('show'), 2200);
+  }
+</script>
+
+</body>
+</html>

@@ -78,6 +78,10 @@
     }
 
     /* ── GALLERY ── */
+    /* min-width:0 lets the grid column shrink below its content's intrinsic
+       min-width — without this, a long thumbnail strip (e.g. RAV4 with 7
+       photos) forces the whole page wider than the mobile viewport. */
+    .gallery, .details { min-width: 0; }
     .gallery { position: relative; }
     .gal-main {
       position: relative; width: 100%;

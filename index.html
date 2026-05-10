@@ -166,6 +166,13 @@
     }
     .hero-sub strong { color: var(--txt); font-weight: 500; }
 
+    /* Hero CTA */
+    .hero-cta-wrap { display: flex; justify-content: center; margin-top: 8px; }
+    .hero-cta {
+      padding: 16px 32px; font-size: 16px; font-weight: 700;
+      letter-spacing: 0.01em; border-radius: 14px;
+    }
+
     /* Booking card */
     .booking-card {
       background: rgba(17,17,32,0.92);
@@ -360,12 +367,12 @@
       background: rgba(7,7,15,0.58); border: 1px solid rgba(255,255,255,0.13);
       color: #fff; font-size: 20px; width: 32px; height: 32px; border-radius: 50%;
       cursor: pointer; z-index: 6; display: flex; align-items: center; justify-content: center;
-      opacity: 0; transition: opacity 0.2s, background 0.15s; backdrop-filter: blur(4px);
-      line-height: 1;
+      opacity: 1; transition: background 0.15s; backdrop-filter: blur(4px);
+      line-height: 1; touch-action: manipulation;
     }
     .slide-prev { left: 8px; }
     .slide-next { right: 8px; }
-    .car-card:hover .slide-btn { opacity: 1; }
+    .slide-btn { opacity: 1; }
     .slide-btn:hover { background: rgba(249,115,22,0.72); }
     .slide-dots {
       position: absolute; bottom: 9px; left: 50%; transform: translateX(-50%);
@@ -584,6 +591,8 @@
       transition: opacity 0.55s ease, transform 0.55s ease;
     }
     .fade-up.vis { opacity: 1; transform: none; }
+    .car-card.fade-up { opacity: 1; }
+    .car-card.fade-up.vis { transform: none; }
   </style>
 </head>
 <body>
@@ -620,36 +629,8 @@
       No hidden fees, no credit card, <strong>deposit returned in cash the moment you hand back the keys.</strong>
     </p>
 
-    <div class="booking-card">
-      <div class="booking-fields">
-        <div>
-          <label class="f-label" data-i18n="labelLoc">📍 Pickup Location</label>
-          <select class="f-input" id="h-loc">
-            <option value="" data-i18n-opt="optAirport">Airport…</option>
-            <option value="Tirana International Airport (TIA)">🇦🇱 Tirana Airport — TIA</option>
-            <option value="Pristina Airport (PRN)">🇽🇰 Pristina Airport — PRN</option>
-          </select>
-        </div>
-        <div>
-          <label class="f-label" data-i18n="labelPd">📅 Pickup Date</label>
-          <input type="date" class="f-input" id="h-pd" />
-        </div>
-        <div>
-          <label class="f-label" data-i18n="labelPt">⏰ Pickup Time</label>
-          <input type="time" class="f-input" id="h-pt" value="10:00" />
-        </div>
-        <div>
-          <label class="f-label" data-i18n="labelRd">📅 Return Date</label>
-          <input type="date" class="f-input" id="h-rd" />
-        </div>
-        <div>
-          <label class="f-label" data-i18n="labelRt">⏰ Return Time</label>
-          <input type="time" class="f-input" id="h-rt" value="10:00" />
-        </div>
-        <div>
-          <button class="find-btn" onclick="scrollToFleet()" data-i18n="findBtn">Find My Car →</button>
-        </div>
-      </div>
+    <div class="hero-cta-wrap">
+      <button class="find-btn hero-cta" onclick="scrollToFleet()" data-i18n="findBtn">View Our Fleet →</button>
     </div>
   </div>
 </section>
@@ -953,6 +934,7 @@ function renderCars(cat) {
   setTimeout(() => {
     grid.querySelectorAll('.fade-up').forEach(el => el.classList.add('vis'));
     initCarousel();
+    CARS.forEach(c => { if (c.imgs.length > 1) { const p = new Image(); p.src = c.imgs[1]; } });
   }, 40);
 }
 
@@ -966,6 +948,8 @@ function slidePhoto(carId, dir) {
   carPhotoIdx[carId] = next;
   const img = document.getElementById('cimg-' + carId);
   if (img) img.src = car.imgs[next];
+  const prefetchIdx = (next + 1) % car.imgs.length;
+  if (prefetchIdx !== next) { const pre = new Image(); pre.src = car.imgs[prefetchIdx]; }
   car.imgs.forEach((_, i) => {
     const dot = document.getElementById('sdot-' + carId + '-' + i);
     if (dot) dot.classList.toggle('on', i === next);
@@ -974,8 +958,13 @@ function slidePhoto(carId, dir) {
 function initCarousel() {
   document.querySelectorAll('.car-img-wrap').forEach(wrap => {
     let startX = 0;
-    wrap.addEventListener('touchstart', e => { startX = e.touches[0].clientX; }, { passive: true });
+    let onBtn = false;
+    wrap.addEventListener('touchstart', e => {
+      onBtn = !!e.target.closest('.slide-btn');
+      startX = e.touches[0].clientX;
+    }, { passive: true });
     wrap.addEventListener('touchend', e => {
+      if (onBtn) return;
       const dx = e.changedTouches[0].clientX - startX;
       if (Math.abs(dx) < 30) return;
       const card = wrap.closest('[data-carid]');
@@ -1006,13 +995,11 @@ function openModal(id) {
   document.getElementById('modal-sub').textContent =
     `${activeCar.name} ${activeCar.year} · €${activeCar.ppd}/day`;
 
-  // Pre-fill from hero form
-  const copy = (hId, mId) => {
-    const v = document.getElementById(hId).value;
-    if (v) document.getElementById(mId).value = v;
-  };
-  copy('h-loc','m-loc'); copy('h-pd','m-pd');
-  copy('h-pt','m-pt');   copy('h-rd','m-rd'); copy('h-rt','m-rt');
+  // Default dates if not yet filled
+  const mPd = document.getElementById('m-pd');
+  const mRd = document.getElementById('m-rd');
+  if (!mPd.value) mPd.value = mPd.dataset.default || '';
+  if (!mRd.value) mRd.value = mRd.dataset.default || '';
 
   document.getElementById('modal-bg').classList.add('open');
   document.body.style.overflow = 'hidden';
@@ -1107,12 +1094,12 @@ document.querySelectorAll('.fade-up').forEach(el => revealObs.observe(el));
   const today    = new Date();
   const tomorrow = new Date(today); tomorrow.setDate(today.getDate()+1);
   const weekOut  = new Date(today); weekOut.setDate(today.getDate()+7);
-  document.getElementById('h-pd').value = fmt(tomorrow);
-  document.getElementById('h-pd').min   = fmt(today);
-  document.getElementById('h-rd').value = fmt(weekOut);
-  document.getElementById('h-rd').min   = fmt(tomorrow);
-  document.getElementById('m-pd').min   = fmt(today);
-  document.getElementById('m-rd').min   = fmt(today);
+  const mPd = document.getElementById('m-pd');
+  const mRd = document.getElementById('m-rd');
+  mPd.min = fmt(today);
+  mRd.min = fmt(today);
+  mPd.dataset.default = fmt(tomorrow);
+  mRd.dataset.default = fmt(weekOut);
 })();
 
 // ─── ESC KEY ───
@@ -1126,7 +1113,7 @@ const T = {
     heroTitle:'',
     heroSub:'Premium car rental from <strong>Tirana Airport (TIA)</strong> and <strong>Pristina Airport (PRN)</strong>. No hidden fees, no credit card, <strong>deposit returned in cash the moment you hand back the keys.</strong>',
     labelLoc:'📍 Pickup Location', labelPd:'📅 Pickup Date', labelPt:'⏰ Pickup Time', labelRd:'📅 Return Date', labelRt:'⏰ Return Time',
-    optAirport:'Airport…', modalAirport:'Select airport…', findBtn:'Find My Car →',
+    optAirport:'Airport…', modalAirport:'Select airport…', findBtn:'View Our Fleet →',
     trust1h:'No Hidden Fees', trust1s:'What you see is what you pay',
     trust2h:'24/7 Support', trust2s:'Always on WhatsApp',
     trust3h:'Albanian Hospitality', trust3s:'Genuine care, every rental',
@@ -1153,7 +1140,7 @@ const T = {
     heroTitle:'',
     heroSub:'Marrje me qira makinash nga <strong>Aeroporti i Tiranës (TIA)</strong> dhe <strong>Aeroporti i Prishtinës (PRN)</strong>. Pa tarifa të fshehura, pa kartë krediti, <strong>depozita kthehet në cash sapo dorëzoni çelësat.</strong>',
     labelLoc:'📍 Pika e Marrjes', labelPd:'📅 Data e Marrjes', labelPt:'⏰ Ora e Marrjes', labelRd:'📅 Data e Kthimit', labelRt:'⏰ Ora e Kthimit',
-    optAirport:'Aeroporti…', modalAirport:'Zgjidh aeroportin…', findBtn:'Gjej Makinën →',
+    optAirport:'Aeroporti…', modalAirport:'Zgjidh aeroportin…', findBtn:'Shiko Flotën →',
     trust1h:'Pa Tarifa të Fshehura', trust1s:'Çfarë shihni, atë paguani',
     trust2h:'Mbështetje 24/7', trust2s:'Gjithmonë në WhatsApp',
     trust3h:'Mikpritja Shqiptare', trust3s:'Kujdes i vërtetë, çdo herë',
@@ -1180,7 +1167,7 @@ const T = {
     heroTitle:'',
     heroSub:'تأجير سيارات فاخر من <strong>مطار تيرانا (TIA)</strong> و<strong>مطار بريشتينا (PRN)</strong>. لا رسوم خفية، لا بطاقة ائتمان، <strong>الوديعة تُرجع نقداً فور تسليم المفاتيح.</strong>',
     labelLoc:'📍 موقع الاستلام', labelPd:'📅 تاريخ الاستلام', labelPt:'⏰ وقت الاستلام', labelRd:'📅 تاريخ الإرجاع', labelRt:'⏰ وقت الإرجاع',
-    optAirport:'المطار…', modalAirport:'اختر المطار…', findBtn:'← ابحث عن سيارتي',
+    optAirport:'المطار…', modalAirport:'اختر المطار…', findBtn:'← شاهد أسطولنا',
     trust1h:'بدون رسوم خفية', trust1s:'ما تراه هو ما تدفعه',
     trust2h:'دعم على مدار الساعة', trust2s:'متاحون دائماً على واتساب',
     trust3h:'الضيافة الألبانية', trust3s:'اهتمام حقيقي في كل تأجير',
@@ -1242,6 +1229,16 @@ function setLang(code) {
 <script type="module">
   import { firebaseConfig, isFirebaseConfigured } from './firebase-config.js';
 
+  // Force Cloudinary delivery to a browser-friendly format (HEIC -> JPG/WebP).
+  function toDeliveryUrl(url){
+    if (!url || typeof url !== 'string' || !url.includes('/upload/')) return url;
+    let out = url.replace(/\.(heic|heif)(\?.*)?$/i, '.jpg$2');
+    if (!/\/upload\/(f_auto|.*[,/]f_auto)/.test(out)) {
+      out = out.replace('/upload/', '/upload/f_auto,q_auto/');
+    }
+    return out;
+  }
+
   if (isFirebaseConfigured()) {
     try {
       const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js');
@@ -1265,7 +1262,7 @@ function setLang(code) {
           seats:    d.seats || 5,
           ppd:      Number(d.ppd) || 0,
           dep:      Number(d.dep) || 0,
-          imgs:     Array.isArray(d.imgs) ? d.imgs : [],
+          imgs:     Array.isArray(d.imgs) ? d.imgs.map(toDeliveryUrl) : [],
           features: Array.isArray(d.features) ? d.features : [],
         });
       });

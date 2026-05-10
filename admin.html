@@ -411,8 +411,18 @@
         <div class="field"><label>Deposit (€)</label><input class="input" name="dep" type="number" min="0" value="300" required /></div>
       </div>
       <div class="field">
+        <label>Variant <span style="color:var(--dim);font-weight:400">(optional — only when you have two cars with the same name + year)</span></label>
+        <input class="input" name="variant" placeholder="e.g. blue, grey, amg, white" />
+      </div>
+
+      <div class="field">
         <label>Features (comma-separated)</label>
         <input class="input" name="features" placeholder="A/C, Navigation, Bluetooth, Rear Camera" />
+      </div>
+
+      <div class="field">
+        <label>Description <span style="color:var(--dim);font-weight:400">(shown on the car's own shareable page)</span></label>
+        <textarea class="input" name="desc" rows="3" placeholder="1–2 sentences about the car — what it's good for, who it suits."></textarea>
       </div>
 
       <div class="field">
@@ -653,6 +663,8 @@ if (!isFirebaseConfigured()) {
       f.seats.value = car.seats || 5;
       f.ppd.value = car.ppd || 0;
       f.dep.value = car.dep || 0;
+      f.variant.value = car.variant || '';
+      f.desc.value = car.desc || '';
       f.features.value = (car.features||[]).join(', ');
       editPhotos = (car.imgs||[]).map(url => ({ url: toDeliveryUrl(url), uploading: false }));
     } else {
@@ -823,12 +835,14 @@ if (!isFirebaseConfigured()) {
     const data = {
       name: f.name.value.trim(),
       year: Number(f.year.value),
+      variant: (f.variant?.value || '').trim().toLowerCase(),
       cat:  f.cat.value,
       tx:   f.tx.value,
       fuel: f.fuel.value,
       seats: Number(f.seats.value),
       ppd:  Number(f.ppd.value),
       dep:  Number(f.dep.value),
+      desc: (f.desc?.value || '').trim(),
       features: f.features.value.split(',').map(s=>s.trim()).filter(Boolean),
       imgs: editPhotos.filter(p=>p.url && !p.uploading).map(p=>p.url),
       updatedAt: serverTimestamp(),

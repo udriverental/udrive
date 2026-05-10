@@ -342,7 +342,11 @@
   <a href="index.html" class="nav-back">← All cars</a>
 </nav>
 
-<main id="main"></main>
+<main id="main">
+  <div style="min-height:60vh;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:14px;">
+    Loading…
+  </div>
+</main>
 
 <script>
 
@@ -488,17 +492,25 @@
   }
   } // end renderInner
 
-  // Run the first render immediately (uses hardcoded fleet)
-  render();
-
-  // Hook for the Firebase loader at the bottom of this file: when fresh data
-  // arrives from Firestore, swap window.CARS and re-render so the per-car
-  // page reflects the latest admin edits (added/removed photos, price, etc.).
-  window.__udriveApplyCars = function(arr) {
-    if (!Array.isArray(arr) || !arr.length) return;
-    window.CARS = arr;
+  // Defer the first render until Firebase has had a chance to respond, so
+  // we don't show stale hardcoded data and then snap to the live admin
+  // version. Safety timeout: 2s — after which we render whatever we have.
+  let __firstRendered = false;
+  function __firstRender() {
+    if (__firstRendered) return;
+    __firstRendered = true;
     render();
+  }
+  setTimeout(__firstRender, 2000);
+
+  // Hook for the Firebase loader. Triggers the first render the first time.
+  window.__udriveApplyCars = function(arr) {
+    if (Array.isArray(arr) && arr.length) window.CARS = arr;
+    if (!__firstRendered) __firstRender(); else render();
   };
+  // Signal from the Firebase loader when it has nothing to apply
+  // (no docs, or fetch failed). Lets us render without waiting 2s.
+  window.__udriveFleetReady = __firstRender;
 
   // ── Gallery ──
   function setGal(i) {
@@ -689,6 +701,7 @@
           id:       doc.id,
           name:     d.name || '',
           year:     d.year || '',
+          variant:  d.variant || '',
           cat:      d.cat || 'economy',
           tx:       d.tx || 'Automatic',
           fuel:     d.fuel || 'Diesel',
@@ -703,10 +716,15 @@
 
       if (cars.length && typeof window.__udriveApplyCars === 'function') {
         window.__udriveApplyCars(cars);
+      } else if (typeof window.__udriveFleetReady === 'function') {
+        window.__udriveFleetReady();
       }
     } catch (err) {
       console.warn('[UDrive] Firebase fetch failed — using built-in fleet data.', err);
+      if (typeof window.__udriveFleetReady === 'function') window.__udriveFleetReady();
     }
+  } else if (typeof window.__udriveFleetReady === 'function') {
+    window.__udriveFleetReady();
   }
 </script>
 

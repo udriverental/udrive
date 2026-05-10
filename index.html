@@ -576,7 +576,9 @@
     </div>
   </div>
 
-  <div class="cars-grid" id="cars-grid"></div>
+  <div class="cars-grid" id="cars-grid">
+    <div class="empty-state" style="grid-column:1/-1">Loading fleet…</div>
+  </div>
 </section>
 
 <!-- ── TRUST BAR ── -->
@@ -939,14 +941,33 @@ const T = {
 };
 
 // ─── INIT ───
-renderCars('all');
+// Defer the first render until Firebase has had a chance to respond, so we
+// don't flash stale hardcoded data and then snap to the live admin data.
+// Firebase typically responds in <500ms; we wait up to 2s and then fall back
+// to the hardcoded fleet so the page never stays blank.
+let __firstRendered = false;
+function __firstRender() {
+  if (__firstRendered) return;
+  __firstRendered = true;
+  renderCars('all');
+}
+setTimeout(__firstRender, 2000);
 
-// Expose hook for the Firebase loader (added below as a module)
+// Expose hook for the Firebase loader (added below as a module).
+// First call also triggers the deferred initial render.
 window.__udriveApplyCars = function(arr) {
-  if (!Array.isArray(arr) || !arr.length) return;
-  CARS = arr;
-  renderCars(activeCat);
+  if (Array.isArray(arr) && arr.length) {
+    CARS = arr;
+  }
+  if (!__firstRendered) {
+    __firstRender();
+  } else {
+    renderCars(activeCat);
+  }
 };
+// Also let the Firebase module signal "no data / failed" so we render fast
+// instead of waiting for the safety timeout.
+window.__udriveFleetReady = __firstRender;
 
 function setLang(code) {
   lang = code;
@@ -1003,6 +1024,7 @@ function setLang(code) {
           id:       doc.id,
           name:     d.name || '',
           year:     d.year || '',
+          variant:  d.variant || '',
           cat:      d.cat || 'economy',
           tx:       d.tx || 'Automatic',
           fuel:     d.fuel || 'Diesel',
@@ -1018,10 +1040,15 @@ function setLang(code) {
 
       if (cars.length && typeof window.__udriveApplyCars === 'function') {
         window.__udriveApplyCars(cars);
+      } else if (typeof window.__udriveFleetReady === 'function') {
+        window.__udriveFleetReady();
       }
     } catch (err) {
       console.warn('[UDrive] Firebase fetch failed — using built-in fleet data.', err);
+      if (typeof window.__udriveFleetReady === 'function') window.__udriveFleetReady();
     }
+  } else if (typeof window.__udriveFleetReady === 'function') {
+    window.__udriveFleetReady();
   }
 </script>
 </body>

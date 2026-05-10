@@ -181,6 +181,26 @@ window.carSlug = function(c, allCars) {
   return base;
 };
 
+// Snapshot of the hardcoded fleet (frozen before Firebase replaces window.CARS)
+// so we can use it as a fallback source for fields admin hasn't filled in yet,
+// e.g. car descriptions written before the admin form had a desc input.
+window.__hardcodedCARS = (window.CARS || []).slice();
+
+// Fill missing fields on a Firebase-fetched car from the hardcoded equivalent
+// (matched by name + year + variant). Used by the Firebase mappers in
+// index.html and car.html so admin docs without a description still show one.
+window.fillFromHardcoded = function(car) {
+  if (!car) return car;
+  const fallback = (window.__hardcodedCARS || []).find(h =>
+    h.name === car.name &&
+    String(h.year) === String(car.year) &&
+    (h.variant || '') === (car.variant || '')
+  );
+  if (!fallback) return car;
+  if (!car.desc) car.desc = fallback.desc || '';
+  return car;
+};
+
 window.findCarBySlugOrId = function(slugOrId) {
   if (!slugOrId) return null;
   const list = window.CARS || [];

@@ -697,7 +697,7 @@
       const cars = [];
       snap.forEach(doc => {
         const d = doc.data();
-        cars.push({
+        const car = {
           id:       doc.id,
           name:     d.name || '',
           year:     d.year || '',
@@ -711,7 +711,9 @@
           imgs:     Array.isArray(d.imgs) ? d.imgs.map(toDeliveryUrl) : [],
           features: Array.isArray(d.features) ? d.features : [],
           desc:     d.desc || '',
-        });
+        };
+        // Inherit hardcoded description if the admin doc doesn't have one.
+        cars.push(window.fillFromHardcoded ? window.fillFromHardcoded(car) : car);
       });
 
       if (cars.length && typeof window.__udriveApplyCars === 'function') {

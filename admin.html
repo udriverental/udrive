@@ -325,7 +325,10 @@
         <h1>Your fleet</h1>
         <div class="sub" id="fleet-count">Loading…</div>
       </div>
-      <button class="btn btn-primary" id="add-btn">+ Add new car</button>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <button class="btn btn-ghost" id="set-all-dep-btn" title="Sets the deposit on every car in your fleet to €300">Set all deposits to €300</button>
+        <button class="btn btn-primary" id="add-btn">+ Add new car</button>
+      </div>
     </div>
 
     <div class="filters" id="filters">
@@ -405,7 +408,7 @@
         </div>
         <div class="field"><label>Seats</label><input class="input" name="seats" type="number" min="2" max="15" required /></div>
         <div class="field"><label>Price per day (€)</label><input class="input" name="ppd" type="number" min="0" required /></div>
-        <div class="field"><label>Deposit (€)</label><input class="input" name="dep" type="number" min="0" required /></div>
+        <div class="field"><label>Deposit (€)</label><input class="input" name="dep" type="number" min="0" value="300" required /></div>
       </div>
       <div class="field">
         <label>Features (comma-separated)</label>
@@ -458,7 +461,7 @@ if (!isFirebaseConfigured()) {
     await import('https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js');
   const {
     getFirestore, collection, getDocs, doc, addDoc, updateDoc, deleteDoc,
-    serverTimestamp, query, orderBy
+    serverTimestamp, query, orderBy, writeBatch
   } = await import('https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js');
 
   const app = initializeApp(firebaseConfig);
@@ -651,6 +654,26 @@ if (!isFirebaseConfigured()) {
     editPhotos = [];
   }
   $('#add-btn').addEventListener('click', () => openEdit(null));
+
+  $('#set-all-dep-btn').addEventListener('click', async () => {
+    if (!cars.length) { alert('No cars loaded yet.'); return; }
+    if (!confirm(`Set the deposit to €300 on all ${cars.length} cars? This overwrites the current deposit on every car.`)) return;
+    const btn = $('#set-all-dep-btn');
+    const original = btn.textContent;
+    btn.disabled = true; btn.textContent = 'Updating…';
+    try {
+      const batch = writeBatch(db);
+      cars.forEach(c => batch.update(doc(db, 'cars', c.id), { dep: 300, updatedAt: serverTimestamp() }));
+      await batch.commit();
+      cars.forEach(c => c.dep = 300);
+      renderList();
+      btn.textContent = 'Done ✓';
+      setTimeout(() => { btn.textContent = original; btn.disabled = false; }, 1800);
+    } catch (err) {
+      btn.textContent = original; btn.disabled = false;
+      alert('Update failed: ' + err.message);
+    }
+  });
   $('#edit-cancel').addEventListener('click', closeEdit);
   $('#edit-bg').addEventListener('click', e => { if (e.target.id==='edit-bg') closeEdit(); });
   document.addEventListener('keydown', e => { if (e.key==='Escape') closeEdit(); });

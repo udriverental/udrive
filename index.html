@@ -320,9 +320,33 @@
     .sec-head { text-align: center; margin-bottom: 38px; }
 
     /* Filter tabs */
-    .tabs-scroll { overflow-x: auto; scrollbar-width: none; margin-bottom: 30px; }
+    .tabs-row { display: flex; align-items: center; gap: 10px; margin-bottom: 30px; }
+    .tabs-scroll { overflow-x: auto; scrollbar-width: none; flex: 1; min-width: 0; }
     .tabs-scroll::-webkit-scrollbar { display: none; }
     .tabs { display: flex; gap: 7px; justify-content: center; min-width: max-content; padding-bottom: 2px; }
+
+    /* View toggle (mobile-only) */
+    .view-toggle {
+      display: flex; gap: 4px; flex-shrink: 0;
+      background: var(--raised);
+      border: 1px solid var(--line);
+      border-radius: 9px; padding: 3px;
+    }
+    .view-toggle button {
+      width: 30px; height: 30px;
+      background: transparent; border: none;
+      border-radius: 6px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--muted); transition: background 0.18s, color 0.18s;
+      padding: 0;
+    }
+    .view-toggle button:hover { color: var(--txt); }
+    .view-toggle button.on {
+      background: var(--or); color: #fff;
+      box-shadow: 0 4px 12px rgba(249,115,22,0.28);
+    }
+    .view-toggle svg { width: 14px; height: 14px; display: block; }
+    @media(min-width:560px){ .view-toggle { display: none; } }
     .tab {
       padding: 9px 20px; border-radius: 100px;
       border: 1px solid var(--line);
@@ -344,6 +368,24 @@
     }
     @media(min-width:560px){ .cars-grid { grid-template-columns: repeat(2,1fr); } }
     @media(min-width:960px){ .cars-grid { grid-template-columns: repeat(3,1fr); } }
+
+    /* Mobile compact 2-col view */
+    @media(max-width:559px){
+      .cars-grid.cols-2 { grid-template-columns: repeat(2,1fr); gap: 10px; }
+      .cars-grid.cols-2 .car-body { padding: 11px; }
+      .cars-grid.cols-2 .car-name { font-size: 0.95rem; }
+      .cars-grid.cols-2 .car-year { font-size: 10.5px; margin-bottom: 8px; }
+      .cars-grid.cols-2 .car-specs { gap: 4px; margin-bottom: 9px; }
+      .cars-grid.cols-2 .spec-chip { font-size: 10px; padding: 2px 6px; }
+      .cars-grid.cols-2 .car-bottom { flex-direction: column; align-items: stretch; gap: 8px; padding-top: 9px; }
+      .cars-grid.cols-2 .car-price-num { font-size: 1.55rem; }
+      .cars-grid.cols-2 .car-price-unit { font-size: 10px; }
+      .cars-grid.cols-2 .car-deposit-line { font-size: 10px; }
+      .cars-grid.cols-2 .book-btn { padding: 8px 10px; font-size: 12px; width: 100%; }
+      .cars-grid.cols-2 .card-note { font-size: 9.5px; margin-top: 5px; }
+      .cars-grid.cols-2 .cat-badge { font-size: 9px; padding: 2px 6px; }
+      .cars-grid.cols-2 .slide-btn { width: 26px; height: 26px; font-size: 16px; }
+    }
 
     /* Card */
     .car-card {
@@ -636,13 +678,23 @@
     <h2 class="sec-title" data-i18n="fleetTitle">Choose Your Perfect Ride</h2>
   </div>
 
-  <div class="tabs-scroll">
-    <div class="tabs" id="tabs">
-      <button class="tab on" data-cat="all" data-i18n="tabAll">All Cars</button>
-      <button class="tab" data-cat="economy" data-i18n="tabEco">Economy</button>
-      <button class="tab" data-cat="suv" data-i18n="tabSuv">SUV</button>
-      <button class="tab" data-cat="luxury" data-i18n="tabLux">Luxury</button>
-      <button class="tab" data-cat="van" data-i18n="tabVan">Van &amp; MPV</button>
+  <div class="tabs-row">
+    <div class="tabs-scroll">
+      <div class="tabs" id="tabs">
+        <button class="tab on" data-cat="all" data-i18n="tabAll">All Cars</button>
+        <button class="tab" data-cat="economy" data-i18n="tabEco">Economy</button>
+        <button class="tab" data-cat="suv" data-i18n="tabSuv">SUV</button>
+        <button class="tab" data-cat="luxury" data-i18n="tabLux">Luxury</button>
+        <button class="tab" data-cat="van" data-i18n="tabVan">Van &amp; MPV</button>
+      </div>
+    </div>
+    <div class="view-toggle" id="view-toggle" aria-label="View density">
+      <button data-view="1" class="on" aria-label="One per row">
+        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1.5" y="2" width="11" height="4" rx="1"/><rect x="1.5" y="8" width="11" height="4" rx="1"/></svg>
+      </button>
+      <button data-view="2" aria-label="Two per row">
+        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1.5" y="2" width="4.5" height="10" rx="1"/><rect x="8" y="2" width="4.5" height="10" rx="1"/></svg>
+      </button>
     </div>
   </div>
 
@@ -1041,6 +1093,25 @@ document.getElementById('tabs').addEventListener('click', e => {
   btn.classList.add('on');
   renderCars(btn.dataset.cat);
 });
+
+// ─── VIEW TOGGLE (mobile) ───
+(function initViewToggle(){
+  const grid = document.getElementById('cars-grid');
+  const toggle = document.getElementById('view-toggle');
+  if (!grid || !toggle) return;
+  const saved = localStorage.getItem('fleetView') === '2' ? '2' : '1';
+  const apply = (v) => {
+    grid.classList.toggle('cols-2', v === '2');
+    toggle.querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.view === v));
+    localStorage.setItem('fleetView', v);
+  };
+  apply(saved);
+  toggle.addEventListener('click', e => {
+    const btn = e.target.closest('button[data-view]');
+    if (!btn) return;
+    apply(btn.dataset.view);
+  });
+})();
 
 // ─── SCROLL TO FLEET ───
 function scrollToFleet() {

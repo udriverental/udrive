@@ -811,7 +811,7 @@ function renderCars(cat) {
         </div>
         <div class="car-bottom">
           <div class="car-price-block">
-            <span class="car-price-num">€${c.ppd}</span>
+            <span class="car-price-num">${c.ppd}€</span>
             <span class="car-price-unit">${(T[lang]||T.en).perDay}</span>
           </div>
           <button class="book-btn" type="button"
@@ -1226,7 +1226,7 @@ let activeCar = null;
 function openModal(id) {
   activeCar = (window.CARS || []).find(c => String(c.id) === String(id));
   if (!activeCar) return;
-  document.getElementById('modal-sub').textContent = `${activeCar.name} ${activeCar.year} · €${activeCar.ppd}/day`;
+  document.getElementById('modal-sub').textContent = `${activeCar.name} ${activeCar.year} · ${activeCar.ppd}€/day`;
   // Default dates if blank
   const mPd = document.getElementById('m-pd');
   const mRd = document.getElementById('m-rd');
@@ -1256,10 +1256,10 @@ function calcSummary() {
   const days  = Math.ceil(ms / 86400000);
   const total = days * activeCar.ppd;
   document.getElementById('s-days').textContent  = `${days} day${days!==1?'s':''}`;
-  document.getElementById('s-rate').textContent  = `€${activeCar.ppd}/day`;
-  document.getElementById('s-total').textContent = `€${total}`;
+  document.getElementById('s-rate').textContent  = `${activeCar.ppd}€/day`;
+  document.getElementById('s-total').textContent = `${total}€`;
   document.getElementById('s-dep').innerHTML =
-    `💵 Security deposit: <b>€${activeCar.dep}</b> — returned in cash immediately when you hand back the keys. No delays.`;
+    `💵 Security deposit: <b>${activeCar.dep}€</b> — returned in cash immediately when you hand back the keys. No delays.`;
   box.style.display = 'block';
 }
 
@@ -1292,9 +1292,9 @@ function sendWA() {
     `📅 From: *${fmtDate(pickup)} at ${fmtTime(pickup)}*`,
     `📅 To:   *${fmtDate(ret)} at ${fmtTime(ret)}*`,
     `⏱️ Duration: *${days} day${days!==1?'s':''}*`,
-    `💰 Rate: €${activeCar.ppd}/day`,
-    `💳 Total Rental: *€${total}*`,
-    `🏦 Deposit: *€${activeCar.dep}* _(returned in cash on key handover)_`,
+    `💰 Rate: ${activeCar.ppd}€/day`,
+    `💳 Total Rental: *${total}€*`,
+    `🏦 Deposit: *${activeCar.dep}€* _(returned in cash on key handover)_`,
     '',
     'Please confirm availability. Thank you!',
   ];

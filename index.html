@@ -1321,7 +1321,8 @@ function setLang(code) {
           fuel:     d.fuel || 'Diesel',
           seats:    d.seats || 5,
           ppd:      Number(d.ppd) || 0,
-          dep:      Number(d.dep) || 0,
+          dep:      300, // fleet-wide flat deposit
+
           imgs:     Array.isArray(d.imgs) ? d.imgs.map(toDeliveryUrl) : [],
           features: Array.isArray(d.features) ? d.features : [],
         });

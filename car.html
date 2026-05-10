@@ -153,6 +153,14 @@
     }
     .car-title-year { color: var(--muted); font-weight: 400; font-size: 0.65em; margin-left: 8px; }
 
+    .car-desc {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15.5px; line-height: 1.65;
+      color: var(--muted);
+      max-width: 58ch;
+      margin-top: 2px; margin-bottom: 4px;
+    }
+
     .price-row {
       display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap;
       padding: 14px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
@@ -371,6 +379,7 @@
         <div class="details">
           <span class="cat-badge cat-${car.cat}">${CAT_LABEL[car.cat] || car.cat}</span>
           <h1 class="car-title">${car.name}<span class="car-title-year">${car.year}</span></h1>
+          ${car.desc ? `<p class="car-desc">${car.desc}</p>` : ''}
 
           <div class="price-row">
             <span class="price-num">€${car.ppd}</span>

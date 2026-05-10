@@ -1333,6 +1333,7 @@ function setLang(code) {
 
           imgs:     Array.isArray(d.imgs) ? d.imgs.map(toDeliveryUrl) : [],
           features: Array.isArray(d.features) ? d.features : [],
+          desc:     d.desc || '',
         });
       });
 

@@ -417,7 +417,7 @@
         <label class="drop" id="drop">
           <strong>Click to upload</strong> or drag & drop photos here
           <div style="margin-top:4px;font-size:11.5px;color:var(--dim)">JPG / PNG / WebP — multiple allowed</div>
-          <input type="file" accept="image/*" multiple id="file-input" />
+          <input type="file" accept="image/*,.heic,.heif" multiple id="file-input" />
         </label>
         <div class="photo-list" id="photo-list"></div>
       </div>
@@ -479,7 +479,19 @@ if (!isFirebaseConfigured()) {
     );
     if (!res.ok) throw new Error(`Cloudinary error ${res.status}`);
     const json = await res.json();
-    return json.secure_url;
+    return toDeliveryUrl(json.secure_url);
+  }
+
+  // Force browser-friendly delivery (auto format + auto quality).
+  // Without this, HEIC photos from iPhone come back as .heic URLs that browsers can't render.
+  function toDeliveryUrl(url){
+    if (!url || !url.includes('/upload/')) return url;
+    // Swap HEIC/HEIF extension to .jpg so the browser actually renders it.
+    let out = url.replace(/\.(heic|heif)(\?.*)?$/i, '.jpg$2');
+    if (!/\/upload\/(f_auto|.*[,/]f_auto)/.test(out)) {
+      out = out.replace('/upload/', '/upload/f_auto,q_auto/');
+    }
+    return out;
   }
 
   // ─── auth state ───
@@ -549,7 +561,7 @@ if (!isFirebaseConfigured()) {
     body.innerHTML = list.map(c => `
       <div class="row" data-id="${c.id}">
         <div class="c-thumb">
-          <img class="thumb" src="${(c.imgs && c.imgs[0]) || 'https://placehold.co/120x90/111120/3a3a58?text=No+Photo'}" alt="" />
+          <img class="thumb" src="${(c.imgs && c.imgs[0] && toDeliveryUrl(c.imgs[0])) || 'https://placehold.co/120x90/111120/3a3a58?text=No+Photo'}" alt="" />
         </div>
         <div class="c-name">
           <div class="name">${escapeHtml(c.name||'(unnamed)')}</div>
@@ -622,7 +634,7 @@ if (!isFirebaseConfigured()) {
       f.ppd.value = car.ppd || 0;
       f.dep.value = car.dep || 0;
       f.features.value = (car.features||[]).join(', ');
-      editPhotos = (car.imgs||[]).map(url => ({ url, uploading: false }));
+      editPhotos = (car.imgs||[]).map(url => ({ url: toDeliveryUrl(url), uploading: false }));
     } else {
       editPhotos = [];
     }
@@ -698,16 +710,54 @@ if (!isFirebaseConfigured()) {
   const fi = $('#file-input');
   ['dragenter','dragover'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('drag'); }));
   ['dragleave','drop'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('drag'); }));
-  drop.addEventListener('drop', e => uploadFiles(Array.from(e.dataTransfer.files||[]).filter(f=>f.type.startsWith('image/'))));
+  function isImageFile(f){
+    if (f.type && f.type.startsWith('image/')) return true;
+    return /\.(heic|heif|jpe?g|png|webp|gif)$/i.test(f.name || '');
+  }
+  function isHeic(f){
+    return /heic|heif/i.test(f.type || '') || /\.(heic|heif)$/i.test(f.name || '');
+  }
+  drop.addEventListener('drop', e => uploadFiles(Array.from(e.dataTransfer.files||[]).filter(isImageFile)));
   fi.addEventListener('change', () => uploadFiles(Array.from(fi.files||[])));
+
+  let heic2anyPromise = null;
+  function loadHeic2Any(){
+    if (window.heic2any) return Promise.resolve(window.heic2any);
+    if (!heic2anyPromise) {
+      heic2anyPromise = new Promise((resolve, reject) => {
+        const s = document.createElement('script');
+        s.src = 'https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js';
+        s.onload = () => resolve(window.heic2any);
+        s.onerror = () => reject(new Error('Could not load HEIC converter'));
+        document.head.appendChild(s);
+      });
+    }
+    return heic2anyPromise;
+  }
+
+  async function convertHeicToJpeg(file){
+    const heic2any = await loadHeic2Any();
+    const blob = await heic2any({ blob: file, toType: 'image/jpeg', quality: 0.9 });
+    const out = Array.isArray(blob) ? blob[0] : blob;
+    const newName = (file.name || 'photo').replace(/\.(heic|heif)$/i, '.jpg');
+    return new File([out], newName, { type: 'image/jpeg' });
+  }
 
   async function uploadFiles(files){
     if (!files.length) return;
-    for (const file of files){
-      const placeholder = { url: URL.createObjectURL(file), uploading: true };
+    for (let file of files){
+      const placeholder = { url: '', uploading: true, progress: isHeic(file) ? 'Converting HEIC…' : 'Uploading…' };
       editPhotos.push(placeholder);
       renderPhotos();
       try {
+        if (isHeic(file)) {
+          file = await convertHeicToJpeg(file);
+          placeholder.progress = 'Uploading…';
+          renderPhotos();
+        } else {
+          placeholder.url = URL.createObjectURL(file);
+          renderPhotos();
+        }
         const url = await uploadToCloudinary(file);
         const idx = editPhotos.indexOf(placeholder);
         if (idx >= 0) editPhotos[idx] = { url, uploading: false };

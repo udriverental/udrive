@@ -906,6 +906,7 @@
       const cars = [];
       snap.forEach(doc => {
         const d = doc.data();
+        if (d.hidden === true) return;
         const car = {
           id:       doc.id,
           name:     d.name || '',

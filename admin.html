@@ -158,6 +158,13 @@
     .row{border-bottom:1px solid var(--line);transition:background .15s}
     .row:last-child{border-bottom:none}
     .row:hover{background:rgba(255,255,255,0.02)}
+    .row.is-hidden{opacity:.55}
+    .row.is-hidden:hover{opacity:.8}
+    .hidden-pill{
+      display:inline-block;margin-left:6px;padding:3px 8px;border-radius:100px;
+      font-size:10.5px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;
+      background:rgba(120,120,160,0.15);border:1px solid var(--line-2);color:var(--muted);
+    }
     .thumb{
       width:56px;height:42px;border-radius:7px;object-fit:cover;
       background:#1a1a26;border:1px solid var(--line);
@@ -595,18 +602,19 @@ if (!isFirebaseConfigured()) {
       return;
     }
     body.innerHTML = list.map(c => `
-      <div class="row" data-id="${c.id}">
+      <div class="row${c.hidden ? ' is-hidden' : ''}" data-id="${c.id}">
         <div class="c-thumb">
           <img class="thumb" src="${(c.imgs && c.imgs[0] && toDeliveryUrl(c.imgs[0])) || 'https://placehold.co/120x90/111120/3a3a58?text=No+Photo'}" alt="" />
         </div>
         <div class="c-name">
-          <div class="name">${escapeHtml(c.name||'(unnamed)')}</div>
+          <div class="name">${escapeHtml(c.name||'(unnamed)')}${c.hidden ? '<span class="hidden-pill">Hidden</span>' : ''}</div>
           <div class="year">${c.year||''}</div>
         </div>
         <div class="c-cat"><span class="cat-pill ${c.cat}">${CAT_LABEL[c.cat]||c.cat}</span></div>
         <div class="c-price price-cell">€${c.ppd||0}<span class="m-lbl"> /day</span></div>
         <div class="c-dep price-cell"><span class="m-lbl">deposit </span>€${c.dep||0}</div>
         <div class="row-actions">
+          <button class="btn" data-act="toggle-hide">${c.hidden ? 'Show' : 'Hide'}</button>
           <button class="btn" data-act="edit">Edit</button>
           <button class="btn btn-danger" data-act="del">Delete</button>
         </div>
@@ -626,6 +634,20 @@ if (!isFirebaseConfigured()) {
     if (!car) return;
     if (btn.dataset.act === 'edit'){
       openEdit(car);
+    } else if (btn.dataset.act === 'toggle-hide'){
+      const next = !car.hidden;
+      btn.disabled = true;
+      const prevLabel = btn.textContent;
+      btn.textContent = next ? 'Hiding…' : 'Showing…';
+      try {
+        await updateDoc(doc(db,'cars',id), { hidden: next, updatedAt: serverTimestamp() });
+        car.hidden = next;
+        renderList();
+      } catch (err) {
+        btn.disabled = false;
+        btn.textContent = prevLabel;
+        alert('Update failed: ' + err.message);
+      }
     } else if (btn.dataset.act === 'del'){
       if (!confirm(`Delete "${car.name}" permanently? This also removes its uploaded photos.`)) return;
       btn.disabled = true;
@@ -851,6 +873,7 @@ if (!isFirebaseConfigured()) {
       desc: (f.desc?.value || '').trim(),
       features: f.features.value.split(',').map(s=>s.trim()).filter(Boolean),
       imgs: editPhotos.filter(p=>p.url && !p.uploading).map(p=>p.url),
+      hidden: editing ? !!editing.hidden : false,
       updatedAt: serverTimestamp(),
     };
     const btn = $('#edit-save');

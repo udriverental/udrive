@@ -842,7 +842,13 @@
 
   // ── Copy link ──
   function copyLink() {
-    const url = location.href;
+    // Prefer the short /c/<slug> URL — those stub pages carry the right
+    // OpenGraph tags so WhatsApp/iMessage previews show this car's photo.
+    let url = location.href;
+    if (car && window.carSlug) {
+      const slug = window.carSlug(car, window.CARS);
+      if (slug) url = `${location.origin}/c/${slug}`;
+    }
     if (navigator.share) {
       navigator.share({ title: document.title, url }).catch(() => doCopy(url));
     } else {

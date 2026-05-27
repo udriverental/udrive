@@ -1,0 +1,37 @@
+name: Build share pages
+
+# Regenerates c/<slug>.html stub pages so newly-added cars get rich
+# link previews (WhatsApp, iMessage, Facebook) automatically.
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'   # every 6 hours
+  workflow_dispatch:         # manual run button in the Actions tab
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Generate share pages
+        run: node build-share-pages.mjs
+
+      - name: Commit & push if changed
+        run: |
+          git config user.name  "udrive-share-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add c/
+          if git diff --cached --quiet; then
+            echo "No changes."
+          else
+            git commit -m "Auto-update car share pages"
+            git push
+          fi

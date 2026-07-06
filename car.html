@@ -551,6 +551,17 @@
 
   // ── Resolve which car to show ──
   const params = new URLSearchParams(location.search);
+
+  // Focus mode: shared client links (…&focus=1) show only this car — hide fleet navigation.
+  if (params.get('focus') === '1') {
+    document.body.classList.add('focus');
+    const _fs = document.createElement('style');
+    _fs.textContent =
+      'body.focus #nav-back-link{display:none}' +
+      'body.focus .nav>a[href="index.html"]{pointer-events:none;cursor:default}';
+    document.head.appendChild(_fs);
+  }
+
   const slugOrId = params.get('car') || params.get('id');
   const main = document.getElementById('main');
   let car = window.findCarBySlugOrId ? window.findCarBySlugOrId(slugOrId) : null;

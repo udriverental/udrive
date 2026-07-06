@@ -99,6 +99,8 @@ function stubHtml(car, slug) {
     : `Rent a ${car.name}${car.year ? ' ' + car.year : ''} from UDrive — pickup at Tirana (TIA) or Pristina (PRN).${priceBit}`;
   const img = car.imgs[0] ? toDeliveryUrl(car.imgs[0]) : `${SITE}/brand_assets/Modern%20UDrive%20car%20rental%20logo.png`;
   const target = `/car.html?car=${encodeURIComponent(slug)}`;
+  // Shared client links land in focus mode (hides fleet nav). Canonical/OG stay clean.
+  const redirectTarget = `${target}&focus=1`;
 
   return `<!doctype html>
 <html lang="en">
@@ -120,10 +122,10 @@ function stubHtml(car, slug) {
 <meta name="twitter:description" content="${esc(desc)}">
 <meta name="twitter:image" content="${esc(img)}">
 
-<meta http-equiv="refresh" content="0; url=${target}">
-<script>location.replace(${JSON.stringify(target)});</script>
+<meta http-equiv="refresh" content="0; url=${redirectTarget}">
+<script>location.replace(${JSON.stringify(redirectTarget)});</script>
 </head>
-<body><p>Redirecting to <a href="${target}">${esc(ogTitle)}</a>…</p></body>
+<body><p>Redirecting to <a href="${redirectTarget}">${esc(ogTitle)}</a>…</p></body>
 </html>
 `;
 }

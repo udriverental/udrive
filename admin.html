@@ -419,7 +419,7 @@
             <option>Diesel</option><option>Petrol</option><option>Petrol/LPG</option><option>Hybrid</option><option>Electric</option>
           </select>
         </div>
-        <div class="field"><label>Seats</label><input class="input" name="seats" type="number" min="2" max="15" required /></div>
+        <div class="field"><label>Seats</label><input class="input" name="seats" type="number" min="2" max="15" placeholder="5" /></div>
         <div class="field"><label>Price per day (€)</label><input class="input" name="ppd" type="number" min="0" required /></div>
         <div class="field"><label>Deposit (€)</label><input class="input" name="dep" type="number" min="0" value="300" required /></div>
       </div>
@@ -867,7 +867,7 @@ if (!isFirebaseConfigured()) {
       cat:  f.cat.value,
       tx:   f.tx.value,
       fuel: f.fuel.value,
-      seats: Number(f.seats.value),
+      seats: Number(f.seats.value) || 5,
       ppd:  Number(f.ppd.value),
       dep:  Number(f.dep.value),
       desc: (f.desc?.value || '').trim(),

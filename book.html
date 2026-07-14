@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Check Availability — UDrive Car Rental</title>
+  <meta name="description" content="Pick your dates and see which UDrive cars are available right now. Tirana Airport (TIA) & Pristina Airport (PRN). Reserve on WhatsApp." />
+  <link rel="icon" type="image/png" href="brand_assets/Modern%20UDrive%20car%20rental%20logo.png" />
+  <link rel="apple-touch-icon" href="brand_assets/Modern%20UDrive%20car%20rental%20logo.png" />
+  <script src="cars-data.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg:      #07070f;
+      --surface: #0d0d1a;
+      --card:    #111120;
+      --raised:  #181826;
+      --line:    rgba(255,255,255,0.07);
+      --glow:    rgba(234,90,30,0.18);
+      --or:      #EA5A1E;
+      --or-d:    #B33E0E;
+      --or-l:    #FF7A3D;
+      --gold:    #d4a843;
+      --gold-l:  #f0c96a;
+      --txt:     #eeeef5;
+      --muted:   #7878a0;
+      --dim:     #3a3a58;
+      --wa:      #25D366;
+      --ok:      #4ade80;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--txt);
+      font-family: 'DM Sans', sans-serif;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+    h1, h2, h3, h4 { font-family: 'Cormorant Garamond', serif; }
+
+    /* ── Grain overlay ── */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.5;
+    }
+
+    /* ── NAV (same as index) ── */
+    .nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 500;
+      padding: 14px 20px;
+      display: flex; align-items: center; justify-content: space-between;
+      background: rgba(7,7,15,0.82);
+      backdrop-filter: blur(24px) saturate(1.4);
+      -webkit-backdrop-filter: blur(24px) saturate(1.4);
+      border-bottom: 1px solid var(--line);
+    }
+    .nav-logo { height: 42px; object-fit: contain; display: block; }
+    .nav-left { display: flex; align-items: center; gap: 14px; min-width: 0; }
+    .nav-back {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 12.5px; font-weight: 500; color: var(--muted);
+      text-decoration: none; padding-left: 14px; border-left: 1px solid var(--line);
+      white-space: nowrap; transition: color .18s;
+    }
+    .nav-back:hover { color: var(--txt); }
+    .nav-right { display: flex; align-items: center; gap: 10px; }
+    .nav-wa {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 9px 16px;
+      background: var(--wa); color: #fff;
+      border-radius: 100px; font-size: 13px; font-weight: 600;
+      text-decoration: none;
+      box-shadow: 0 4px 18px rgba(37,211,102,0.28);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .nav-wa:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(37,211,102,0.38); }
+    .nav-wa:active { transform: none; }
+    .nav-wa-label { display: none; }
+    @media(min-width:540px){ .nav-wa-label { display: inline; } }
+    .lang-sw { display: flex; gap: 4px; align-items: center; }
+    .lang-btn {
+      padding: 5px 9px; border-radius: 100px;
+      background: transparent; border: 1px solid var(--line);
+      color: var(--muted); font-size: 11.5px; font-weight: 600;
+      cursor: pointer; letter-spacing: 0.04em;
+      font-family: 'DM Sans', sans-serif;
+      transition: border-color 0.18s, color 0.18s, background 0.18s;
+    }
+    .lang-btn:hover { border-color: rgba(255,255,255,0.22); color: var(--txt); }
+    .lang-btn.on { background: var(--or); border-color: var(--or); color: #fff; }
+
+    html[lang="ar"] body { font-family: 'Cairo', sans-serif; }
+    html[lang="ar"] h1, html[lang="ar"] h2, html[lang="ar"] h3, html[lang="ar"] h4 { font-family: 'Cairo', sans-serif; }
+    html[lang="ar"] .car-bottom { flex-direction: row-reverse; }
+    html[lang="ar"] .nav-back { padding-left: 0; padding-right: 14px; border-left: none; border-right: 1px solid var(--line); }
+
+    /* ── HEADER ── */
+    .page-head {
+      position: relative;
+      padding: 118px 20px 26px;
+      text-align: center;
+      overflow: hidden;
+    }
+    .page-head::before {
+      content: ''; position: absolute; inset: 0; pointer-events: none;
+      background:
+        radial-gradient(ellipse 70% 60% at 30% 0%, rgba(234,90,30,0.12) 0%, transparent 60%),
+        radial-gradient(ellipse 55% 45% at 80% 20%, rgba(212,168,67,0.06) 0%, transparent 65%);
+    }
+    .sec-eye {
+      position: relative;
+      display: block; font-size: 11px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.13em;
+      color: var(--or); margin-bottom: 10px;
+    }
+    .page-title {
+      position: relative;
+      font-size: clamp(2rem, 6vw, 3.2rem); font-weight: 600;
+      letter-spacing: -0.02em; line-height: 1.12;
+      margin-bottom: 10px;
+    }
+    .page-title em { font-style: italic; color: var(--or); }
+    .page-sub {
+      position: relative;
+      font-size: 13.5px; color: var(--muted); line-height: 1.7; font-weight: 300;
+      max-width: 480px; margin: 0 auto;
+    }
+
+    /* ── DATE PANEL ── */
+    .panel-wrap { max-width: 720px; margin: 18px auto 0; padding: 0 20px; position: relative; z-index: 5; }
+    .panel {
+      background: rgba(17,17,32,0.92);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 20px; padding: 20px 18px 16px;
+      box-shadow:
+        0 0 0 1px rgba(234,90,30,0.04),
+        0 24px 64px rgba(0,0,0,0.65),
+        0 4px 24px rgba(234,90,30,0.07);
+      backdrop-filter: blur(16px);
+    }
+    .panel-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 11px; }
+    .pg-full { grid-column: 1 / -1; }
+    .f-label {
+      display: block;
+      font-size: 11.5px; font-weight: 500; color: var(--muted);
+      margin-bottom: 5px; letter-spacing: 0.02em;
+    }
+    .f-input {
+      width: 100%;
+      background: var(--surface); color: var(--txt);
+      border: 1px solid var(--line); border-radius: 9px;
+      padding: 10px 12px; font-size: 14px;
+      font-family: 'DM Sans', sans-serif;
+      transition: border-color .18s, box-shadow .18s;
+      color-scheme: dark;
+    }
+    .f-input:focus {
+      outline: none; border-color: var(--or);
+      box-shadow: 0 0 0 3px rgba(234,90,30,0.18);
+    }
+    .f-input option { background: var(--raised); }
+
+    .trip-strip {
+      margin-top: 14px; padding: 11px 13px;
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
+      background: var(--surface); border: 1px solid var(--line);
+      border-radius: 11px; flex-wrap: wrap;
+    }
+    .trip-days { font-size: 13px; color: var(--muted); }
+    .trip-days b { color: var(--txt); font-weight: 600; }
+    .trip-count {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 6px 13px; border-radius: 100px;
+      font-size: 12.5px; font-weight: 600;
+      background: rgba(34,197,94,0.09); border: 1px solid rgba(34,197,94,0.2);
+      color: var(--ok);
+    }
+    .trip-count .dot {
+      width: 7px; height: 7px; border-radius: 50%; background: var(--ok);
+      box-shadow: 0 0 0 0 rgba(74,222,128,0.4);
+      animation: pulse-ok 2.4s ease-in-out infinite;
+    }
+    @keyframes pulse-ok {
+      0%,100% { box-shadow: 0 0 0 0 rgba(74,222,128,0.35); }
+      55%     { box-shadow: 0 0 0 6px rgba(74,222,128,0); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .trip-count .dot, .wa-fab { animation: none; }
+    }
+    .trip-warn {
+      width: 100%; font-size: 12px; color: var(--gold-l);
+      background: rgba(212,168,67,0.07); border: 1px solid rgba(212,168,67,0.18);
+      border-radius: 8px; padding: 8px 11px;
+    }
+    .updated-line {
+      text-align: center; margin-top: 10px;
+      font-size: 11px; color: var(--dim);
+    }
+
+    /* ── BANNER (feed unreachable) ── */
+    .feed-banner {
+      max-width: 720px; margin: 16px auto 0; padding: 0 20px;
+    }
+    .feed-banner-inner {
+      font-size: 12.5px; color: var(--gold-l); line-height: 1.6;
+      background: rgba(212,168,67,0.07); border: 1px solid rgba(212,168,67,0.2);
+      border-radius: 11px; padding: 11px 14px; text-align: center;
+    }
+
+    /* ── CARS GRID ── */
+    .fleet-wrap { max-width: 1140px; margin: 40px auto 60px; padding: 0 20px; }
+    .cars-grid { display: grid; gap: 18px; grid-template-columns: 1fr; }
+    @media(min-width:560px){ .cars-grid { grid-template-columns: repeat(2,1fr); } }
+    @media(min-width:960px){ .cars-grid { grid-template-columns: repeat(3,1fr); } }
+
+    .car-card {
+      display: block;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 16px; overflow: hidden;
+      color: inherit; text-decoration: none;
+      cursor: pointer;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.04), 0 1px 0 rgba(0,0,0,0.4);
+      transition: transform 0.32s cubic-bezier(0.34,1.56,0.64,1),
+                  box-shadow 0.18s ease-out;
+    }
+    .car-card:focus-visible { outline: 2px solid var(--or-l); outline-offset: 3px; }
+    .car-card:hover {
+      transform: translateY(-5px);
+      border-color: rgba(234,90,30,0.22);
+      box-shadow: 0 16px 48px rgba(0,0,0,0.55), 0 0 0 1px rgba(234,90,30,0.07);
+    }
+    .car-img-wrap {
+      position: relative; aspect-ratio: 4/3; overflow: hidden;
+      background: var(--raised);
+    }
+    .car-img {
+      width: 100%; height: 100%; object-fit: cover;
+      transition: transform 0.55s cubic-bezier(0.25,0.46,0.45,0.94);
+      display: block;
+    }
+    .car-card:hover .car-img { transform: scale(1.06); }
+    .car-img-shade {
+      position: absolute; inset: 0;
+      background: linear-gradient(to bottom, transparent 45%, rgba(7,7,15,0.72) 100%);
+    }
+    .car-img-wrap::after {
+      content: ''; position: absolute; inset: 0; pointer-events: none;
+      background: rgba(234,90,30,0.10); mix-blend-mode: multiply;
+      opacity: 0; transition: opacity 0.35s ease;
+      z-index: 2;
+    }
+    .car-card:hover .car-img-wrap::after { opacity: 1; }
+    .cat-badge {
+      position: absolute; top: 11px; left: 11px;
+      padding: 3px 9px; border-radius: 100px;
+      font-size: 10.5px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase;
+    }
+    .cat-economy { background: rgba(34,197,94,0.14); border:1px solid rgba(34,197,94,0.24); color:#4ade80; }
+    .cat-suv     { background: rgba(59,130,246,0.14); border:1px solid rgba(59,130,246,0.24); color:#60a5fa; }
+    .cat-luxury  { background: rgba(212,168,67,0.14); border:1px solid rgba(212,168,67,0.24); color:#d4a843; }
+    .cat-van     { background: rgba(168,85,247,0.14); border:1px solid rgba(168,85,247,0.24); color:#c084fc; }
+    .avail-chip {
+      position: absolute; top: 11px; right: 11px; z-index: 3;
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 3px 10px; border-radius: 100px;
+      font-size: 10.5px; font-weight: 600; letter-spacing: 0.04em;
+      background: rgba(7,7,15,0.6); border: 1px solid rgba(74,222,128,0.4); color: var(--ok);
+      backdrop-filter: blur(6px);
+    }
+    html[lang="ar"] .cat-badge { left: auto; right: 11px; }
+    html[lang="ar"] .avail-chip { right: auto; left: 11px; }
+
+    .car-body { padding: 15px; }
+    .car-name { font-size: 1.15rem; font-weight: 600; line-height: 1.2; margin-bottom: 11px; }
+    .car-year-inline { font-family: 'DM Sans',sans-serif; font-size: 12px; font-weight: 400; color: var(--muted); margin-left: 4px; }
+    .car-specs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 13px; }
+    .spec-chip {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: var(--raised); border-radius: 6px;
+      padding: 3px 8px; font-size: 11.5px; color: var(--muted);
+    }
+    .car-bottom {
+      display: flex; align-items: flex-end; justify-content: space-between; gap: 8px;
+      padding-top: 13px; border-top: 1px solid var(--line);
+    }
+    .car-price-block { display: flex; flex-direction: column; gap: 2px; }
+    .car-total-num {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1.55rem; font-weight: 700; line-height: 1; color: var(--or);
+    }
+    .car-total-sub { font-family: 'DM Sans',sans-serif; font-size: 11px; color: var(--muted); }
+    .wa-reserve-btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+      padding: 10px 15px;
+      background: var(--wa); color: #fff;
+      border: none; border-radius: 9px;
+      font-family: 'DM Sans',sans-serif; font-size: 13px; font-weight: 600;
+      cursor: pointer; white-space: nowrap; flex-shrink: 0;
+      box-shadow: 0 6px 18px rgba(37,211,102,0.26);
+      transition: background .18s, transform .14s, box-shadow .18s;
+    }
+    .wa-reserve-btn:hover { background: #1ea851; transform: translateY(-1px); box-shadow: 0 8px 22px rgba(37,211,102,0.36); }
+    .wa-reserve-btn:active { transform: none; }
+    .wa-reserve-btn:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+    .card-dep-note { text-align: center; font-size: 10.5px; color: var(--dim); margin-top: 7px; }
+
+    .empty-state { text-align:center; padding:60px 20px; color:var(--muted); font-size:15px; grid-column: 1/-1; line-height: 1.8; }
+
+    /* ── ASK CARD ── */
+    .ask-card {
+      max-width: 720px; margin: 8px auto 0;
+      background: var(--card); border: 1px solid var(--line);
+      border-radius: 18px; padding: 24px 22px; text-align: center;
+    }
+    .ask-title { font-size: 1.35rem; font-weight: 600; margin-bottom: 6px; }
+    .ask-sub { font-size: 13px; color: var(--muted); line-height: 1.7; margin-bottom: 16px; }
+    .ask-wa-btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      background: var(--wa); color: #fff;
+      border: none; border-radius: 11px;
+      padding: 12px 22px; font-size: 14px; font-weight: 600;
+      cursor: pointer; text-decoration: none;
+      box-shadow: 0 8px 22px rgba(37,211,102,0.32);
+      transition: background .18s, transform .18s, box-shadow .18s;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .ask-wa-btn:hover { background: #1ea851; transform: translateY(-1px); box-shadow: 0 10px 26px rgba(37,211,102,0.4); }
+    .ask-wa-btn:active { transform: none; }
+
+    /* ── FOOTER ── */
+    .footer { padding: 44px 20px 60px; text-align: center; }
+    .footer-logo { height: 38px; margin: 0 auto 18px; opacity: 0.65; display: block; }
+    .footer-txt { font-size: 12.5px; color: var(--dim); line-height: 1.8; }
+    .footer-copy { margin-top: 20px; font-size: 11px; color: var(--dim); opacity: 0.55; }
+
+    /* ── WA FAB ── */
+    .wa-fab {
+      position: fixed; bottom: 22px; right: 22px; z-index: 600;
+      width: 58px; height: 58px; border-radius: 50%;
+      background: var(--wa); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      text-decoration: none;
+      box-shadow: 0 4px 22px rgba(37,211,102,0.38), 0 0 0 0 rgba(37,211,102,0.14);
+      animation: wa-ring 2.8s ease-in-out infinite;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .wa-fab:hover {
+      transform: scale(1.1); animation: none;
+      box-shadow: 0 8px 36px rgba(37,211,102,0.5);
+    }
+    @keyframes wa-ring {
+      0%,100% { box-shadow: 0 4px 22px rgba(37,211,102,0.38), 0 0 0 0 rgba(37,211,102,0.14); }
+      55%      { box-shadow: 0 4px 22px rgba(37,211,102,0.38), 0 0 0 14px rgba(37,211,102,0); }
+    }
+
+    .fade-up {
+      opacity: 0; transform: translateY(22px);
+      transition: opacity 0.55s ease, transform 0.55s ease;
+    }
+    .fade-up.vis { opacity: 1; transform: none; }
+  </style>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<nav class="nav">
+  <div class="nav-left">
+    <a href="index.html">
+      <picture>
+        <source srcset="brand_assets/udrive-logo-dark.png" media="(prefers-color-scheme: dark)" />
+        <img src="brand_assets/udrive-logo-light.png" alt="UDrive Car Rental" class="nav-logo" />
+      </picture>
+    </a>
+    <a class="nav-back" href="index.html" data-i18n="navBack">← All cars</a>
+  </div>
+  <div class="nav-right">
+    <div class="lang-sw">
+      <button class="lang-btn on" data-lang="en" onclick="setLang('en')">ENG</button>
+      <button class="lang-btn" data-lang="sq" onclick="setLang('sq')">SHQ</button>
+      <button class="lang-btn" data-lang="ar" onclick="setLang('ar')">عربي</button>
+    </div>
+    <a href="https://wa.me/355693755827?text=Hello%20UDrive!%20I'd%20like%20to%20inquire%20about%20renting%20a%20car." target="_blank" rel="noopener" class="nav-wa">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      <span class="nav-wa-label" data-i18n="navWa">WhatsApp Us</span>
+    </a>
+  </div>
+</nav>
+
+<!-- ── HEADER + DATE PANEL ── -->
+<header class="page-head">
+  <span class="sec-eye" data-i18n="headEye">Live Availability</span>
+  <h1 class="page-title" data-i18n="headTitle">Which cars are free <em>for your dates?</em></h1>
+  <p class="page-sub" data-i18n="headSub">Pick your pickup and return time — we'll show you every car that's actually available. Reserve it on WhatsApp in one tap.</p>
+</header>
+
+<div class="panel-wrap">
+  <div class="panel">
+    <div class="panel-grid">
+      <div class="pg-full">
+        <label class="f-label" for="b-loc" data-i18n-opt="locLabel">📍 Pickup Location</label>
+        <select class="f-input" id="b-loc">
+          <option value="" data-i18n-opt="locSelect">Select airport…</option>
+          <option value="Tirana International Airport (TIA)">🇦🇱 Tirana Airport — TIA</option>
+          <option value="Pristina Airport (PRN)">🇽🇰 Pristina Airport — PRN</option>
+        </select>
+      </div>
+      <div>
+        <label class="f-label" for="b-pd" data-i18n-opt="pdLabel">📅 Pickup Date</label>
+        <input type="date" class="f-input" id="b-pd" />
+      </div>
+      <div>
+        <label class="f-label" for="b-pt" data-i18n-opt="ptLabel">⏰ Pickup Time</label>
+        <input type="time" class="f-input" id="b-pt" value="10:00" />
+      </div>
+      <div>
+        <label class="f-label" for="b-rd" data-i18n-opt="rdLabel">📅 Return Date</label>
+        <input type="date" class="f-input" id="b-rd" />
+      </div>
+      <div>
+        <label class="f-label" for="b-rt" data-i18n-opt="rtLabel">⏰ Return Time</label>
+        <input type="time" class="f-input" id="b-rt" value="10:00" />
+      </div>
+    </div>
+    <div class="trip-strip" id="trip-strip">
+      <span class="trip-days" id="trip-days">—</span>
+      <span class="trip-count" id="trip-count" style="display:none"><span class="dot"></span><span id="trip-count-txt"></span></span>
+    </div>
+    <div class="updated-line" id="updated-line" style="display:none"></div>
+  </div>
+</div>
+
+<div class="feed-banner" id="feed-banner" style="display:none">
+  <div class="feed-banner-inner" data-i18n="feedDown">⚠️ We couldn't check live availability right now — the cars below may or may not be free. Message us on WhatsApp and we'll confirm straight away.</div>
+</div>
+
+<!-- ── AVAILABLE CARS ── -->
+<section class="fleet-wrap">
+  <div class="cars-grid" id="cars-grid">
+    <div class="empty-state" data-i18n="loading">Checking availability…</div>
+  </div>
+
+  <div class="ask-card fade-up vis" style="margin-top:34px">
+    <h3 class="ask-title" data-i18n="askTitle">Don't see the car you want?</h3>
+    <p class="ask-sub" data-i18n="askSub">Tell us your dates on WhatsApp — we'll find you the right car or suggest the closest alternative.</p>
+    <a class="ask-wa-btn" id="ask-wa" href="https://wa.me/355693755827" target="_blank" rel="noopener">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+      <span data-i18n="askBtn">Ask on WhatsApp</span>
+    </a>
+  </div>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer class="footer">
+  <picture>
+    <source srcset="brand_assets/udrive-logo-dark.png" media="(prefers-color-scheme: dark)" />
+    <img src="brand_assets/udrive-logo-light.png" alt="UDrive" class="footer-logo" />
+  </picture>
+  <p class="footer-txt">
+    UDrive Car Rental · Albania &amp; Kosovo<br/>
+    Tirana International Airport (TIA) &amp; Pristina Airport (PRN)
+  </p>
+  <p class="footer-copy">© 2025 UDrive Car Rental. All rights reserved.</p>
+</footer>
+
+<!-- ── WA FAB ── -->
+<a class="wa-fab" id="wa-fab" href="https://wa.me/355693755827?text=Hello%20UDrive!%20I'd%20like%20to%20inquire%20about%20renting%20a%20car." target="_blank" rel="noopener" title="Chat on WhatsApp">
+  <svg width="27" height="27" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+</a>
+
+<script>
+// ═══════════════════════════════════
+// LIVE AVAILABILITY — book.html
+//
+// Car list: same live Firestore fleet as index.html (cars-data.js fallback).
+// Availability: anonymous busy-ranges feed published by the fleet manager at
+// FEED_URL (rid = car id + busy [{b,e}] ranges, 'YYYY-MM-DDTHH:mm' strings).
+// A car is hidden only when the feed CONFIRMS it's taken for the chosen range;
+// cars the fleet manager hasn't linked yet stay visible without the
+// "Available" badge, and WhatsApp remains the confirmation step.
+// ═══════════════════════════════════
+let CARS = (window.CARS || []).slice();
+
+const FEED_URL = 'https://fleet-manager2-0.vercel.app/api/public-availability?account=udrive';
+const WA_PHONE = '355693755827';
+const CAT_LABEL = { economy:'Economy', suv:'SUV', luxury:'Luxury', van:'Van & MPV' };
+
+let FEED = null;         // { updatedAt, cars:[{rid, busy:[{b,e}]}] }
+let FEED_FAILED = false;
+
+// ─── TRANSLATIONS ───
+let lang = 'en';
+const T = {
+  en: {
+    navWa:'WhatsApp Us', navBack:'← All cars',
+    headEye:'Live Availability', headTitle:'Which cars are free <em>for your dates?</em>',
+    headSub:"Pick your pickup and return time — we'll show you every car that's actually available. Reserve it on WhatsApp in one tap.",
+    locLabel:'📍 Pickup Location', locSelect:'Select airport…',
+    pdLabel:'📅 Pickup Date', ptLabel:'⏰ Pickup Time', rdLabel:'📅 Return Date', rtLabel:'⏰ Return Time',
+    loading:'Checking availability…',
+    feedDown:"⚠️ We couldn't check live availability right now — the cars below may or may not be free. Message us on WhatsApp and we'll confirm straight away.",
+    invalidRange:'Return must be after pickup — adjust your dates to see availability.',
+    daysLine:(n)=>`<b>${n} day${n!==1?'s':''}</b> rental`,
+    countLine:(n)=>`${n} car${n!==1?'s':''} available`,
+    updated:(m)=>m < 2 ? 'Availability updated just now' : m < 60 ? `Availability updated ${m} min ago` : `Availability updated ${Math.round(m/60)} h ago`,
+    availChip:'✓ Available', perDay:'€/day', totalFor:(n)=>`total for ${n} day${n!==1?'s':''}`,
+    reserve:'Reserve', seats:'seats',
+    emptyTitle:'No cars free for these exact dates.',
+    emptySub:'Try shifting your dates slightly — or message us and we\'ll find a solution.',
+    askTitle:"Don't see the car you want?",
+    askSub:"Tell us your dates on WhatsApp — we'll find you the right car or suggest the closest alternative.",
+    askBtn:'Ask on WhatsApp',
+    fillDates:'Please choose pickup and return dates first.',
+    fillLoc:'Please select a pickup airport first.',
+    depNote:(d)=>`💵 ${d}€ cash deposit — returned instantly on key handover`,
+  },
+  sq: {
+    navWa:'Na Kontaktoni', navBack:'← Të gjitha makinat',
+    headEye:'Disponueshmëria Live', headTitle:'Cilat makina janë të lira <em>për datat tuaja?</em>',
+    headSub:'Zgjidhni datën e marrjes dhe të kthimit — ju tregojmë çdo makinë realisht të disponueshme. Rezervojeni në WhatsApp me një prekje.',
+    locLabel:'📍 Vendi i Marrjes', locSelect:'Zgjidhni aeroportin…',
+    pdLabel:'📅 Data e Marrjes', ptLabel:'⏰ Ora e Marrjes', rdLabel:'📅 Data e Kthimit', rtLabel:'⏰ Ora e Kthimit',
+    loading:'Duke kontrolluar disponueshmërinë…',
+    feedDown:'⚠️ Nuk arritëm të kontrollojmë disponueshmërinë live — makinat më poshtë mund të jenë ose jo të lira. Na shkruani në WhatsApp dhe konfirmojmë menjëherë.',
+    invalidRange:'Kthimi duhet të jetë pas marrjes — rregulloni datat për të parë disponueshmërinë.',
+    daysLine:(n)=>`Qira <b>${n} ditë</b>`,
+    countLine:(n)=>`${n} makina të lira`,
+    updated:(m)=>m < 2 ? 'Disponueshmëria u përditësua tani' : m < 60 ? `Përditësuar ${m} min më parë` : `Përditësuar ${Math.round(m/60)} orë më parë`,
+    availChip:'✓ E lirë', perDay:'€/ditë', totalFor:(n)=>`totali për ${n} ditë`,
+    reserve:'Rezervo', seats:'vende',
+    emptyTitle:'Asnjë makinë e lirë për këto data.',
+    emptySub:'Provoni të zhvendosni pak datat — ose na shkruani dhe gjejmë një zgjidhje.',
+    askTitle:'Nuk e shihni makinën që doni?',
+    askSub:'Na tregoni datat në WhatsApp — ju gjejmë makinën e duhur ose alternativën më të afërt.',
+    askBtn:'Pyesni në WhatsApp',
+    fillDates:'Ju lutem zgjidhni fillimisht datat e marrjes dhe kthimit.',
+    fillLoc:'Ju lutem zgjidhni fillimisht aeroportin e marrjes.',
+    depNote:(d)=>`💵 Depozitë cash ${d}€ — kthehet menjëherë me dorëzimin e çelësave`,
+  },
+  ar: {
+    navWa:'واتساب', navBack:'← كل السيارات',
+    headEye:'التوفر المباشر', headTitle:'ما السيارات المتاحة <em>في تواريخك؟</em>',
+    headSub:'اختر وقت الاستلام والإرجاع — نعرض لك كل سيارة متاحة فعلاً. احجزها عبر واتساب بلمسة واحدة.',
+    locLabel:'📍 مكان الاستلام', locSelect:'اختر المطار…',
+    pdLabel:'📅 تاريخ الاستلام', ptLabel:'⏰ وقت الاستلام', rdLabel:'📅 تاريخ الإرجاع', rtLabel:'⏰ وقت الإرجاع',
+    loading:'جارٍ التحقق من التوفر…',
+    feedDown:'⚠️ تعذّر التحقق من التوفر المباشر الآن — السيارات أدناه قد تكون متاحة أو لا. راسلنا على واتساب وسنؤكد فوراً.',
+    invalidRange:'يجب أن يكون الإرجاع بعد الاستلام — عدّل التواريخ لعرض التوفر.',
+    daysLine:(n)=>`تأجير <b>${n} ${n===1?'يوم':'أيام'}</b>`,
+    countLine:(n)=>`${n} ${n===1?'سيارة متاحة':'سيارات متاحة'}`,
+    updated:(m)=>m < 2 ? 'تم تحديث التوفر الآن' : m < 60 ? `تم التحديث قبل ${m} دقيقة` : `تم التحديث قبل ${Math.round(m/60)} ساعة`,
+    availChip:'✓ متاحة', perDay:'€/اليوم', totalFor:(n)=>`الإجمالي لـ ${n} ${n===1?'يوم':'أيام'}`,
+    reserve:'احجز', seats:'مقاعد',
+    emptyTitle:'لا توجد سيارات متاحة لهذه التواريخ بالضبط.',
+    emptySub:'جرّب تعديل التواريخ قليلاً — أو راسلنا وسنجد لك حلاً.',
+    askTitle:'لا ترى السيارة التي تريدها؟',
+    askSub:'أخبرنا بتواريخك على واتساب — سنجد لك السيارة المناسبة أو أقرب بديل.',
+    askBtn:'اسأل على واتساب',
+    fillDates:'يرجى اختيار تاريخي الاستلام والإرجاع أولاً.',
+    fillLoc:'يرجى اختيار مطار الاستلام أولاً.',
+    depNote:(d)=>`💵 وديعة نقدية ${d}€ — تُرجع فوراً عند تسليم المفاتيح`,
+  },
+};
+const tt = () => T[lang] || T.en;
+
+// ─── DATE HELPERS (string-based, timezone-proof) ───
+const val = id => document.getElementById(id).value;
+function pickupStr() { return val('b-pd') && `${val('b-pd')}T${val('b-pt') || '00:00'}`; }
+function returnStr() { return val('b-rd') && `${val('b-rd')}T${val('b-rt') || '00:00'}`; }
+function rangeValid() {
+  const p = pickupStr(), r = returnStr();
+  return p && r && r > p;
+}
+// Same "every started 24h block = 1 day" rule the site modal and the fleet
+// manager both use. Date is only used for the delta — timezone-invariant.
+function rentalDays() {
+  const ms = new Date(returnStr()) - new Date(pickupStr());
+  return Math.max(1, Math.ceil(ms / 86400000));
+}
+
+// ─── AVAILABILITY ───
+// Pure lexicographic comparison on 'YYYY-MM-DDTHH:mm' strings — a client
+// browsing from any timezone gets the same result the manager sees.
+// Same-day handover is OK: a busy range ending 10:00 doesn't block a 10:00 pickup.
+function entryFree(busy, p, r) {
+  return (busy || []).every(w => r <= w.b || w.e <= p);
+}
+// Map a feed rid (Firestore doc id / legacy numeric id / slug) to a site car id.
+function ridToCarId(rid) {
+  const list = CARS;
+  rid = String(rid);
+  let car = list.find(c => String(c.id) === rid);
+  if (!car && typeof window.carSlug === 'function') {
+    car = list.find(c => window.carSlug(c, list) === rid.toLowerCase());
+  }
+  if (!car && /^\d+$/.test(rid)) {
+    const hard = (window.__hardcodedCARS || []).find(h => String(h.id) === rid);
+    if (hard) {
+      car = list.find(c => c.name === hard.name && String(c.year) === String(hard.year)
+        && (c.variant || '') === (hard.variant || ''));
+    }
+  }
+  return car ? String(car.id) : null;
+}
+// 'free' = feed confirms available · 'busy' = feed confirms taken (hidden)
+// 'unknown' = car not linked in the fleet manager (shown, no badge)
+function carStatus(carId) {
+  if (!FEED || FEED_FAILED || !rangeValid()) return 'unknown';
+  const p = pickupStr(), r = returnStr();
+  const entries = FEED.cars.filter(fc => ridToCarId(fc.rid) === String(carId));
+  if (!entries.length) return 'unknown';
+  return entries.some(fc => entryFree(fc.busy, p, r)) ? 'free' : 'busy';
+}
+
+// ─── RENDER ───
+function render() {
+  const grid = document.getElementById('cars-grid');
+  const strip = document.getElementById('trip-days');
+  const countEl = document.getElementById('trip-count');
+  const t = tt();
+
+  if (!rangeValid()) {
+    strip.innerHTML = `<span class="trip-warn">${t.invalidRange}</span>`;
+    strip.classList.add('pg-full');
+    countEl.style.display = 'none';
+  }
+
+  let list = CARS.map(c => ({ c, status: carStatus(c.id) }))
+    .filter(x => x.status !== 'busy');
+  // Confirmed-available first, then unlinked; keep the site's own order inside each group.
+  list.sort((a, b) => (a.status === 'free' ? 0 : 1) - (b.status === 'free' ? 0 : 1));
+
+  if (rangeValid()) {
+    const days = rentalDays();
+    strip.innerHTML = t.daysLine(days);
+    const freeCount = list.filter(x => x.status === 'free').length;
+    if (FEED && !FEED_FAILED && freeCount) {
+      document.getElementById('trip-count-txt').textContent = t.countLine(freeCount);
+      countEl.style.display = 'inline-flex';
+    } else {
+      countEl.style.display = 'none';
+    }
+  }
+
+  if (!CARS.length) {
+    grid.innerHTML = `<div class="empty-state">${t.loading}</div>`;
+    return;
+  }
+  if (!list.length) {
+    grid.innerHTML = `<div class="empty-state"><b>${t.emptyTitle}</b><br/>${t.emptySub}</div>`;
+    return;
+  }
+
+  const days = rangeValid() ? rentalDays() : null;
+  grid.innerHTML = list.map(({ c, status }, i) => {
+    const slug = window.carSlug ? window.carSlug(c, CARS) : c.id;
+    const total = days ? days * c.ppd : null;
+    return `
+    <a class="car-card fade-up" href="car.html?car=${encodeURIComponent(slug)}" style="transition-delay:${(i % 6) * 0.055}s">
+      <div class="car-img-wrap">
+        <img class="car-img" src="${c.imgs[0]}" alt="${c.name} ${c.year}" loading="lazy"
+          onerror="this.src='https://placehold.co/400x300/111120/3a3a58?text=${encodeURIComponent(c.name)}'" />
+        <div class="car-img-shade"></div>
+        <span class="cat-badge cat-${c.cat}">${CAT_LABEL[c.cat] || c.cat}</span>
+        ${status === 'free' ? `<span class="avail-chip">${t.availChip}</span>` : ''}
+      </div>
+      <div class="car-body">
+        <div class="car-name">${c.name} <span class="car-year-inline">${c.year}</span></div>
+        <div class="car-specs">
+          <span class="spec-chip">👤 ${c.seats} ${t.seats}</span>
+          <span class="spec-chip">⚙️ ${c.tx}</span>
+        </div>
+        <div class="car-bottom">
+          <div class="car-price-block">
+            <span class="car-total-num">${total != null ? total + '€' : c.ppd + t.perDay}</span>
+            <span class="car-total-sub">${total != null ? `${c.ppd}${t.perDay} · ${t.totalFor(days)}` : ''}</span>
+          </div>
+          <button class="wa-reserve-btn" type="button"
+            onclick="event.preventDefault(); event.stopPropagation(); reserve('${String(c.id).replace(/'/g, '')}')">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
+            ${t.reserve}
+          </button>
+        </div>
+        <div class="card-dep-note">${t.depNote(c.dep)}</div>
+      </div>
+    </a>`;
+  }).join('');
+
+  setTimeout(() => grid.querySelectorAll('.fade-up').forEach(el => el.classList.add('vis')), 40);
+}
+
+// ─── UPDATED LINE ───
+function renderUpdated() {
+  const el = document.getElementById('updated-line');
+  if (!FEED || FEED_FAILED || !FEED.updatedAt) { el.style.display = 'none'; return; }
+  const mins = Math.max(0, Math.round((Date.now() - new Date(FEED.updatedAt)) / 60000));
+  el.textContent = tt().updated(mins);
+  el.style.display = 'block';
+}
+
+// ─── RESERVE → WHATSAPP ───
+function reserve(id) {
+  const c = CARS.find(x => String(x.id) === String(id));
+  if (!c) return;
+  const t = tt();
+  if (!rangeValid()) { alert(t.fillDates); return; }
+  const loc = val('b-loc');
+  if (!loc) { alert(t.fillLoc); document.getElementById('b-loc').focus(); return; }
+  const pickup = new Date(pickupStr());
+  const ret = new Date(returnStr());
+  const days = rentalDays();
+  const total = days * c.ppd;
+  const slug = window.carSlug ? window.carSlug(c, CARS) : c.id;
+  const link = `https://rihladrive.com/car.html?car=${encodeURIComponent(slug)}&focus=1`;
+  const fmtDate = d => d.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
+  const fmtTime = d => d.toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit' });
+  const lines = [
+    'Hello UDrive! 🚗',
+    '',
+    '*Booking Request*',
+    '',
+    `🚙 Car: *${c.name} ${c.year}*`,
+    `📍 Pickup: *${loc}*`,
+    `📅 From: *${fmtDate(pickup)} at ${fmtTime(pickup)}*`,
+    `📅 To:   *${fmtDate(ret)} at ${fmtTime(ret)}*`,
+    `⏱️ Duration: *${days} day${days !== 1 ? 's' : ''}*`,
+    `💰 Rate: ${c.ppd}€/day`,
+    `💳 Total Rental: *${total}€*`,
+    `🏦 Deposit: *${c.dep}€* _(returned in cash on key handover)_`,
+    `🔗 ${link}`,
+    '',
+    'Please confirm availability. Thank you!',
+  ];
+  window.open(`https://wa.me/${WA_PHONE}?text=${encodeURIComponent(lines.join('\n'))}`, '_blank');
+}
+
+// Keep the generic WhatsApp buttons carrying the chosen dates too.
+function syncAskLinks() {
+  let text = "Hello UDrive! I'd like to inquire about renting a car.";
+  if (rangeValid()) {
+    const p = new Date(pickupStr()), r = new Date(returnStr());
+    const fmt = d => d.toLocaleDateString('en-GB', { day:'2-digit', month:'short' }) + ' ' +
+                     d.toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit' });
+    text = `Hello UDrive! 🚗 I'm looking for a car from *${fmt(p)}* to *${fmt(r)}*. What do you have available?`;
+  }
+  const href = `https://wa.me/${WA_PHONE}?text=${encodeURIComponent(text)}`;
+  document.getElementById('ask-wa').href = href;
+  document.getElementById('wa-fab').href = href;
+}
+
+// ─── FEED FETCH ───
+fetch(FEED_URL, { cache: 'no-store' })
+  .then(r => (r.ok ? r.json() : Promise.reject(new Error('feed ' + r.status))))
+  .then(j => {
+    if (j && Array.isArray(j.cars)) FEED = j;
+    else FEED_FAILED = true;
+  })
+  .catch(() => { FEED_FAILED = true; })
+  .finally(() => {
+    document.getElementById('feed-banner').style.display = FEED_FAILED ? 'block' : 'none';
+    renderUpdated();
+    render();
+  });
+
+// ─── INPUTS ───
+['b-pd', 'b-pt', 'b-rd', 'b-rt'].forEach(id =>
+  document.getElementById(id).addEventListener('change', () => { render(); syncAskLinks(); })
+);
+
+// Defaults: tomorrow 10:00 → +3 days 10:00
+(function setDates() {
+  const fmt = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  const today = new Date();
+  const tomorrow = new Date(today); tomorrow.setDate(today.getDate() + 1);
+  const ret = new Date(today); ret.setDate(today.getDate() + 4);
+  document.getElementById('b-pd').min = fmt(today);
+  document.getElementById('b-rd').min = fmt(today);
+  document.getElementById('b-pd').value = fmt(tomorrow);
+  document.getElementById('b-rd').value = fmt(ret);
+})();
+
+// ─── I18N ───
+function setLang(code) {
+  if (!T[code]) code = 'en';
+  lang = code;
+  try { localStorage.setItem('udriveLang', code); } catch {}
+  const t = T[code];
+  document.documentElement.lang = code;
+  document.documentElement.dir = code === 'ar' ? 'rtl' : 'ltr';
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const k = el.dataset.i18n;
+    if (typeof t[k] === 'string') el.innerHTML = t[k];
+  });
+  document.querySelectorAll('[data-i18n-opt]').forEach(el => {
+    const k = el.dataset.i18nOpt;
+    if (typeof t[k] === 'string') el.textContent = t[k];
+  });
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('on', b.dataset.lang === code));
+  renderUpdated();
+  render();
+}
+(function restoreLang() {
+  let saved = null;
+  try { saved = localStorage.getItem('udriveLang'); } catch {}
+  if (saved && saved !== 'en' && T[saved]) setLang(saved);
+})();
+
+// ─── FIRST RENDER (deferred for Firebase, same pattern as index.html) ───
+let __firstRendered = false;
+function __firstRender() {
+  if (__firstRendered) return;
+  __firstRendered = true;
+  render();
+  syncAskLinks();
+}
+setTimeout(__firstRender, 2000);
+
+window.__udriveApplyCars = function (arr) {
+  if (Array.isArray(arr) && arr.length) {
+    CARS = arr;
+    window.CARS = arr;
+  }
+  if (!__firstRendered) __firstRender();
+  else render();
+};
+window.__udriveFleetReady = __firstRender;
+</script>
+
+<!-- ═══ FIREBASE LIVE-DATA LOADER (same as index.html) ═══ -->
+<script type="module">
+  import { firebaseConfig, isFirebaseConfigured } from './firebase-config.js';
+
+  function toDeliveryUrl(url){
+    if (!url || typeof url !== 'string' || !url.includes('/upload/')) return url;
+    let out = url.replace(/\.(heic|heif)(\?.*)?$/i, '.jpg$2');
+    if (!/\/upload\/(f_auto|.*[,/]f_auto)/.test(out)) {
+      out = out.replace('/upload/', '/upload/f_auto,q_auto/');
+    }
+    return out;
+  }
+
+  if (isFirebaseConfigured()) {
+    try {
+      const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js');
+      const { getFirestore, collection, getDocs, query, orderBy } =
+        await import('https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js');
+
+      const app = initializeApp(firebaseConfig);
+      const db  = getFirestore(app);
+
+      const snap = await getDocs(query(collection(db, 'cars'), orderBy('order', 'asc')));
+      const cars = [];
+      snap.forEach(doc => {
+        const d = doc.data();
+        if (d.hidden === true) return;
+        const car = {
+          id:       doc.id,
+          name:     d.name || '',
+          year:     d.year || '',
+          variant:  d.variant || '',
+          cat:      d.cat || 'economy',
+          tx:       d.tx || 'Automatic',
+          fuel:     d.fuel || 'Diesel',
+          seats:    d.seats || 5,
+          ppd:      Number(d.ppd) || 0,
+          dep:      300, // fleet-wide flat deposit
+          imgs:     Array.isArray(d.imgs) ? d.imgs.map(toDeliveryUrl) : [],
+          features: Array.isArray(d.features) ? d.features : [],
+          desc:     d.desc || '',
+        };
+        cars.push(window.fillFromHardcoded ? window.fillFromHardcoded(car) : car);
+      });
+
+      if (cars.length && typeof window.__udriveApplyCars === 'function') {
+        window.__udriveApplyCars(cars);
+      } else if (typeof window.__udriveFleetReady === 'function') {
+        window.__udriveFleetReady();
+      }
+    } catch (err) {
+      console.warn('[UDrive] Firebase fetch failed — using built-in fleet data.', err);
+      if (typeof window.__udriveFleetReady === 'function') window.__udriveFleetReady();
+    }
+  } else if (typeof window.__udriveFleetReady === 'function') {
+    window.__udriveFleetReady();
+  }
+</script>
+
+</body>
+</html>

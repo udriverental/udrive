@@ -801,7 +801,7 @@ fetch(FEED_URL, { cache: 'no-store' })
 );
 
 // Defaults: tomorrow 10:00 → +3 days 10:00
-(function setDates() {
+function setDates() {
   const fmt = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
   const today = new Date();
   const tomorrow = new Date(today); tomorrow.setDate(today.getDate() + 1);
@@ -810,6 +810,45 @@ fetch(FEED_URL, { cache: 'no-store' })
   document.getElementById('b-rd').min = fmt(today);
   document.getElementById('b-pd').value = fmt(tomorrow);
   document.getElementById('b-rd').value = fmt(ret);
+  document.getElementById('b-pt').value = '10:00';
+  document.getElementById('b-rt').value = '10:00';
+}
+setDates();
+
+/* ─── PREFILLED LINKS ───
+   ?from=2026-07-20T10:00&to=2026-07-25T10:00&loc=tia
+   The manager sends this straight from the fleet manager (Offer Maker →
+   "Copy availability link") when a client has already said their dates, so the
+   client lands on a list that's already filtered instead of re-entering them.
+   The format IS this page's internal one ('YYYY-MM-DDTHH:mm'); a bare date works
+   too because that's what a person types. Kept in sync by hand with
+   OfferMaker.bookUrl() in the fleet manager.
+   Runs after setDates() so it overrides the defaults, and before __firstRender
+   so the first paint already shows the client's dates. Anything unusable is
+   ignored in favour of the defaults — this page's job is to convert, never to
+   scold someone about a URL they didn't type. */
+(function applyUrlDates() {
+  const q = new URLSearchParams(location.search);
+  const put = (dateId, timeId, raw) => {
+    if (!raw) return;
+    const m = String(raw).match(/^(\d{4}-\d{2}-\d{2})(?:[T ](\d{2}:\d{2}))?$/);
+    if (!m) return;
+    const dEl = document.getElementById(dateId);
+    if (dEl.min && m[1] < dEl.min) return;      // a date in the past → keep the default
+    dEl.value = m[1];
+    if (m[2]) document.getElementById(timeId).value = m[2];
+  };
+  put('b-pd', 'b-pt', q.get('from'));
+  put('b-rd', 'b-rt', q.get('to'));
+  if (!rangeValid()) setDates();                // inverted or nonsense → start over
+  const loc = (q.get('loc') || '').toLowerCase();
+  if (loc === 'tia' || loc === 'prn') {
+    /* Worth prefilling: the airport is the one field that blocks Reserve. */
+    const tag = loc === 'tia' ? '(TIA)' : '(PRN)';
+    const sel = document.getElementById('b-loc');
+    const opt = [...sel.options].find(o => o.value.includes(tag));
+    if (opt) sel.value = opt.value;
+  }
 })();
 
 // ─── I18N ───

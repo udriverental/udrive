@@ -43,4 +43,7 @@ const server = createServer(async (req, res) => {
   }
 });
 
-server.listen(3000, () => console.log('UDrive server → http://localhost:3000'));
+/* PORT override: the fleet-manager repo ships its own serve.mjs on 3000 too, so
+   the two can't run side by side without this. PORT=3100 node serve.mjs */
+const port = Number(process.env.PORT) || 3000;
+server.listen(port, () => console.log(`UDrive server → http://localhost:${port}`));

@@ -5,6 +5,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>UDrive — Car Details</title>
   <meta name="description" content="UDrive Car Rental — premium fleet at Tirana Airport (TIA) and Pristina Airport (PRN). Cash deposit, returned instantly." />
+
+  <!-- STATIC fallback preview only. This page picks its car from ?car= at
+       runtime, and crawlers don't run JS — so per-car previews come from the
+       pre-rendered /c/<slug> stubs (build-share-pages.mjs, 6-hourly). Share
+       those, not this URL, when you want the car's own photo in the card. -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="UDrive Car Rental" />
+  <meta property="og:title" content="UDrive Car Rental — Albania &amp; Kosovo" />
+  <meta property="og:description" content="Premium car rental at Tirana (TIA) and Pristina (PRN). No hidden fees, no credit card — your cash deposit comes back the moment you hand over the keys." />
+  <meta property="og:image" content="https://rihladrive.com/brand_assets/og-home.jpg" />
+  <meta property="og:image:type" content="image/jpeg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="UDrive Car Rental — Albania and Kosovo" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="UDrive Car Rental — Albania &amp; Kosovo" />
+  <meta name="twitter:image" content="https://rihladrive.com/brand_assets/og-home.jpg" />
+
   <link rel="icon" type="image/png" href="brand_assets/Modern%20UDrive%20car%20rental%20logo.png" />
   <link rel="apple-touch-icon" href="brand_assets/Modern%20UDrive%20car%20rental%20logo.png" />
   <script src="cars-data.js"></script>

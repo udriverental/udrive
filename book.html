@@ -731,6 +731,48 @@ function renderUpdated() {
   el.style.display = 'block';
 }
 
+/* ─── DEMAND BEACONS + LEAD CAPTURE ───
+   Two anonymous counters (page opened with a date range, Reserve tapped on a
+   car) plus the inquiry itself, so a client who taps Reserve and then never
+   sends the WhatsApp message isn't simply lost.
+
+   No cookies, no visitor id, no third-party analytics: the server stores
+   pre-aggregated counts, so there is no per-visitor row to read (see
+   api/_public-events.js in the fleet manager). Everything here is
+   fire-and-forget — the client's WhatsApp handoff must never wait on it or fail
+   because of it. */
+const API_BASE = 'https://fleet-manager2-0.vercel.app/api/public-availability';
+const ACCOUNT = 'udrive';
+
+/* The server caps nights at 60 and drops anything longer, so clamp rather than
+   lose the whole event on an unusually long search. */
+const clampNights = (n) => Math.max(1, Math.min(60, n || 1));
+
+function beacon(body) {
+  try {
+    const url = `${API_BASE}?event=1&account=${ACCOUNT}`;
+    /* text/plain keeps this a "simple" request: no CORS preflight, and
+       sendBeacon survives the page being closed straight after a tap. */
+    const json = JSON.stringify(body);
+    const blob = new Blob([json], { type: 'text/plain' });
+    if (!(navigator.sendBeacon && navigator.sendBeacon(url, blob))) {
+      fetch(url, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: json, keepalive: true })
+        .catch(() => {});
+    }
+  } catch {}
+}
+
+function recordInquiry(payload) {
+  try {
+    fetch(`${API_BASE}?inquiry=1&account=${ACCOUNT}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },   // simple request → no preflight
+      body: JSON.stringify(payload),
+      keepalive: true,
+    }).catch(() => {});
+  } catch {}
+}
+
 // ─── RESERVE → WHATSAPP ───
 function reserve(id) {
   const c = CARS.find(x => String(x.id) === String(id));
@@ -764,6 +806,14 @@ function reserve(id) {
     '',
     'Please confirm availability. Thank you!',
   ];
+  /* Record before the handoff, so the lead survives the client changing their
+     mind in WhatsApp. Both calls are fire-and-forget and can't block the tap. */
+  beacon({ kind: 'reserve', rid: String(c.id), from: val('b-pd'), nights: clampNights(days) });
+  recordInquiry({
+    rid: String(c.id), vehicleName: `${c.name} ${c.year}`,
+    begin: pickupStr(), end: returnStr(),
+    location: loc, days, totalClient: total, lang,
+  });
   window.open(`https://wa.me/${WA_PHONE}?text=${encodeURIComponent(lines.join('\n'))}`, '_blank');
 }
 
@@ -884,6 +934,14 @@ function __firstRender() {
   __firstRendered = true;
   render();
   syncAskLinks();
+  /* The "someone searched" counter fires from HERE, once, rather than on load:
+     at this point the fleet and the feed have landed, so the free-car count is
+     the real one the visitor saw. A count of 0 is the most valuable signal in
+     the whole feature — demand we turned away. Never beacon on date `change`,
+     that would be a firehose. */
+  const freeNow = FEED && !FEED_FAILED && rangeValid()
+    ? CARS.filter(c => carStatus(c.id) === 'free').length : 0;
+  beacon({ kind: 'open', from: val('b-pd'), nights: clampNights(rentalDays()), free: freeNow });
 }
 setTimeout(__firstRender, 2000);
 

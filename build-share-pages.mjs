@@ -83,6 +83,19 @@ function toDeliveryUrl(url) {
   return out;
 }
 
+// ── Link-preview image ───────────────────────────────────────────
+// WhatsApp drops the thumbnail when og:image is too heavy (full-size listing
+// photos run 0.5–2.3MB), so the preview gets a 1200×630 JPEG crop instead —
+// the standard OG size, ~100–250KB. g_auto keeps the car in frame.
+const OG_TRANSFORM = 'c_fill,g_auto,w_1200,h_630,q_auto,f_jpg';
+function ogImage(url) {
+  const d = toDeliveryUrl(url);
+  if (d && d.includes('/upload/f_auto,q_auto/')) {
+    return { url: d.replace('/upload/f_auto,q_auto/', `/upload/${OG_TRANSFORM}/`), sized: true };
+  }
+  return { url: d, sized: false };
+}
+
 // ── HTML escaping for safe attribute interpolation ──────────────
 function esc(s) {
   return String(s ?? '')
@@ -97,7 +110,12 @@ function stubHtml(car, slug) {
   const desc = car.desc
     ? car.desc.slice(0, 200)
     : `Rent a ${car.name} from UDrive — pickup at Tirana (TIA) or Pristina (PRN).${priceBit}`;
-  const img = car.imgs[0] ? toDeliveryUrl(car.imgs[0]) : `${SITE}/brand_assets/Modern%20UDrive%20car%20rental%20logo.png`;
+  const og = car.imgs[0] ? ogImage(car.imgs[0]) : { url: `${SITE}/brand_assets/Modern%20UDrive%20car%20rental%20logo.png`, sized: false };
+  const img = og.url;
+  const imgMeta = og.sized ? `
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">` : '';
   const target = `/car.html?car=${encodeURIComponent(slug)}`;
   // Shared client links land in focus mode (hides fleet nav). Canonical/OG stay clean.
   const redirectTarget = `${target}&focus=1`;
@@ -114,7 +132,7 @@ function stubHtml(car, slug) {
 <meta property="og:site_name" content="UDrive Car Rental">
 <meta property="og:title" content="${esc(ogTitle)}">
 <meta property="og:description" content="${esc(desc)}">
-<meta property="og:image" content="${esc(img)}">
+<meta property="og:image" content="${esc(img)}">${imgMeta}
 <meta property="og:url" content="${SITE}/c/${esc(slug)}">
 
 <meta name="twitter:card" content="summary_large_image">

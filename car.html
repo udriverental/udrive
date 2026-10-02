@@ -136,6 +136,38 @@
       opacity: 0; transition: opacity .35s ease;
     }
     .gal-img.on { opacity: 1; }
+    .gal-main { cursor: zoom-in; }
+    /* A tall photo shows whole, over a blurred copy of itself, instead of
+       being cropped to the 4:3 frame. */
+    .gal-img.tall { object-fit: contain; }
+    .gal-bg {
+      position: absolute; inset: -24px;
+      background-size: cover; background-position: center;
+      filter: blur(22px) brightness(0.45);
+      opacity: 0; transition: opacity .35s ease;
+    }
+    .gal-bg.on { opacity: 1; }
+
+    /* ── FULL-SCREEN PHOTO VIEWER ── */
+    .lb {
+      position: fixed; inset: 0; z-index: 8000;
+      background: rgba(7,7,15,0.96);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none; transition: opacity .2s ease;
+    }
+    .lb.on { opacity: 1; pointer-events: auto; }
+    .lb-img {
+      max-width: 100%; max-height: 100%; object-fit: contain;
+      user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
+    }
+    .lb .gal-btn:focus-visible { outline: 2px solid var(--or); outline-offset: 2px; }
+    .lb .gal-btn:active { transform: translateY(-50%) scale(0.95); }
+    /* .lb-scoped so they win over the .gal-btn / .gal-counter rules further down. */
+    .lb .lb-close { top: 16px; right: 16px; transform: none; }
+    .lb .lb-close:hover { transform: scale(1.05); }
+    .lb .lb-close:active { transform: scale(0.95); }
+    .lb .lb-counter { right: auto; left: 50%; bottom: 20px; transform: translateX(-50%); }
+    .lb.single .gal-prev, .lb.single .gal-next, .lb.single .lb-counter { display: none; }
     .gal-shade {
       position: absolute; inset: 0; pointer-events: none;
       background: linear-gradient(to top, rgba(7,7,15,0.55), transparent 35%);
@@ -570,7 +602,9 @@
   const params = new URLSearchParams(location.search);
 
   // Focus mode: shared client links (…&focus=1) show only this car — hide fleet navigation.
-  if (params.get('focus') === '1') {
+  // The client already gave their dates in the chat, so there's no booking box either.
+  const focus = params.get('focus') === '1';
+  if (focus) {
     document.body.classList.add('focus');
     const _fs = document.createElement('style');
     _fs.textContent =
@@ -619,9 +653,11 @@
       <section class="page">
         <div class="gallery">
           <div class="gal-main" id="gal-main">
+            <div class="gal-bg" id="gal-bg"></div>
             ${car.imgs.map((src, i) => `
               <img class="gal-img${i===0?' on':''}" data-idx="${i}"
                 src="${src}" alt="${t.photoAlt(car.name, i+1)}"
+                onload="markTall(this)"
                 ${i===0?'':'loading="lazy"'} />
             `).join('')}
             <div class="gal-shade"></div>
@@ -667,7 +703,7 @@
               </div>
             </div>` : ''}
 
-          <div class="booking">
+          ${focus ? '' : `<div class="booking">
             <h2 class="booking-title">${t.bookTitle}</h2>
             <div class="booking-sub">${car.name} · €${car.ppd} ${t.perDay}</div>
 
@@ -716,12 +752,12 @@
             <div class="share-row">
               <button class="btn" onclick="copyLink()">${t.copyBtn}</button>
             </div>
-          </div>
+          </div>`}
         </div>
       </section>`;
 
     initGallery();
-    initBooking();
+    if (!focus) initBooking();
   }
   } // end renderInner
 
@@ -758,12 +794,32 @@
     });
     const cur = document.getElementById('gal-cur');
     if (cur) cur.textContent = String(galIdx + 1);
+    syncBg();
+    if (lb && lb.classList.contains('on')) fillViewer();
+  }
+  // Portrait photos get .tall (shown whole, see .gal-bg) once their size is known.
+  function markTall(img) {
+    img.classList.toggle('tall', img.naturalHeight > img.naturalWidth);
+    if (Number(img.dataset.idx) === galIdx) syncBg();
+  }
+  function syncBg() {
+    const bg = document.getElementById('gal-bg');
+    const img = document.querySelector(`.gal-img[data-idx="${galIdx}"]`);
+    if (!bg || !img) return;
+    const tall = img.classList.contains('tall');
+    if (tall) bg.style.backgroundImage = `url("${img.currentSrc || img.src}")`;
+    bg.classList.toggle('on', tall);
   }
   function slideGal(dir) { setGal(galIdx + dir); }
   function goGal(i) { setGal(i); }
 
   function initGallery() {
-    if (!car || car.imgs.length <= 1) return;
+    if (!car) return;
+    // Tap the photo to see it full screen (the arrows keep their own job).
+    document.getElementById('gal-main').addEventListener('click', e => {
+      if (!e.target.closest('.gal-btn')) openViewer();
+    });
+    if (car.imgs.length <= 1) return;
     // Prefetch next image
     const pre = new Image(); pre.src = car.imgs[1 % car.imgs.length];
     // Touch swipe
@@ -775,12 +831,73 @@
       if (Math.abs(dx) < 30) return;
       slideGal(dx < 0 ? 1 : -1);
     });
-    // Keyboard arrows
-    document.addEventListener('keydown', e => {
-      if (e.key === 'ArrowRight') slideGal(1);
-      else if (e.key === 'ArrowLeft') slideGal(-1);
-    });
   }
+  // Keyboard: arrows page the photos (gallery and viewer alike), Esc closes the viewer.
+  // Bound once — initGallery runs on every render.
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && lb && lb.classList.contains('on')) closeViewer();
+    if (!car || car.imgs.length <= 1) return;
+    if (e.key === 'ArrowRight') slideGal(1);
+    else if (e.key === 'ArrowLeft') slideGal(-1);
+  });
+
+  // ── Full-screen viewer ──
+  // One overlay for the page's life; it shows car.imgs[galIdx] and pages through
+  // setGal, so the gallery behind is on the same photo when it closes. Opening
+  // pushes a history entry so a phone's back button closes it instead of leaving.
+  let lb = null;
+  function viewerEl() {
+    if (lb) return lb;
+    lb = document.createElement('div');
+    lb.className = 'lb';
+    lb.setAttribute('role', 'dialog');
+    lb.setAttribute('aria-modal', 'true');
+    lb.innerHTML = `
+      <img class="lb-img" alt="" />
+      <button class="gal-btn lb-close" aria-label="Close">&#10005;</button>
+      <button class="gal-btn gal-prev" aria-label="">&#8249;</button>
+      <button class="gal-btn gal-next" aria-label="">&#8250;</button>
+      <div class="gal-counter lb-counter"></div>`;
+    lb.addEventListener('click', e => { if (e.target === lb) closeViewer(); });
+    lb.querySelector('.lb-close').addEventListener('click', () => closeViewer());
+    lb.querySelector('.gal-prev').addEventListener('click', () => slideGal(-1));
+    lb.querySelector('.gal-next').addEventListener('click', () => slideGal(1));
+    let startX = 0;
+    lb.addEventListener('touchstart', e => { startX = e.touches[0].clientX; }, { passive: true });
+    lb.addEventListener('touchend', e => {
+      const dx = e.changedTouches[0].clientX - startX;
+      if (Math.abs(dx) < 30 || !car || car.imgs.length <= 1) return;
+      slideGal(dx < 0 ? 1 : -1);
+    });
+    document.body.appendChild(lb);
+    return lb;
+  }
+  function fillViewer() {
+    const t = T[lang] || T.en;
+    const n = car.imgs.length;
+    const img = lb.querySelector('.lb-img');
+    img.src = car.imgs[galIdx];
+    img.alt = t.photoAlt(car.name, galIdx + 1);
+    lb.querySelector('.gal-prev').setAttribute('aria-label', t.ariaPrev);
+    lb.querySelector('.gal-next').setAttribute('aria-label', t.ariaNext);
+    lb.querySelector('.lb-counter').textContent = `${galIdx + 1} / ${n}`;
+    lb.classList.toggle('single', n <= 1);
+  }
+  function openViewer() {
+    if (!car || !car.imgs.length) return;
+    viewerEl();
+    fillViewer();
+    lb.classList.add('on');
+    document.body.style.overflow = 'hidden';
+    history.pushState({ lb: 1 }, '');
+  }
+  function closeViewer(fromBack) {
+    if (!lb || !lb.classList.contains('on')) return;
+    lb.classList.remove('on');
+    document.body.style.overflow = '';
+    if (!fromBack && history.state && history.state.lb) history.back();
+  }
+  window.addEventListener('popstate', () => closeViewer(true));
 
   // ── Booking ──
   function initBooking() {

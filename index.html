@@ -358,7 +358,6 @@
       .cars-grid.cols-2 { grid-template-columns: repeat(2,1fr); gap: 10px; }
       .cars-grid.cols-2 .car-body { padding: 11px; }
       .cars-grid.cols-2 .car-name { font-size: 0.95rem; margin-bottom: 8px; }
-      .cars-grid.cols-2 .car-year-inline { font-size: 10.5px; }
       .cars-grid.cols-2 .car-specs { gap: 4px; margin-bottom: 9px; }
       .cars-grid.cols-2 .spec-chip { font-size: 10px; padding: 2px 6px; }
       .cars-grid.cols-2 .car-bottom { flex-direction: column; align-items: stretch; gap: 8px; padding-top: 9px; }
@@ -444,7 +443,6 @@
 
     .car-body { padding: 15px; }
     .car-name { font-size: 1.15rem; font-weight: 600; line-height: 1.2; margin-bottom: 11px; }
-    .car-year-inline { font-family: 'DM Sans',sans-serif; font-size: 12px; font-weight: 400; color: var(--muted); margin-left: 4px; }
     .car-specs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 13px; }
     .spec-chip {
       display: inline-flex; align-items: center; gap: 4px;
@@ -827,7 +825,7 @@ function renderCars(cat) {
     return `
     <a class="car-card fade-up" href="${href}" style="transition-delay:${(i % 6) * 0.055}s" data-carid="${c.id}">
       <div class="car-img-wrap" data-carid="${c.id}">
-        <img class="car-img" id="cimg-${c.id}" src="${c.imgs[0]}" alt="${c.name} ${c.year}" loading="lazy"
+        <img class="car-img" id="cimg-${c.id}" src="${c.imgs[0]}" alt="${c.name}" loading="lazy"
           onerror="this.src='https://placehold.co/400x300/111120/3a3a58?text=${encodeURIComponent(c.name)}'" />
         <div class="car-img-shade"></div>
         <span class="cat-badge cat-${c.cat}">${CAT_LABEL[c.cat]}</span>
@@ -838,7 +836,7 @@ function renderCars(cat) {
         ` : ''}
       </div>
       <div class="car-body">
-        <div class="car-name">${c.name} <span class="car-year-inline">${c.year}</span></div>
+        <div class="car-name">${c.name}</div>
         <div class="car-specs">
           <span class="spec-chip">👤 ${c.seats} seats</span>
           <span class="spec-chip">⚙️ ${c.tx}</span>
@@ -1264,7 +1262,7 @@ let activeCar = null;
 function openModal(id) {
   activeCar = (window.CARS || []).find(c => String(c.id) === String(id));
   if (!activeCar) return;
-  document.getElementById('modal-sub').textContent = `${activeCar.name} ${activeCar.year} · ${activeCar.ppd}€/day`;
+  document.getElementById('modal-sub').textContent = `${activeCar.name} · ${activeCar.ppd}€/day`;
   // Default dates if blank
   const mPd = document.getElementById('m-pd');
   const mRd = document.getElementById('m-rd');

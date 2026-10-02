@@ -91,12 +91,12 @@ function esc(s) {
 }
 
 function stubHtml(car, slug) {
-  const title = `${car.name}${car.year ? ' ' + car.year : ''} — UDrive Car Rental`;
-  const ogTitle = `${car.name}${car.year ? ' ' + car.year : ''} — UDrive`;
+  const title = `${car.name} — UDrive Car Rental`;
+  const ogTitle = `${car.name} — UDrive`;
   const priceBit = car.ppd ? ` From ${car.ppd}€/day.` : '';
   const desc = car.desc
     ? car.desc.slice(0, 200)
-    : `Rent a ${car.name}${car.year ? ' ' + car.year : ''} from UDrive — pickup at Tirana (TIA) or Pristina (PRN).${priceBit}`;
+    : `Rent a ${car.name} from UDrive — pickup at Tirana (TIA) or Pristina (PRN).${priceBit}`;
   const img = car.imgs[0] ? toDeliveryUrl(car.imgs[0]) : `${SITE}/brand_assets/Modern%20UDrive%20car%20rental%20logo.png`;
   const target = `/car.html?car=${encodeURIComponent(slug)}`;
   // Shared client links land in focus mode (hides fleet nav). Canonical/OG stay clean.

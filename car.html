@@ -195,7 +195,6 @@
       font-size: clamp(2rem, 5vw, 2.8rem); font-weight: 600;
       line-height: 1.05; letter-spacing: -0.02em;
     }
-    .car-title-year { color: var(--muted); font-weight: 400; font-size: 0.65em; margin-left: 8px; }
 
     .car-desc {
       font-family: 'DM Sans', sans-serif;
@@ -237,7 +236,7 @@
     .price-dep b { color: var(--txt); }
 
     .specs {
-      display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
     }
     .spec {
       background: var(--card); border: 1px solid var(--line);
@@ -431,8 +430,8 @@
       notFoundBody:"The link you opened doesn't match any car in our fleet. It may have been removed or the link is mistyped.",
       notFoundCta:'See all cars →',
       titleSuffix:' — UDrive Car Rental',
-      metaDesc:(name,year,ppd)=>`Rent the ${name} ${year} from UDrive — €${ppd}/day, deposit returned in cash on key handover.`,
-      photoAlt:(name,year,n)=>`${name} ${year} photo ${n}`,
+      metaDesc:(name,ppd)=>`Rent the ${name} from UDrive — €${ppd}/day, deposit returned in cash on key handover.`,
+      photoAlt:(name,n)=>`${name} photo ${n}`,
       ariaPrev:'Previous photo', ariaNext:'Next photo',
       loading:'Loading…',
       // WhatsApp message template
@@ -476,8 +475,8 @@
       notFoundBody:'Linku që hapet nuk përputhet me asnjë makinë në flotën tonë. Mund të jetë hequr ose linku është gabim.',
       notFoundCta:'Shiko të gjitha makinat →',
       titleSuffix:' — UDrive Marrje me Qira',
-      metaDesc:(name,year,ppd)=>`Merrni me qira ${name} ${year} nga UDrive — €${ppd}/ditë, depozita kthehet në cash sapo dorëzoni çelësat.`,
-      photoAlt:(name,year,n)=>`${name} ${year} foto ${n}`,
+      metaDesc:(name,ppd)=>`Merrni me qira ${name} nga UDrive — €${ppd}/ditë, depozita kthehet në cash sapo dorëzoni çelësat.`,
+      photoAlt:(name,n)=>`${name} foto ${n}`,
       ariaPrev:'Foto e mëparshme', ariaNext:'Foto tjetër',
       loading:'Duke u ngarkuar…',
       waHello:'Përshëndetje UDrive! 🚗',
@@ -520,8 +519,8 @@
       notFoundBody:'الرابط الذي فتحته لا يطابق أي سيارة في أسطولنا. ربما تمت إزالتها أو أن الرابط غير صحيح.',
       notFoundCta:'← شاهد كل السيارات',
       titleSuffix:' — UDrive لتأجير السيارات',
-      metaDesc:(name,year,ppd)=>`استأجر ${name} ${year} من UDrive — €${ppd}/يوم، الوديعة تُرجع نقداً عند تسليم المفاتيح.`,
-      photoAlt:(name,year,n)=>`${name} ${year} صورة ${n}`,
+      metaDesc:(name,ppd)=>`استأجر ${name} من UDrive — €${ppd}/يوم، الوديعة تُرجع نقداً عند تسليم المفاتيح.`,
+      photoAlt:(name,n)=>`${name} صورة ${n}`,
       ariaPrev:'الصورة السابقة', ariaNext:'الصورة التالية',
       loading:'جارٍ التحميل…',
       waHello:'مرحباً UDrive! 🚗',
@@ -609,9 +608,9 @@
         <a href="index.html">${t.notFoundCta}</a>
       </div>`;
   } else {
-    document.title = `${car.name} ${car.year}${t.titleSuffix}`;
+    document.title = `${car.name}${t.titleSuffix}`;
     const meta = document.querySelector('meta[name="description"]');
-    if (meta) meta.setAttribute('content', t.metaDesc(car.name, car.year, car.ppd));
+    if (meta) meta.setAttribute('content', t.metaDesc(car.name, car.ppd));
 
     const CAT_LABEL = { economy:t.catEconomy, suv:t.catSuv, luxury:t.catLuxury, van:t.catVan };
     const FUEL_ICON = { Petrol:'⛽', Diesel:'🛢', Hybrid:'🌿', 'Petrol+LPG':'⛽', 'Petrol/LPG':'⛽' };
@@ -622,7 +621,7 @@
           <div class="gal-main" id="gal-main">
             ${car.imgs.map((src, i) => `
               <img class="gal-img${i===0?' on':''}" data-idx="${i}"
-                src="${src}" alt="${t.photoAlt(car.name, car.year, i+1)}"
+                src="${src}" alt="${t.photoAlt(car.name, i+1)}"
                 ${i===0?'':'loading="lazy"'} />
             `).join('')}
             <div class="gal-shade"></div>
@@ -645,7 +644,7 @@
 
         <div class="details">
           <span class="cat-badge cat-${car.cat}">${CAT_LABEL[car.cat] || car.cat}</span>
-          <h1 class="car-title">${car.name}<span class="car-title-year">${car.year}</span></h1>
+          <h1 class="car-title">${car.name}</h1>
           ${car.desc && lang === 'en' ? `<p class="car-desc car-desc-mobile">${car.desc}</p>` : ''}
 
           <div class="price-row">
@@ -658,7 +657,6 @@
             <div class="spec"><span class="spec-lbl">${t.specTx}</span><span class="spec-val">⚙️ ${car.tx}</span></div>
             <div class="spec"><span class="spec-lbl">${t.specFuel}</span><span class="spec-val">${FUEL_ICON[car.fuel]||'⛽'} ${car.fuel}</span></div>
             <div class="spec"><span class="spec-lbl">${t.specSeats}</span><span class="spec-val">👤 ${car.seats}</span></div>
-            <div class="spec"><span class="spec-lbl">${t.specYear}</span><span class="spec-val">📅 ${car.year}</span></div>
           </div>
 
           ${car.features && car.features.length ? `
@@ -671,7 +669,7 @@
 
           <div class="booking">
             <h2 class="booking-title">${t.bookTitle}</h2>
-            <div class="booking-sub">${car.name} ${car.year} · €${car.ppd} ${t.perDay}</div>
+            <div class="booking-sub">${car.name} · €${car.ppd} ${t.perDay}</div>
 
             <div class="form-grid">
               <div class="mg-full">

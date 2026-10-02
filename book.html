@@ -306,7 +306,6 @@
 
     .car-body { padding: 15px; }
     .car-name { font-size: 1.15rem; font-weight: 600; line-height: 1.2; margin-bottom: 11px; }
-    .car-year-inline { font-family: 'DM Sans',sans-serif; font-size: 12px; font-weight: 400; color: var(--muted); margin-left: 4px; }
     .car-specs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 13px; }
     .spec-chip {
       display: inline-flex; align-items: center; gap: 4px;
@@ -691,14 +690,14 @@ function render() {
     return `
     <a class="car-card fade-up" href="car.html?car=${encodeURIComponent(slug)}" style="transition-delay:${(i % 6) * 0.055}s">
       <div class="car-img-wrap">
-        <img class="car-img" src="${c.imgs[0]}" alt="${c.name} ${c.year}" loading="lazy"
+        <img class="car-img" src="${c.imgs[0]}" alt="${c.name}" loading="lazy"
           onerror="this.src='https://placehold.co/400x300/111120/3a3a58?text=${encodeURIComponent(c.name)}'" />
         <div class="car-img-shade"></div>
         <span class="cat-badge cat-${c.cat}">${CAT_LABEL[c.cat] || c.cat}</span>
         ${status === 'free' ? `<span class="avail-chip">${t.availChip}</span>` : ''}
       </div>
       <div class="car-body">
-        <div class="car-name">${c.name} <span class="car-year-inline">${c.year}</span></div>
+        <div class="car-name">${c.name}</div>
         <div class="car-specs">
           <span class="spec-chip">👤 ${c.seats} ${t.seats}</span>
           <span class="spec-chip">⚙️ ${c.tx}</span>

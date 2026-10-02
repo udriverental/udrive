@@ -106,10 +106,11 @@ function esc(s) {
 function stubHtml(car, slug) {
   const title = `${car.name} — UDrive Car Rental`;
   const ogTitle = `${car.name} — UDrive`;
-  const priceBit = car.ppd ? ` From ${car.ppd}€/day.` : '';
+  // Just the price under the title; no line at all when the car has none.
   const desc = car.desc
     ? car.desc.slice(0, 200)
-    : `Rent a ${car.name} from UDrive — pickup at Tirana (TIA) or Pristina (PRN).${priceBit}`;
+    : (car.ppd ? `From ${car.ppd}€/day.` : '');
+  const descTag = (attr, name) => desc ? `\n<meta ${attr}="${name}" content="${esc(desc)}">` : '';
   const og = car.imgs[0] ? ogImage(car.imgs[0]) : { url: `${SITE}/brand_assets/Modern%20UDrive%20car%20rental%20logo.png`, sized: false };
   const img = og.url;
   const imgMeta = og.sized ? `
@@ -124,20 +125,17 @@ function stubHtml(car, slug) {
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>${esc(title)}</title>
-<meta name="description" content="${esc(desc)}">
+<title>${esc(title)}</title>${descTag('name', 'description')}
 <link rel="canonical" href="${SITE}${target}">
 
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="UDrive Car Rental">
-<meta property="og:title" content="${esc(ogTitle)}">
-<meta property="og:description" content="${esc(desc)}">
+<meta property="og:title" content="${esc(ogTitle)}">${descTag('property', 'og:description')}
 <meta property="og:image" content="${esc(img)}">${imgMeta}
 <meta property="og:url" content="${SITE}/c/${esc(slug)}">
 
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="${esc(ogTitle)}">
-<meta name="twitter:description" content="${esc(desc)}">
+<meta name="twitter:title" content="${esc(ogTitle)}">${descTag('name', 'twitter:description')}
 <meta name="twitter:image" content="${esc(img)}">
 
 <meta http-equiv="refresh" content="0; url=${redirectTarget}">

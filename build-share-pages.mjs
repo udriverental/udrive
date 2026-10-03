@@ -60,7 +60,20 @@ function fv(v) {
 function slugify(s) {
   return String(s).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
 }
+// Name + variant only — the year stays out of shared URLs.
 function carSlug(c, all) {
+  const key = o => slugify(`${o.name} ${o.variant || ''}`);
+  const base = key(c);
+  const twins = all.filter(o => key(o) === base);
+  if (twins.length > 1 && c.id != null) {
+    const idTail = String(c.id).toLowerCase().replace(/[^a-z0-9]/g, '').slice(-4);
+    if (idTail) return `${base}-${idTail}`;
+  }
+  return base;
+}
+// The old name + year + variant slug (mirrors window.carLegacySlug). Links
+// already sent out use it, so each car keeps a stub at that path too.
+function carLegacySlug(c, all) {
   const base = slugify(`${c.name} ${c.year || ''} ${c.variant || ''}`);
   if (c.variant) return base;
   const sameKey = all.filter(o =>
@@ -158,6 +171,15 @@ for (const car of cars) {
   wanted.add(`${slug}.html`);
   await writeFile(join(OUT_DIR, `${slug}.html`), stubHtml(car, slug));
   written++;
+}
+// Old year-bearing paths: same preview, redirecting to the new slug. Written
+// after the current ones so they can never overwrite a car's real page.
+for (const car of cars) {
+  const slug = carSlug(car, cars);
+  const legacy = carLegacySlug(car, cars);
+  if (!slug || !legacy || wanted.has(`${legacy}.html`)) continue;
+  wanted.add(`${legacy}.html`);
+  await writeFile(join(OUT_DIR, `${legacy}.html`), stubHtml(car, slug));
 }
 
 // Clean up stubs for cars that no longer exist / got hidden

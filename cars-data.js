@@ -178,13 +178,29 @@ window.fillFromHardcoded = function(car) {
 // Slug helper — turns "VW Golf 8" into "vw-golf-8" so URLs are share-friendly.
 // Used by both pages: index.html builds the share link, car.html resolves ?car=.
 //
-// Disambiguation rules (in order of preference):
-//   1. If `variant` is set on the car (e.g. "blue", "amg"), include it in the slug.
-//   2. Otherwise, if another car in the fleet shares the same name+year, append
-//      a short hash of the doc id so each car still gets a unique URL.
-// Stable across reloads because doc ids don't change. Set a variant in admin
-// to get a clean human-readable suffix instead of the hash.
+// Built from name + variant only — the year is deliberately left out so shared
+// links don't reveal the car's age. If two cars in the fleet would get the same
+// slug, a short hash of the doc id is appended so each still has a unique URL.
+// Stable across reloads because doc ids don't change. Set a distinct variant in
+// admin to get a clean human-readable suffix instead of the hash.
 window.carSlug = function(c, allCars) {
+  if (!c) return '';
+  const slugify = s => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+  const key = o => slugify(`${o.name} ${o.variant || ''}`);
+  const base = key(c);
+
+  const list = Array.isArray(allCars) ? allCars : (window.CARS || []);
+  const twins = list.filter(o => o && key(o) === base);
+  if (twins.length > 1 && c.id != null) {
+    const idTail = String(c.id).toLowerCase().replace(/[^a-z0-9]/g, '').slice(-4);
+    if (idTail) return `${base}-${idTail}`;
+  }
+  return base;
+};
+
+// The pre-Oct-2026 slug (name + year + variant). Links already sent out still
+// carry it, so lookups fall back to it — never use it to build new links.
+window.carLegacySlug = function(c, allCars) {
   if (!c) return '';
   const slugify = s => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
   const base = slugify(`${c.name} ${c.year || ''} ${c.variant || ''}`);
@@ -210,17 +226,21 @@ window.findCarBySlugOrId = function(slugOrId) {
   const exact = list.find(c => window.carSlug(c) === target);
   if (exact) return exact;
 
-  // 2. Fallback for shareable links built before a car had its variant set:
+  // 2. Old links that still carry the year (see carLegacySlug).
+  const legacy = list.find(c => window.carLegacySlug(c) === target);
+  if (legacy) return legacy;
+
+  // 3. Fallback for shareable links built before a car had its variant set:
   //    strip a trailing variant word that follows a 4-digit year (e.g.
   //    "vw-passat-2013-blue" -> "vw-passat-2013") and try again. Keeps
   //    old WhatsApp links alive if Firebase data ever drops the variant.
   const stripVariant = s => s.replace(/-(\d{4})-[a-z]+$/, '-$1');
   const noVariant = stripVariant(target);
   if (noVariant !== target) {
-    const lenient = list.find(c => stripVariant(window.carSlug(c)) === noVariant);
+    const lenient = list.find(c => stripVariant(window.carLegacySlug(c)) === noVariant);
     if (lenient) return lenient;
   }
 
-  // 3. Last resort: lookup by id (Firestore string id or numeric).
+  // 4. Last resort: lookup by id (Firestore string id or numeric).
   return list.find(c => String(c.id) === String(slugOrId)) || null;
 };

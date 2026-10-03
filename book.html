@@ -623,7 +623,8 @@ function ridToCarId(rid) {
   rid = String(rid);
   let car = list.find(c => String(c.id) === rid);
   if (!car && typeof window.carSlug === 'function') {
-    car = list.find(c => window.carSlug(c, list) === rid.toLowerCase());
+    car = list.find(c => window.carSlug(c, list) === rid.toLowerCase())
+       || (window.carLegacySlug && list.find(c => window.carLegacySlug(c, list) === rid.toLowerCase()));
   }
   if (!car && /^\d+$/.test(rid)) {
     const hard = (window.__hardcodedCARS || []).find(h => String(h.id) === rid);

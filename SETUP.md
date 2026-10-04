@@ -78,23 +78,29 @@ This is the only login that will work for `admin.html`.
 
 ## Step 5 — Set security rules
 
-These rules make sure visitors can read your cars but only **you** (logged in) can change them.
+These rules make sure visitors can read your cars but only **your admin account** can change them.
+
+> ⚠️ `request.auth != null` is **not** enough: it lets *any* signed-in Firebase user write, and anyone can create a Firebase user with the public API key unless sign-up is turned off. Always name the admin.
 
 ### Firestore rules
 1. **Build → Firestore Database → Rules** tab
-2. Replace everything with:
+2. Replace everything with (put your admin email in place of `you@example.com`):
    ```
    rules_version = '2';
    service cloud.firestore {
      match /databases/{database}/documents {
        match /cars/{carId} {
          allow read: if true;
-         allow write: if request.auth != null;
+         allow write: if request.auth != null
+                      && request.auth.token.email == 'you@example.com';
        }
      }
    }
    ```
 3. Click **Publish**.
+
+### Turn off self sign-up
+**Build → Authentication → Settings → User actions** → untick **Enable create (sign-up)** → **Save**. Your admin user (Step 4) keeps working; nobody else can create an account.
 
 ### Storage rules — Skip
 Firebase Storage is not used. No storage rules needed.

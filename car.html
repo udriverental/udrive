@@ -461,6 +461,8 @@
       notFoundTitle:'Car not found',
       notFoundBody:"The link you opened doesn't match any car in our fleet. It may have been removed or the link is mistyped.",
       notFoundCta:'See all cars →',
+      notFoundWa:'Message us on WhatsApp →',
+      notFoundWaMsg:"Hi UDrive! The car link you sent me isn't working:",
       titleSuffix:' — UDrive Car Rental',
       metaDesc:(name,ppd)=>`Rent the ${name} from UDrive — €${ppd}/day, deposit returned in cash on key handover.`,
       photoAlt:(name,n)=>`${name} photo ${n}`,
@@ -506,6 +508,8 @@
       notFoundTitle:'Makina nuk u gjet',
       notFoundBody:'Linku që hapet nuk përputhet me asnjë makinë në flotën tonë. Mund të jetë hequr ose linku është gabim.',
       notFoundCta:'Shiko të gjitha makinat →',
+      notFoundWa:'Na shkruani në WhatsApp →',
+      notFoundWaMsg:'Përshëndetje UDrive! Linku i makinës që më dërguat nuk punon:',
       titleSuffix:' — UDrive Marrje me Qira',
       metaDesc:(name,ppd)=>`Merrni me qira ${name} nga UDrive — €${ppd}/ditë, depozita kthehet në cash sapo dorëzoni çelësat.`,
       photoAlt:(name,n)=>`${name} foto ${n}`,
@@ -550,6 +554,8 @@
       notFoundTitle:'لم يتم العثور على السيارة',
       notFoundBody:'الرابط الذي فتحته لا يطابق أي سيارة في أسطولنا. ربما تمت إزالتها أو أن الرابط غير صحيح.',
       notFoundCta:'← شاهد كل السيارات',
+      notFoundWa:'← راسلنا على واتساب',
+      notFoundWaMsg:'مرحباً UDrive! رابط السيارة الذي أرسلتموه لا يعمل:',
       titleSuffix:' — UDrive لتأجير السيارات',
       metaDesc:(name,ppd)=>`استأجر ${name} من UDrive — €${ppd}/يوم، الوديعة تُرجع نقداً عند تسليم المفاتيح.`,
       photoAlt:(name,n)=>`${name} صورة ${n}`,
@@ -639,7 +645,10 @@
       <div class="notfound">
         <h1>${t.notFoundTitle}</h1>
         <p>${t.notFoundBody}</p>
-        <a href="index.html">${t.notFoundCta}</a>
+        ${focus
+          // A shared link must never lead to the rest of the fleet — send them to us instead.
+          ? `<a href="https://wa.me/355693755827?text=${encodeURIComponent(t.notFoundWaMsg + ' ' + location.href)}" target="_blank" rel="noopener">${t.notFoundWa}</a>`
+          : `<a href="index.html">${t.notFoundCta}</a>`}
       </div>`;
   } else {
     document.title = `${car.name}${t.titleSuffix}`;

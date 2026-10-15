@@ -527,6 +527,8 @@ const T = {
     navWa:'WhatsApp Us', navBack:'← All cars',
     headEye:'Live Availability', headTitle:'Which cars are free <em>for your dates?</em>',
     headSub:"Pick your pickup and return time — we'll show you every car that's actually available. Reserve it on WhatsApp in one tap.",
+    pickTitle:'Your cars <em>for these dates</em>',
+    pickSub:'These are the cars we picked for you. Check your pickup and return time, then reserve on WhatsApp in one tap.',
     locLabel:'📍 Pickup Location', locSelect:'Select airport…',
     pdLabel:'📅 Pickup Date', ptLabel:'⏰ Pickup Time', rdLabel:'📅 Return Date', rtLabel:'⏰ Return Time',
     loading:'Checking availability…',
@@ -550,6 +552,8 @@ const T = {
     navWa:'Na Kontaktoni', navBack:'← Të gjitha makinat',
     headEye:'Disponueshmëria Live', headTitle:'Cilat makina janë të lira <em>për datat tuaja?</em>',
     headSub:'Zgjidhni datën e marrjes dhe të kthimit — ju tregojmë çdo makinë realisht të disponueshme. Rezervojeni në WhatsApp me një prekje.',
+    pickTitle:'Makinat tuaja <em>për këto data</em>',
+    pickSub:'Këto janë makinat që zgjodhëm për ju. Kontrolloni orën e marrjes dhe të kthimit, pastaj rezervoni në WhatsApp me një prekje.',
     locLabel:'📍 Vendi i Marrjes', locSelect:'Zgjidhni aeroportin…',
     pdLabel:'📅 Data e Marrjes', ptLabel:'⏰ Ora e Marrjes', rdLabel:'📅 Data e Kthimit', rtLabel:'⏰ Ora e Kthimit',
     loading:'Duke kontrolluar disponueshmërinë…',
@@ -573,6 +577,8 @@ const T = {
     navWa:'واتساب', navBack:'← كل السيارات',
     headEye:'التوفر المباشر', headTitle:'ما السيارات المتاحة <em>في تواريخك؟</em>',
     headSub:'اختر وقت الاستلام والإرجاع — نعرض لك كل سيارة متاحة فعلاً. احجزها عبر واتساب بلمسة واحدة.',
+    pickTitle:'سياراتك <em>لهذه التواريخ</em>',
+    pickSub:'هذه هي السيارات التي اخترناها لك. تحقق من وقت الاستلام والإرجاع، ثم احجز عبر واتساب بلمسة واحدة.',
     locLabel:'📍 مكان الاستلام', locSelect:'اختر المطار…',
     pdLabel:'📅 تاريخ الاستلام', ptLabel:'⏰ وقت الاستلام', rdLabel:'📅 تاريخ الإرجاع', rtLabel:'⏰ وقت الإرجاع',
     loading:'جارٍ التحقق من التوفر…',
@@ -645,6 +651,24 @@ function carStatus(carId) {
   return entries.some(fc => entryFree(fc.busy, p, r)) ? 'free' : 'busy';
 }
 
+// ─── PICKED MODE ───
+// ?cars=<rid>,<rid> (the fleet manager's Offer Maker booking link) lists only
+// those cars and, like car.html's focus mode, offers no way into the rest of
+// the fleet. rids are Firestore doc ids or slugs, resolved by ridToCarId.
+const PICKED_RIDS = (new URLSearchParams(location.search).get('cars') || '')
+  .split(',').map(x => x.trim()).filter(Boolean);
+const PICKED = PICKED_RIDS.length > 0;
+if (PICKED) {
+  document.body.classList.add('picked');
+  const st = document.createElement('style');
+  st.textContent = 'body.picked .nav-back{display:none}' +
+    'body.picked .nav-left>a[href="index.html"]{pointer-events:none;cursor:default}';
+  document.head.appendChild(st);
+  const title = document.querySelector('.page-title'), sub = document.querySelector('.page-sub');
+  title.dataset.i18n = 'pickTitle'; title.innerHTML = T.en.pickTitle;
+  sub.dataset.i18n = 'pickSub'; sub.innerHTML = T.en.pickSub;
+}
+
 // ─── RENDER ───
 function render() {
   const grid = document.getElementById('cars-grid');
@@ -658,7 +682,9 @@ function render() {
     countEl.style.display = 'none';
   }
 
-  let list = CARS.map(c => ({ c, status: carStatus(c.id) }))
+  const pickedIds = PICKED ? new Set(PICKED_RIDS.map(ridToCarId).filter(Boolean)) : null;
+  let list = CARS.filter(c => !pickedIds || pickedIds.has(String(c.id)))
+    .map(c => ({ c, status: carStatus(c.id) }))
     .filter(x => x.status !== 'busy');
   // Confirmed-available first, then unlinked; keep the site's own order inside each group.
   list.sort((a, b) => (a.status === 'free' ? 0 : 1) - (b.status === 'free' ? 0 : 1));
@@ -689,7 +715,7 @@ function render() {
     const slug = window.carSlug ? window.carSlug(c, CARS) : c.id;
     const total = days ? days * c.ppd : null;
     return `
-    <a class="car-card fade-up" href="car.html?car=${encodeURIComponent(slug)}" style="transition-delay:${(i % 6) * 0.055}s">
+    <a class="car-card fade-up" href="car.html?car=${encodeURIComponent(slug)}${PICKED ? '&focus=1' : ''}" style="transition-delay:${(i % 6) * 0.055}s">
       <div class="car-img-wrap">
         <img class="car-img" src="${c.imgs[0]}" alt="${c.name}" loading="lazy"
           onerror="this.src='https://placehold.co/400x300/111120/3a3a58?text=${encodeURIComponent(c.name)}'" />

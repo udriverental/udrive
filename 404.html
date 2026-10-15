@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex" />
+  <title>Link not working — UDrive</title>
+  <!-- GitHub Pages serves this for every missing path (often a /c/<slug> share
+       link for a car that was renamed or removed). Clients reach it from links
+       we sent them, so it deliberately has no way into the rest of the fleet:
+       the only way forward is WhatsApp. Paths are absolute because it can be
+       served from any depth. -->
+  <link rel="icon" type="image/png" href="/brand_assets/Modern%20UDrive%20car%20rental%20logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=DM+Sans:opsz,wght@9..40,400;9..40,600&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg:    #07070f;
+      --line:  rgba(255,255,255,0.07);
+      --or:    #F97316;
+      --txt:   #eeeef5;
+      --muted: #7878a0;
+      --wa:    #25D366;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg); color: var(--txt);
+      font-family: 'DM Sans', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh; display: flex; flex-direction: column;
+    }
+    html[dir="rtl"] body { font-family: 'Cairo', sans-serif; }
+    .nav { padding: 14px 20px; border-bottom: 1px solid var(--line); }
+    .nav-logo { height: 38px; object-fit: contain; display: block; }
+    .lost {
+      flex: 1;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      text-align: center; padding: 40px 20px;
+    }
+    .lost h1 { font-family: 'Cormorant Garamond', serif; font-size: 2.4rem; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 12px; }
+    html[dir="rtl"] .lost h1 { font-family: 'Cairo', sans-serif; font-size: 2rem; }
+    .lost p { color: var(--muted); line-height: 1.7; margin-bottom: 24px; max-width: 420px; }
+    .wa-btn {
+      display: inline-flex; align-items: center; gap: 8px; padding: 12px 22px;
+      background: var(--wa); color: #06210f; border-radius: 100px;
+      text-decoration: none; font-weight: 600; font-size: 14px;
+      box-shadow: 0 8px 22px rgba(37,211,102,0.28), 0 2px 6px rgba(37,211,102,0.18);
+      transition: transform .2s cubic-bezier(.34,1.56,.64,1), opacity .2s ease;
+    }
+    .wa-btn:hover { transform: translateY(-2px); }
+    .wa-btn:active { transform: translateY(0); opacity: .9; }
+    .wa-btn:focus-visible { outline: 2px solid var(--txt); outline-offset: 3px; }
+    @media (prefers-reduced-motion: reduce) { .wa-btn { transition: none; } }
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <picture>
+      <source srcset="/brand_assets/udrive-logo-dark.png" media="(prefers-color-scheme: dark)" />
+      <img src="/brand_assets/udrive-logo-light.png" alt="UDrive" class="nav-logo" />
+    </picture>
+  </nav>
+
+  <main class="lost">
+    <h1 id="t-title">This link isn't working</h1>
+    <p id="t-body">The car may have been renamed or taken off the site. Send us the link on WhatsApp and we'll get you the right one.</p>
+    <a class="wa-btn" id="t-wa" target="_blank" rel="noopener" href="https://wa.me/355693755827">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
+      <span id="t-cta">Message us on WhatsApp</span>
+    </a>
+  </main>
+
+  <script>
+    (function () {
+      var T = {
+        en: { title: "This link isn't working", body: "The car may have been renamed or taken off the site. Send us the link on WhatsApp and we'll get you the right one.", cta: 'Message us on WhatsApp', msg: "Hi UDrive! The link you sent me isn't working:" },
+        sq: { title: 'Ky link nuk punon', body: 'Makina mund të jetë riemërtuar ose hequr nga faqja. Na e dërgoni linkun në WhatsApp dhe ju dërgojmë atë të saktin.', cta: 'Na shkruani në WhatsApp', msg: 'Përshëndetje UDrive! Linku që më dërguat nuk punon:' },
+        ar: { title: 'هذا الرابط لا يعمل', body: 'ربما تم تغيير اسم السيارة أو إزالتها من الموقع. أرسل لنا الرابط على واتساب وسنرسل لك الرابط الصحيح.', cta: 'راسلنا على واتساب', msg: 'مرحباً UDrive! الرابط الذي أرسلتموه لا يعمل:' }
+      };
+      var lang = 'en';
+      try { lang = localStorage.getItem('udriveLang') || ''; } catch (e) {}
+      if (!T[lang]) lang = (navigator.language || 'en').slice(0, 2);
+      if (!T[lang]) lang = 'en';
+      var t = T[lang];
+      document.documentElement.lang = lang;
+      document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+      document.title = t.title + ' — UDrive';
+      document.getElementById('t-title').textContent = t.title;
+      document.getElementById('t-body').textContent = t.body;
+      document.getElementById('t-cta').textContent = t.cta;
+      document.getElementById('t-wa').href = 'https://wa.me/355693755827?text=' + encodeURIComponent(t.msg + ' ' + location.href);
+    })();
+  </script>
+</body>
+</html>

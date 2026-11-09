@@ -639,6 +639,8 @@ if (!isFirebaseConfigured()) {
 
   const EYE_ON = '<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>';
   const EYE_OFF = '<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/><path d="m3 3 18 18"/>';
+  /* The list only needs a tiny picture, not the full-size photo. */
+  const thumbUrl = u => toDeliveryUrl(u).replace('/upload/f_auto,q_auto/', '/upload/f_auto,q_auto,c_fill,w_168,h_126/');
   const CAT_LABEL = { economy:'Economy', suv:'SUV', luxury:'Luxury', van:'Van & MPV' };
 
   function renderList(){
@@ -660,7 +662,7 @@ if (!isFirebaseConfigured()) {
     body.innerHTML = list.map(c => `
       <div class="row${c.hidden ? ' is-hidden' : ''}" data-id="${c.id}">
         <div class="c-thumb">
-          <img class="thumb" src="${(c.imgs && c.imgs[0] && toDeliveryUrl(c.imgs[0])) || 'https://placehold.co/120x90/111120/3a3a58?text=No+Photo'}" alt="" />
+          <img class="thumb" loading="lazy" decoding="async" src="${(c.imgs && c.imgs[0] && thumbUrl(c.imgs[0])) || 'https://placehold.co/120x90/111120/3a3a58?text=No+Photo'}" alt="" />
         </div>
         <div class="c-name">
           <div class="name">${escapeHtml(c.name||'(unnamed)')}${c.hidden ? '<span class="hidden-pill">Hidden</span>' : ''}</div>

@@ -139,6 +139,8 @@
     }
     .chip:hover{color:var(--txt);border-color:var(--line-2)}
     .chip.on{background:var(--or);border-color:var(--or);color:#fff}
+    #car-search{width:100%;margin-bottom:12px}
+    .price-cell.no-price{color:#f87171;font-weight:700}
     .chip:focus-visible{outline:2px solid var(--or);outline-offset:2px}
 
     /* ── list table ── */
@@ -148,7 +150,7 @@
     }
     .list-head, .row{
       display:grid;
-      grid-template-columns:64px 1.7fr 0.9fr 0.7fr 0.7fr 1fr;
+      grid-template-columns:64px 1.9fr 0.9fr 0.7fr 92px;
       gap:12px;align-items:center;padding:12px 18px;
     }
     .list-head{
@@ -202,7 +204,7 @@
     .modal h2{font-size:28px;margin-bottom:6px}
     .modal .lead{color:var(--muted);font-size:14px;margin-bottom:22px}
     .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-    @media(max-width:560px){.grid-2{grid-template-columns:1fr}}
+    .grid-2 .span-2{grid-column:1/-1}
 
     /* ── upload zone ── */
     .drop{
@@ -282,9 +284,53 @@
       .row .c-name{flex:1 1 auto;order:2;min-width:0}
       .row .c-cat{order:3;flex-basis:100%;margin-top:2px}
       .row .c-price{order:4;font-weight:700}
-      .row .c-dep{order:5;font-weight:500;color:var(--muted);font-size:13px}
       .row-actions{order:6;flex-basis:100%;justify-content:flex-start;margin-top:6px}
       .m-lbl{display:inline;color:var(--muted);font-weight:400;font-size:12.5px}
+    }
+
+    /* ── compact rows: icon buttons, one row per car ── */
+    .icon-btn{
+      width:38px;height:38px;display:grid;place-items:center;padding:0;
+      border-radius:9px;border:1px solid var(--line-2);background:var(--raised);color:var(--txt);cursor:pointer;
+      transition:transform .12s, background .18s, border-color .18s;
+    }
+    .icon-btn svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+    .icon-btn:hover{border-color:var(--or)}
+    .icon-btn:active{transform:scale(.92)}
+    .icon-btn:focus-visible{outline:2px solid var(--or);outline-offset:2px}
+    .m-only{display:none}
+    b.no-price{color:#f87171}
+    #list-body .row-actions{gap:6px}
+    @media(max-width:780px){
+      #list-body .row{display:grid;grid-template-columns:48px minmax(0,1fr) auto;gap:0 10px;padding:9px 12px;align-items:center}
+      #list-body .row .c-thumb{grid-area:1/1;display:block}
+      #list-body .row .c-name{grid-area:1/2;display:block}
+      #list-body .row .row-actions{grid-area:1/3;margin:0;width:auto;padding:0;border:0}
+      #list-body .row .c-cat, #list-body .row .c-price{display:none}
+      #list-body .thumb{width:48px;height:38px}
+      #list-body .m-only{display:inline}
+      #list-body .year b{font-weight:600;color:var(--txt)}
+      #list-body .year b.no-price{color:#f87171}
+    }
+    @media(max-width:560px){
+      .topbar{padding:10px 14px}
+      .brand{gap:9px}
+      .brand-name{font-size:18px;white-space:nowrap;line-height:1.1}
+      .brand-tag{font-size:9.5px}
+      .top-actions{gap:6px}
+      .top-actions .btn{padding:8px 10px;font-size:12.5px;white-space:nowrap}
+      .page-head{display:grid;grid-template-columns:1fr auto;align-items:center;gap:2px 10px;margin-bottom:14px}
+      .page-head > div:first-child{display:contents}
+      .page-head h1{grid-column:1;grid-row:1;font-size:28px}
+      .page-head > div:last-child{grid-column:2;grid-row:1}
+      .page-head > div:last-child .btn{padding:9px 12px;white-space:nowrap}
+      .page-head .sub{grid-column:1/-1;grid-row:2;font-size:13px}
+      .modal-bg{padding:12px 8px}
+      .modal{padding:18px 14px 16px}
+      .modal .lead{margin-bottom:12px}
+      .grid-2{gap:0 10px}
+      .field{margin-bottom:10px}
+      .drop{padding:14px}
     }
   </style>
 </head>
@@ -323,7 +369,7 @@
       <div class="brand-mark">U</div>
       <div>
         <div class="brand-name">UDrive Admin</div>
-        <div class="brand-tag">Fleet manager</div>
+        <div class="brand-tag">Website cars</div>
       </div>
     </div>
     <div class="top-actions">
@@ -339,17 +385,18 @@
         <div class="sub" id="fleet-count">Loading…</div>
       </div>
       <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-        <button class="btn btn-ghost" id="set-all-dep-btn" title="Sets the deposit on every car in your fleet to €300">Set all deposits to €300</button>
         <button class="btn btn-primary" id="add-btn">+ Add new car</button>
       </div>
     </div>
 
+    <input class="input" id="car-search" type="search" placeholder="Search by name, year or colour…" aria-label="Search cars" autocomplete="off" />
     <div class="filters" id="filters">
       <button class="chip on" data-cat="all">All</button>
       <button class="chip" data-cat="economy">Economy</button>
       <button class="chip" data-cat="suv">SUV</button>
       <button class="chip" data-cat="luxury">Luxury</button>
       <button class="chip" data-cat="van">Van &amp; MPV</button>
+      <button class="chip" data-cat="hidden">Hidden</button>
     </div>
 
     <div class="list" id="list">
@@ -358,7 +405,6 @@
         <div>Car</div>
         <div>Category</div>
         <div>Price/day</div>
-        <div>Deposit</div>
         <div></div>
       </div>
       <div id="list-body">
@@ -393,11 +439,12 @@
 <div class="modal-bg" id="edit-bg">
   <div class="modal">
     <h2 id="edit-title">Add new car</h2>
-    <p class="lead">All prices are in EUR. Photos are uploaded to Cloudinary.</p>
+    <p class="lead">All prices are in EUR.</p>
     <form id="edit-form">
       <div class="grid-2">
-        <div class="field"><label>Name</label><input class="input" name="name" required placeholder="e.g. Mercedes C-Class" /></div>
+        <div class="field span-2"><label>Name</label><input class="input" name="name" required placeholder="e.g. Mercedes C-Class" /></div>
         <div class="field"><label>Year</label><input class="input" name="year" type="number" min="1990" max="2099" required /></div>
+        <div class="field"><label>Seats</label><input class="input" name="seats" type="number" min="2" max="15" placeholder="5" /></div>
         <div class="field">
           <label>Category</label>
           <select class="select" name="cat" required>
@@ -419,12 +466,10 @@
             <option>Diesel</option><option>Petrol</option><option>Petrol/LPG</option><option>Hybrid</option><option>Electric</option>
           </select>
         </div>
-        <div class="field"><label>Seats</label><input class="input" name="seats" type="number" min="2" max="15" placeholder="5" /></div>
-        <div class="field"><label>Price per day (€)</label><input class="input" name="ppd" type="number" min="0" required /></div>
-        <div class="field"><label>Deposit (€)</label><input class="input" name="dep" type="number" min="0" value="300" required /></div>
+        <div class="field"><label>Price per day (€)</label><input class="input" name="ppd" type="number" min="1" required /></div>
       </div>
       <div class="field">
-        <label>Variant <span style="color:var(--dim);font-weight:400">(optional — only when you have two cars with the same name + year)</span></label>
+        <label>Variant <span style="color:var(--dim);font-weight:400">(colour, if two cars match)</span></label>
         <input class="input" name="variant" placeholder="e.g. blue, grey, amg, white" />
       </div>
 
@@ -435,7 +480,7 @@
 
       <div class="field">
         <label>Description <span style="color:var(--dim);font-weight:400">(shown on the car's own shareable page)</span></label>
-        <textarea class="input" name="desc" rows="3" placeholder="1–2 sentences about the car — what it's good for, who it suits."></textarea>
+        <textarea class="input" name="desc" rows="2" placeholder="1–2 sentences about the car — what it's good for, who it suits."></textarea>
       </div>
 
       <div class="field">
@@ -452,6 +497,7 @@
       <div class="ok" id="edit-ok"></div>
 
       <div class="modal-foot">
+        <button type="button" class="btn btn-danger" id="edit-delete" style="margin-right:auto">Delete</button>
         <button type="button" class="btn btn-ghost" id="edit-cancel">Cancel</button>
         <button type="submit" class="btn btn-primary" id="edit-save">Save car</button>
       </div>
@@ -561,6 +607,7 @@ if (!isFirebaseConfigured()) {
   // ─── cars list ───
   let cars = [];
   let activeCat = 'all';
+  let searchText = '';
 
   async function loadCars(){
     try {
@@ -590,15 +637,24 @@ if (!isFirebaseConfigured()) {
     }
   }
 
+  const EYE_ON = '<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>';
+  const EYE_OFF = '<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/><path d="m3 3 18 18"/>';
   const CAT_LABEL = { economy:'Economy', suv:'SUV', luxury:'Luxury', van:'Van & MPV' };
 
   function renderList(){
     const body = $('#list-body');
-    const list = activeCat === 'all' ? cars : cars.filter(c => c.cat === activeCat);
+    const inTab = c => activeCat === 'all' || (activeCat === 'hidden' ? c.hidden : c.cat === activeCat);
+    const words = searchText.toLowerCase().split(/\s+/).filter(Boolean);
+    const matches = c => { const h = [c.name, c.year, c.variant].join(' ').toLowerCase(); return words.every(w => h.includes(w)); };
+    const list = cars.filter(c => inTab(c) && matches(c));
+    const hiddenN = cars.filter(c => c.hidden).length;
+    const noPrice = cars.filter(c => !Number(c.ppd)).length;
     $('#fleet-count').textContent =
-      `${cars.length} car${cars.length===1?'':'s'} total · showing ${list.length}`;
+      `${cars.length} cars · ${cars.length - hiddenN} on the website · ${hiddenN} hidden${noPrice ? ` · ${noPrice} with no price` : ''}${list.length !== cars.length ? ` · showing ${list.length}` : ''}`;
     if (!list.length){
-      body.innerHTML = `<div class="empty">No cars in this category yet. Click <b>Add new car</b> to start.</div>`;
+      body.innerHTML = words.length || activeCat === 'hidden'
+        ? `<div class="empty">No cars match.</div>`
+        : `<div class="empty">No cars in this category yet. Click <b>Add new car</b> to start.</div>`;
       return;
     }
     body.innerHTML = list.map(c => `
@@ -608,15 +664,13 @@ if (!isFirebaseConfigured()) {
         </div>
         <div class="c-name">
           <div class="name">${escapeHtml(c.name||'(unnamed)')}${c.hidden ? '<span class="hidden-pill">Hidden</span>' : ''}</div>
-          <div class="year">${c.year||''}</div>
+          <div class="year">${[c.year, c.variant].filter(Boolean).map(escapeHtml).join(' · ')}<span class="m-only"> · ${CAT_LABEL[c.cat]||escapeHtml(c.cat)} · <b class="${Number(c.ppd) ? '' : 'no-price'}">${Number(c.ppd) ? '€' + c.ppd : 'No price'}</b></span></div>
         </div>
         <div class="c-cat"><span class="cat-pill ${c.cat}">${CAT_LABEL[c.cat]||c.cat}</span></div>
-        <div class="c-price price-cell">€${c.ppd||0}<span class="m-lbl"> /day</span></div>
-        <div class="c-dep price-cell"><span class="m-lbl">deposit </span>€${c.dep||0}</div>
+        <div class="c-price price-cell${Number(c.ppd) ? '' : ' no-price'}">${Number(c.ppd) ? `€${c.ppd}<span class="m-lbl"> /day</span>` : 'No price'}</div>
         <div class="row-actions">
-          <button class="btn" data-act="toggle-hide">${c.hidden ? 'Show' : 'Hide'}</button>
-          <button class="btn" data-act="edit">Edit</button>
-          <button class="btn btn-danger" data-act="del">Delete</button>
+          <button class="icon-btn" data-act="toggle-hide" title="${c.hidden ? 'Show on website' : 'Hide from website'}" aria-label="${c.hidden ? 'Show on website' : 'Hide from website'}"><svg viewBox="0 0 24 24">${c.hidden ? EYE_OFF : EYE_ON}</svg></button>
+          <button class="icon-btn" data-act="edit" title="Edit" aria-label="Edit"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
         </div>
       </div>
     `).join('');
@@ -648,18 +702,6 @@ if (!isFirebaseConfigured()) {
         btn.textContent = prevLabel;
         alert('Update failed: ' + err.message);
       }
-    } else if (btn.dataset.act === 'del'){
-      if (!confirm(`Delete "${car.name}" permanently? This also removes its uploaded photos.`)) return;
-      btn.disabled = true;
-      try {
-        // Photos on Cloudinary are not deleted here (use Cloudinary dashboard to clean up)
-        await deleteDoc(doc(db,'cars',id));
-        cars = cars.filter(c=>c.id!==id);
-        renderList();
-      } catch (err) {
-        alert('Delete failed: ' + err.message);
-        btn.disabled = false;
-      }
     }
   });
 
@@ -672,6 +714,8 @@ if (!isFirebaseConfigured()) {
     activeCat = c.dataset.cat;
     renderList();
   });
+
+  $('#car-search').addEventListener('input', e => { searchText = e.target.value; renderList(); });
 
   // ─── edit modal ───
   let editing = null;          // null = new, otherwise current car obj
@@ -689,8 +733,7 @@ if (!isFirebaseConfigured()) {
       f.tx.value = car.tx || 'Automatic';
       f.fuel.value = car.fuel || 'Diesel';
       f.seats.value = car.seats || 5;
-      f.ppd.value = car.ppd || 0;
-      f.dep.value = car.dep || 0;
+      f.ppd.value = Number(car.ppd) || '';
       f.variant.value = car.variant || '';
       f.desc.value = car.desc || '';
       f.features.value = (car.features||[]).join(', ');
@@ -699,10 +742,24 @@ if (!isFirebaseConfigured()) {
       editPhotos = [];
     }
     renderPhotos();
+    $('#edit-delete').style.display = car ? '' : 'none';
     $('#edit-err').classList.remove('show');
     $('#edit-ok').classList.remove('show');
     $('#edit-bg').classList.add('open');
     document.body.style.overflow = 'hidden';
+    formAtOpen = formState();
+  }
+  /* The safety net: once anything has changed, closing asks first. */
+  let formAtOpen = '';
+  function formState(){
+    const fields = [...$('#edit-form').elements].filter(el => el.name && el.type !== 'file')
+      .map(el => el.type === 'checkbox' ? el.checked : el.value);
+    return JSON.stringify([fields, editPhotos.map(p => p.url)]);
+  }
+  function requestCloseEdit(){
+    if (!$('#edit-bg').classList.contains('open')) return;
+    if (formState() !== formAtOpen && !confirm('Close without saving? What you changed will be lost.')) return;
+    closeEdit();
   }
   function closeEdit(){
     $('#edit-bg').classList.remove('open');
@@ -712,28 +769,26 @@ if (!isFirebaseConfigured()) {
   }
   $('#add-btn').addEventListener('click', () => openEdit(null));
 
-  $('#set-all-dep-btn').addEventListener('click', async () => {
-    if (!cars.length) { alert('No cars loaded yet.'); return; }
-    if (!confirm(`Set the deposit to €300 on all ${cars.length} cars? This overwrites the current deposit on every car.`)) return;
-    const btn = $('#set-all-dep-btn');
-    const original = btn.textContent;
-    btn.disabled = true; btn.textContent = 'Updating…';
+  $('#edit-delete').addEventListener('click', async () => {
+    const car = editing;
+    if (!car || !confirm(`Delete "${car.name}" from the website permanently? This can't be undone.`)) return;
+    const btn = $('#edit-delete');
+    btn.disabled = true;
     try {
-      const batch = writeBatch(db);
-      cars.forEach(c => batch.update(doc(db, 'cars', c.id), { dep: 300, updatedAt: serverTimestamp() }));
-      await batch.commit();
-      cars.forEach(c => c.dep = 300);
+      // Photos on Cloudinary are not deleted here (use Cloudinary dashboard to clean up)
+      await deleteDoc(doc(db,'cars',car.id));
+      cars = cars.filter(c=>c.id!==car.id);
       renderList();
-      btn.textContent = 'Done ✓';
-      setTimeout(() => { btn.textContent = original; btn.disabled = false; }, 1800);
+      closeEdit();
     } catch (err) {
-      btn.textContent = original; btn.disabled = false;
-      alert('Update failed: ' + err.message);
+      alert('Delete failed: ' + err.message);
+    } finally {
+      btn.disabled = false;
     }
   });
-  $('#edit-cancel').addEventListener('click', closeEdit);
-  $('#edit-bg').addEventListener('click', e => { if (e.target.id==='edit-bg') closeEdit(); });
-  document.addEventListener('keydown', e => { if (e.key==='Escape') closeEdit(); });
+  $('#edit-cancel').addEventListener('click', requestCloseEdit);
+  $('#edit-bg').addEventListener('click', e => { if (e.target.id==='edit-bg') requestCloseEdit(); });
+  document.addEventListener('keydown', e => { if (e.key==='Escape') requestCloseEdit(); });
 
   let dragSrcIdx = null;
 
@@ -869,7 +924,7 @@ if (!isFirebaseConfigured()) {
       fuel: f.fuel.value,
       seats: Number(f.seats.value) || 5,
       ppd:  Number(f.ppd.value),
-      dep:  Number(f.dep.value),
+      dep:  300,
       desc: (f.desc?.value || '').trim(),
       features: f.features.value.split(',').map(s=>s.trim()).filter(Boolean),
       imgs: editPhotos.filter(p=>p.url && !p.uploading).map(p=>p.url),

@@ -96,7 +96,21 @@
       white-space: nowrap; transition: color .18s;
     }
     .nav-back:hover { color: var(--txt); }
-    .nav-right { display: flex; align-items: center; gap: 10px; }
+    .nav-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+    /* Phones: the header has room for the arrow only, so the back link's
+       words go and the logo shrinks a little. Nothing overlaps. */
+    @media(max-width:539px){
+      .nav { padding: 12px 14px; }
+      .nav-logo { height: 36px; }
+      .nav-left { gap: 10px; flex-shrink: 0; }
+      .nav-back { padding: 8px 4px 8px 10px; font-size: 16px; }
+      .nav-back-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+      .nav-right { gap: 6px; }
+      .nav-wa { padding: 9px 12px; }
+      html[lang="ar"] .nav-back { padding: 8px 10px 8px 4px; }
+      .lang-btn { padding: 5px 7px; }
+    }
+    html[lang="ar"] .nav-back-arrow { display: inline-block; transform: scaleX(-1); }
     .nav-wa {
       display: inline-flex; align-items: center; gap: 7px;
       padding: 9px 16px;
@@ -406,7 +420,7 @@
         <img src="brand_assets/udrive-lockup.png" alt="UDrive Car Rental" class="nav-logo" />
       </picture>
     </a>
-    <a class="nav-back" href="index.html" data-i18n="navBack">← All cars</a>
+    <a class="nav-back" href="index.html"><span class="nav-back-arrow" aria-hidden="true">←</span><span class="nav-back-label" data-i18n="navBack">All cars</span></a>
   </div>
   <div class="nav-right">
     <div class="lang-sw">
@@ -526,7 +540,7 @@ let FEED_FAILED = false;
 let lang = 'en';
 const T = {
   en: {
-    navWa:'WhatsApp Us', navBack:'← All cars',
+    navWa:'WhatsApp Us', navBack:'All cars',
     headEye:'Live Availability', headTitle:'Which cars are free <em>for your dates?</em>',
     headSub:"Pick your pickup and return time — we'll show you every car that's actually available. Reserve it on WhatsApp in one tap.",
     pickTitle:'Your cars <em>for these dates</em>',
@@ -551,7 +565,7 @@ const T = {
     depNote:(d)=>`💵 ${d}€ cash deposit — returned instantly on key handover`,
   },
   sq: {
-    navWa:'Na Kontaktoni', navBack:'← Të gjitha makinat',
+    navWa:'Na Kontaktoni', navBack:'Të gjitha makinat',
     headEye:'Disponueshmëria Live', headTitle:'Cilat makina janë të lira <em>për datat tuaja?</em>',
     headSub:'Zgjidhni datën e marrjes dhe të kthimit — ju tregojmë çdo makinë realisht të disponueshme. Rezervojeni në WhatsApp me një prekje.',
     pickTitle:'Makinat tuaja <em>për këto data</em>',
@@ -576,7 +590,7 @@ const T = {
     depNote:(d)=>`💵 Depozitë cash ${d}€ — kthehet menjëherë me dorëzimin e çelësave`,
   },
   ar: {
-    navWa:'واتساب', navBack:'← كل السيارات',
+    navWa:'واتساب', navBack:'كل السيارات',
     headEye:'التوفر المباشر', headTitle:'ما السيارات المتاحة <em>في تواريخك؟</em>',
     headSub:'اختر وقت الاستلام والإرجاع — نعرض لك كل سيارة متاحة فعلاً. احجزها عبر واتساب بلمسة واحدة.',
     pickTitle:'سياراتك <em>لهذه التواريخ</em>',
@@ -992,7 +1006,7 @@ window.__udriveFleetReady = __firstRender;
     if (!url || typeof url !== 'string' || !url.includes('/upload/')) return url;
     let out = url.replace(/\.(heic|heif)(\?.*)?$/i, '.jpg$2');
     if (!/\/upload\/(f_auto|.*[,/]f_auto)/.test(out)) {
-      out = out.replace('/upload/', '/upload/f_auto,q_auto/');
+      out = out.replace('/upload/', '/upload/f_auto,q_auto,w_800,c_limit/');
     }
     return out;
   }

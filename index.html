@@ -871,7 +871,17 @@ function renderCars(cat) {
     grid.querySelectorAll('.fade-up').forEach(el => el.classList.add('vis'));
     initCarousel();
     initAutoCycle();
-    CARS.forEach(c => { if (c.imgs.length > 1) { const p = new Image(); p.src = c.imgs[1]; } });
+    // Fetch a card's second photo only as the card nears the screen, instead
+    // of pulling the second photo of every car in the fleet up front.
+    const warm = id => { const c = CARS.find(x => String(x.id) === String(id)); if (c && c.imgs.length > 1) { const p = new Image(); p.src = c.imgs[1]; } };
+    if ('IntersectionObserver' in window) {
+      const io = new IntersectionObserver((entries, obs) => {
+        entries.forEach(e => { if (e.isIntersecting) { warm(e.target.dataset.carid); obs.unobserve(e.target); } });
+      }, { rootMargin: '300px 0px' });
+      grid.querySelectorAll('.car-card[data-carid]').forEach(el => io.observe(el));
+    } else {
+      CARS.slice(0, 6).forEach(c => warm(c.id));
+    }
   }, 40);
 }
 
@@ -1162,7 +1172,7 @@ function setLang(code) {
     if (!url || typeof url !== 'string' || !url.includes('/upload/')) return url;
     let out = url.replace(/\.(heic|heif)(\?.*)?$/i, '.jpg$2');
     if (!/\/upload\/(f_auto|.*[,/]f_auto)/.test(out)) {
-      out = out.replace('/upload/', '/upload/f_auto,q_auto/');
+      out = out.replace('/upload/', '/upload/f_auto,q_auto,w_800,c_limit/');
     }
     return out;
   }

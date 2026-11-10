@@ -241,6 +241,19 @@ window.findCarBySlugOrId = function(slugOrId) {
     if (lenient) return lenient;
   }
 
-  // 4. Last resort: lookup by id (Firestore string id or numeric).
-  return list.find(c => String(c.id) === String(slugOrId)) || null;
+  // 4. Lookup by id (Firestore string id or numeric).
+  const byId = list.find(c => String(c.id) === String(slugOrId));
+  if (byId) return byId;
+
+  // 5. A link made while two cars shared a name carries the end of the car's
+  //    id ("vw-golf-black-x1y2"). If its twin has since left the site the car's
+  //    address is plain "vw-golf-black" again: match on the id ending.
+  const m = target.match(/^(.*)-([a-z0-9]{4})$/);
+  if (m) {
+    const tailOf = c => String(c.id).toLowerCase().replace(/[^a-z0-9]/g, '').slice(-4);
+    const twin = list.find(c => tailOf(c) === m[2] && window.carSlug(c).replace(/-[a-z0-9]{4}$/, '') === m[1].replace(/-[a-z0-9]{4}$/, ''))
+              || list.find(c => tailOf(c) === m[2] && window.carSlug(c) === m[1]);
+    if (twin) return twin;
+  }
+  return null;
 };

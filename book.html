@@ -30,6 +30,7 @@
   <link rel="icon" type="image/png" href="brand_assets/udrive-icon.png" />
   <link rel="apple-touch-icon" href="brand_assets/udrive-icon.png" />
   <script src="cars-data.js"></script>
+<script src="app-cars.js?v=1"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet" />
@@ -1011,7 +1012,12 @@ window.__udriveFleetReady = __firstRender;
     return out;
   }
 
-  if (isFirebaseConfigured()) {
+  // One car list: the cars come from the fleet-manager app (app-cars.js).
+  // Until the app publishes listings, fall back to the old website database.
+  const appCars = typeof window.loadAppCars === 'function' ? await window.loadAppCars(toDeliveryUrl) : null;
+  if (appCars && typeof window.__udriveApplyCars === 'function') {
+    window.__udriveApplyCars(appCars);
+  } else if (isFirebaseConfigured()) {
     try {
       const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js');
       const { getFirestore, collection, getDocs, query, orderBy } =

@@ -16,8 +16,30 @@ const OUT_DIR = join(ROOT, 'c');
 const SITE = 'https://rihladrive.com';
 const PROJECT_ID = 'udrive-3ced9';
 
+// ── One car list: the cars come from the fleet-manager app's public feed
+//    (see app-cars.js). Returns null until the app publishes listings, and
+//    the Firestore reader below is used instead. ──────────────────────────
+const APP_FEED = 'https://fleet-manager2-0.vercel.app/api/public-availability?account=udrive';
+async function fetchAppCars() {
+  try {
+    const res = await fetch(`${APP_FEED}&cb=${Date.now()}`);
+    if (!res.ok) return null;
+    const feed = await res.json();
+    const rows = (feed.cars || []).filter(r => r && r.car && r.car.name && Array.isArray(r.car.imgs) && r.car.imgs.length);
+    if (!rows.length) return null;
+    return rows.map((r, i) => ({
+      id: String(r.car.id || r.rid), name: r.car.name, year: r.car.year || '', variant: r.car.variant || '',
+      ppd: Number(r.car.ppd) || 0, hidden: false,
+      order: typeof r.car.order === 'number' ? r.car.order : 1e9 + i,
+      imgs: r.car.imgs, desc: r.car.desc || '',
+    })).sort((a, b) => a.order - b.order);
+  } catch { return null; }
+}
+
 // ── Fetch all cars from Firestore REST API ──────────────────────
 async function fetchCars() {
+  const fromApp = await fetchAppCars();
+  if (fromApp) { console.log(`Using the app's car list (${fromApp.length} cars).`); return fromApp; }
   const url = `https://firestore.googleapis.com/v1/projects/${PROJECT_ID}/databases/(default)/documents/cars?pageSize=300`;
   const res = await fetch(url);
   if (!res.ok) throw new Error(`Firestore fetch failed: ${res.status} ${res.statusText}`);
@@ -180,6 +202,17 @@ for (const car of cars) {
   if (!slug || !legacy || wanted.has(`${legacy}.html`)) continue;
   wanted.add(`${legacy}.html`);
   await writeFile(join(OUT_DIR, `${legacy}.html`), stubHtml(car, slug));
+}
+
+// A car that once shared its name with another was shared as "<slug>-<end of
+// its id>". Keep that path alive after the twin leaves the site.
+for (const car of cars) {
+  const slug = carSlug(car, cars);
+  const tail = String(car.id).toLowerCase().replace(/[^a-z0-9]/g, '').slice(-4);
+  const alias = `${slugify(`${car.name} ${car.variant || ''}`)}-${tail}`;
+  if (!slug || !tail || alias === slug || wanted.has(`${alias}.html`)) continue;
+  wanted.add(`${alias}.html`);
+  await writeFile(join(OUT_DIR, `${alias}.html`), stubHtml(car, slug));
 }
 
 // Clean up stubs for cars that no longer exist / got hidden

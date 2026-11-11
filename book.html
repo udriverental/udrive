@@ -700,7 +700,8 @@ function render() {
   }
 
   const pickedIds = PICKED ? new Set(PICKED_RIDS.map(ridToCarId).filter(Boolean)) : null;
-  let list = CARS.filter(c => !pickedIds || pickedIds.has(String(c.id)))
+  // Link-only cars appear only when a booking link names them (?cars=).
+  let list = CARS.filter(c => pickedIds ? pickedIds.has(String(c.id)) : !c.linkOnly)
     .map(c => ({ c, status: carStatus(c.id) }))
     .filter(x => x.status !== 'busy');
   // Confirmed-available first, then unlinked; keep the site's own order inside each group.
@@ -983,7 +984,7 @@ function __firstRender() {
      the whole feature — demand we turned away. Never beacon on date `change`,
      that would be a firehose. */
   const freeNow = FEED && !FEED_FAILED && rangeValid()
-    ? CARS.filter(c => carStatus(c.id) === 'free').length : 0;
+    ? CARS.filter(c => (PICKED || !c.linkOnly) && carStatus(c.id) === 'free').length : 0;
   beacon({ kind: 'open', from: val('b-pd'), nights: clampNights(rentalDays()), free: freeNow });
 }
 setTimeout(__firstRender, 2000);

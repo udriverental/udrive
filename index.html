@@ -826,7 +826,9 @@ let activeCat = 'all';
 function renderCars(cat) {
   activeCat = cat || 'all';
   const grid = document.getElementById('cars-grid');
-  const list = activeCat === 'all' ? CARS : CARS.filter(c => c.cat === activeCat);
+  // Link-only cars (set in the fleet app) stay off the list; their own link still opens them.
+  const listed = CARS.filter(c => !c.linkOnly);
+  const list = activeCat === 'all' ? listed : listed.filter(c => c.cat === activeCat);
 
   if (!list.length) {
     grid.innerHTML = '<div class="empty-state">No cars available in this category.</div>';

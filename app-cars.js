@@ -39,6 +39,8 @@ window.loadAppCars = async function (toDeliveryUrl) {
         imgs:     Array.isArray(c.imgs) ? c.imgs.map(fix) : [],
         features: Array.isArray(c.features) ? c.features : [],
         desc:     c.desc || '',
+        descAr:   c.descAr || '',
+        descSq:   c.descSq || '',
         linkOnly: c.main === false,   // reachable by its own link, left off the main list
         _order:   typeof c.order === 'number' ? c.order : 1e9 + i,
       };

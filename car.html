@@ -105,7 +105,6 @@
     html[lang="ar"] .gal-prev { left: auto; right: 12px; }
     html[lang="ar"] .gal-next { right: auto; left: 12px; }
     html[lang="ar"] .gal-counter { right: auto; left: 12px; }
-    html:not([lang="en"]) .car-desc { display: none !important; }
 
     /* ── PAGE ── */
     .page {
@@ -627,6 +626,9 @@
 
   // Single render pass — runs on initial load with hardcoded CARS,
   // and again after Firebase data arrives (see __udriveApplyCars below).
+  /* The car's description in the language being read (nothing if not written). */
+  function descText(car) { return (lang === 'ar' ? car.descAr : lang === 'sq' ? car.descSq : car.desc) || ''; }
+
   function render() {
     car = window.findCarBySlugOrId ? window.findCarBySlugOrId(slugOrId) : car;
     galIdx = 0;
@@ -685,13 +687,13 @@
                 </div>
               `).join('')}
             </div>` : ''}
-          ${car.desc && lang === 'en' ? `<p class="car-desc car-desc-desktop">${car.desc}</p>` : ''}
+          ${descText(car) ? `<p class="car-desc car-desc-desktop">${descText(car)}</p>` : ''}
         </div>
 
         <div class="details">
           <span class="cat-badge cat-${car.cat}">${CAT_LABEL[car.cat] || car.cat}</span>
           <h1 class="car-title">${car.name}</h1>
-          ${car.desc && lang === 'en' ? `<p class="car-desc car-desc-mobile">${car.desc}</p>` : ''}
+          ${descText(car) ? `<p class="car-desc car-desc-mobile">${descText(car)}</p>` : ''}
 
           <div class="price-row">
             <span class="price-num">€${car.ppd}</span>
